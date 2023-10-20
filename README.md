@@ -1,2 +1,2 @@
-# SynExperimentZoo
-The dev environment for CV related researches using synthetic data for deep learning
+# SynthExperimentZoo
+Workspace and development area for any CV task using synthetic data for deep learning.
