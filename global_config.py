@@ -18,8 +18,12 @@ disable_progress_bar = False
 server_config = -1
 num_workers = -1
 
-a_path = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-b_path = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+a_path_base = ""
+b_path_base = ""
+a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
 
 sr_network_version = "VXX.XX"
 sr_iteration = -1

@@ -53,8 +53,9 @@ def load_train_img2img_dataset(a_path, b_path):
         a_list += a_list_dup
         b_list += b_list_dup
 
-    random.shuffle(a_list)
-    random.shuffle(b_list)
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
 
     img_length = len(a_list)
     print("Length of images: %d %d"  % (img_length, len(b_list)))
@@ -76,14 +77,15 @@ def load_test_img2img_dataset(a_path, b_path):
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
 
-    random.shuffle(a_list)
-    random.shuffle(b_list)
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
 
     img_length = len(a_list)
     print("Length of images: %d %d" % (img_length, len(b_list)))
 
     data_loader = torch.utils.data.DataLoader(
-        image_datasets.PairedImageDataset(a_list, b_list, 1),
+        image_datasets.PairedImageDataset(a_list, b_list, 2),
         batch_size=global_config.test_size,
         num_workers=1
     )

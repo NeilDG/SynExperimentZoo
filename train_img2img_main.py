@@ -36,51 +36,63 @@ def update_config(opts):
     global_config.cuda_device = opts.cuda_device
     global_config.sr_network_version = opts.network_version
     global_config.sr_iteration = opts.iteration
-    global_config.test_size = 8
+    global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_a_version = network_config["dataset_version"]
-    dataset_b_version = network_config["dataset_version"]
+    dataset_version = network_config["dataset_version"]
+
     if(global_config.server_config == 0): #COARE
         global_config.num_workers = 6
         global_config.disable_progress_bar = True
-        global_config.a_path = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.a_path_train = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         print("Using COARE configuration. Workers: ", global_config.num_workers)
 
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
-        global_config.a_path = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.a_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using CCS configuration. Workers: ", global_config.num_workers)
 
     elif(global_config.server_config == 2): #RTX 2080Ti
         global_config.num_workers = 6
-        global_config.a_path = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.a_path_train = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/scratch1/scratch2/neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.load_size = network_config["load_size"][2]
         print("Using RTX 2080Ti configuration. Workers: ", global_config.num_workers)
 
     elif(global_config.server_config == 3): #RTX 3090 PC
         global_config.num_workers = 12
-        global_config.a_path = "X:/{dataset_version}/SuperRes Dataset/low/test_images/*.jpg"
-        global_config.b_path = "X:/{dataset_version}/SuperRes Dataset/high/test_images/*.jpg"
+        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 4):  # @TITAN1 - 3
         global_config.num_workers = 4
-        global_config.a_path = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.a_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
 
-    global_config.a_path = global_config.a_path.format(dataset_version=dataset_b_version)
-    global_config.b_path = global_config.b_path.format(dataset_version=dataset_b_version)
+    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version)
+    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version)
+    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version)
+    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version)
 
 
 def main(argv):
@@ -111,16 +123,18 @@ def main(argv):
     hyperparams_table = hyperparam_config["hyperparams"][network_iteration]
     print("Network iteration:", str(network_iteration), ". Hyper parameters: ", hyperparams_table, " Learning rates: ", network_config["g_lr"], network_config["d_lr"])
 
-    a_path = global_config.a_path
-    b_path = global_config.b_path
+    a_path_train = global_config.a_path_train
+    b_path_train = global_config.b_path_train
+    a_path_test = global_config.a_path_test
+    b_path_test = global_config.b_path_test
 
-    print("Dataset path A: ", a_path)
-    print("Dataset path B: ", b_path)
+    print("Dataset path A: ", a_path_train, a_path_test)
+    print("Dataset path B: ", b_path_train, b_path_test)
 
     plot_utils.VisdomReporter.initialize()
 
-    train_loader, train_count = dataset_loader.load_train_img2img_dataset(a_path, b_path)
-    test_loader, test_count = dataset_loader.load_test_img2img_dataset(a_path, b_path)
+    train_loader, train_count = dataset_loader.load_train_img2img_dataset(a_path_train, b_path_train)
+    test_loader, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
     img2img_t = paired_trainer.PairedTrainer(device)
 
     iteration = 0
@@ -136,35 +150,29 @@ def main(argv):
     pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
     pbar.update(current_progress)
 
-    # for epoch in range(start_epoch, network_config["max_epochs"]):
-    #     for i, (_, a_batch, b_batch) in enumerate(train_loader, 0):
-    #         a_batch = a_batch.to(device, non_blocking = True)
-    #         b_batch = b_batch.to(device, non_blocking = True)
-    #         input_map = {"img_a" : a_batch, "img_b" : b_batch}
-    #         img2img_t.train(epoch, iteration, input_map, input_map)
-    #
-    #         iteration = iteration + 1
-    #         pbar.update(1)
-    #
-    #         if(img2img_t.is_stop_condition_met()):
-    #             break
-    #
-    #         if(iteration % opts.save_per_iter == 0):
-    #             img2img_t.save_states(epoch, iteration, True)
-    #
-    #             if(global_config.plot_enabled == 1):
-    #                 img2img_t.visdom_plot(iteration)
-    #                 img2img_t.visdom_visualize(input_map, "Train")
-    #
-    #                 _, a_test_batch, b_test_batch = next(iter(test_loader))
-    #                 a_test_batch = a_test_batch.to(device, non_blocking = True)
-    #                 b_test_batch = b_test_batch.to(device, non_blocking = True)
-    #
-    #                 input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-    #                 img2img_t.visdom_visualize(input_map, "Test")
-    #
-    #     if(img2img_t.is_stop_condition_met()):
-    #         break
+    for epoch in range(start_epoch, network_config["max_epochs"]):
+        for i, (_, a_batch, b_batch) in enumerate(train_loader, 0):
+            a_batch = a_batch.to(device, non_blocking = True)
+            b_batch = b_batch.to(device, non_blocking = True)
+            input_map = {"img_a" : a_batch, "img_b" : b_batch}
+            img2img_t.train(epoch, iteration, input_map)
+
+            iteration = iteration + 1
+            pbar.update(1)
+
+            if(iteration % opts.save_per_iter == 0):
+                img2img_t.save_states(epoch, iteration, True)
+
+                if(global_config.plot_enabled == 1):
+                    img2img_t.visdom_plot(iteration)
+                    img2img_t.visdom_visualize(input_map, "Train")
+
+                    _, a_test_batch, b_test_batch = next(iter(test_loader))
+                    a_test_batch = a_test_batch.to(device, non_blocking = True)
+                    b_test_batch = b_test_batch.to(device, non_blocking = True)
+
+                    input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+                    img2img_t.visdom_visualize(input_map, "Test")
 
     pbar.close()
 

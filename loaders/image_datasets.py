@@ -4,6 +4,7 @@ import random
 import torch
 import cv2
 import numpy as np
+from torch import nn
 from torch.utils import data
 from matplotlib import pyplot as plt
 import torchvision.transforms as transforms
@@ -35,15 +36,23 @@ class PairedImageDataset(data.Dataset):
 
         if (self.transform_config == 1):
             patch_size = config_holder.get_network_attribute("patch_size", 32)
+            self.initial_op = transforms.Compose([
+                transforms.ToPILImage(),
+                # transforms.Resize((256, 256), antialias=True),
+                transforms.RandomCrop(patch_size),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
+                transforms.RandomAdjustSharpness(1.25),
+                transforms.RandomAutocontrast(),
+                transforms.RandomInvert(),
+                transforms.ToTensor()
+            ])
         else:
-            patch_size = 256
-
-        self.patch_size = (patch_size, patch_size)
-        self.initial_op = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize((256, 256), antialias=True),
-            transforms.ToTensor()
-        ])
+            self.initial_op = transforms.Compose([
+                transforms.ToPILImage(),
+                # transforms.Resize((4096, 4096), antialias=True),
+                transforms.ToTensor()
+            ])
 
         self.norm_op = transforms.Normalize((0.5, ), (0.5, ))
 
@@ -52,8 +61,10 @@ class PairedImageDataset(data.Dataset):
 
         a_img = cv2.imread(self.a_list[idx])
         a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
+        state = torch.get_rng_state()
         a_img = self.initial_op(a_img)
 
+        torch.set_rng_state(state)
         b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
         b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
         b_img = self.initial_op(b_img)

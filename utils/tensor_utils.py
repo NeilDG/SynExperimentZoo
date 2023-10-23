@@ -91,6 +91,31 @@ def normalize_to_01(input_tensor):
 def normalize_for_gan(input_tensor):
     return transform_functional.normalize(input_tensor, [0.5,], [0.5,])
 
+#performs network inference via patch-based approach --> suitable for transformer-based models that cannot
+# do sliding-window style of inference like CNNs
+def patched_infer(img_tensor, model_G, patch_size, padding):
+    orig_h = np.shape(img_tensor)[2]
+    orig_w = np.shape(img_tensor)[3]
+
+    patch_op = kornia.contrib.ExtractTensorPatches(patch_size, patch_size, padding)
+    img_a = patch_op(img_tensor)
+
+    img_patch = img_a[:, 0]
+    img_a2b_patches = torch.unsqueeze(model_G(img_patch), 1)
+    for i in range(1, np.shape(img_a)[1]):
+        img_patch = img_a[:, i]
+        img_a2b_patch = torch.unsqueeze(model_G(img_patch), 1)
+        img_a2b_patches = torch.cat([img_a2b_patches, img_a2b_patch], dim=1)
+
+    print("Shape of patches: ", np.shape(img_a2b_patches), patch_size, padding)
+
+    hpad_check = (orig_h + padding[2] + padding[3]) % patch_size
+    wpad_check = (orig_w + padding[0] + padding[1]) % patch_size
+    print("Hpad check: ", hpad_check, "Wpad check: ", wpad_check)
+    unpatch_op = kornia.contrib.CombineTensorPatches((orig_h, orig_w), patch_size, padding)
+    img_a2b_patches = unpatch_op(img_a2b_patches)
+    return img_a2b_patches
+
 # loads an image compatible with opencv
 def load_image(file_path):
     img = cv2.imread(file_path)

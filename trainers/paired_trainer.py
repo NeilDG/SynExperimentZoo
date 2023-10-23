@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Paired trainer used for training.
+import numpy as np
+
 from config.network_config import ConfigHolder
 from losses import common_losses
 import global_config
@@ -9,8 +11,7 @@ import itertools
 
 from model.modules import image_pool
 from trainers import early_stopper, abstract_iid_trainer
-from utils import plot_utils
-
+from utils import plot_utils, tensor_utils
 
 
 class PairedTrainer:
@@ -44,7 +45,7 @@ class PairedTrainer:
         self.schedulerD = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizerD, patience=100000 / self.batch_size, threshold=0.00005)
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
-        self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pt'
+        self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
         self.load_saved_state()
 
     def initialize_dict(self):
@@ -150,8 +151,12 @@ class PairedTrainer:
             img_a = input_map["img_a"]
 
             self.G_A2B.eval()
-            img_a2b = self.G_A2B(img_a)
-            return img_a2b
+            if(label == "Test"):
+                img_a2b = tensor_utils.patched_infer(img_a, self.G_A2B, 64, (32, 32, 536, 536))
+                return img_a2b
+            else:
+                img_a2b = self.G_A2B(img_a)
+                return img_a2b
 
     def visdom_plot(self, iteration):
         self.visdom_reporter.plot_finegrain_loss("a2b_loss", iteration, self.losses_dict, self.caption_dict, global_config.sr_network_version)
@@ -163,7 +168,8 @@ class PairedTrainer:
             img_a = input_map["img_a"]
             img_b = input_map["img_b"]
 
-            img_a2b = self.test(input_map)
+            print("Test shapes: ", np.shape(img_a), np.shape(img_b))
+            img_a2b = self.test(input_map, label)
 
             self.visdom_reporter.plot_image(img_a, str(label) + " Input A Images - " + network_version + str(self.iteration))
             self.visdom_reporter.plot_image(img_a2b, str(label) + " A2B Transfer " + network_version + str(self.iteration))
@@ -191,7 +197,7 @@ class PairedTrainer:
         except:
             # check if a .checkpt is available, load it
             try:
-                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pt.checkpt"
+                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
                 checkpoint = torch.load(checkpt_name, map_location=self.gpu_device)
             except:
                 checkpoint = None
