@@ -164,7 +164,7 @@ class PairedTrainer:
             img_a = input_map["img_a"]
 
             self.G_A2B.eval()
-            if(label == "Test"):
+            if("Test" in label):
                 img_a2b = tensor_utils.patched_infer(img_a, self.G_A2B, 64, (536, 536, 32, 32))
                 return img_a2b
             else:

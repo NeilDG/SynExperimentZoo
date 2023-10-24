@@ -10,7 +10,7 @@ from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
-from testers import img2img_tester
+from testers import paired_tester
 from tqdm import tqdm
 import yaml
 from yaml.loader import SafeLoader
@@ -29,68 +29,68 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.style_transfer_version = opts.sr_network_version
-    global_config.st_iteration = opts.iteration
-    global_config.test_size = 64
-    global_config.save_images = opts.save_images
+    global_config.sr_network_version = opts.network_version
+    global_config.sr_iteration = opts.iteration
+    global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_a_version = network_config["dataset_a_version"]
-    dataset_b_version = network_config["dataset_b_version"]
-    global_config.dataset_target = dataset_a_version
+    dataset_version = network_config["dataset_version"]
 
     if (global_config.server_config == 0):  # COARE
         global_config.num_workers = 6
         global_config.disable_progress_bar = True
-        global_config.path = "/scratch1/scratch2/neil.delgallego/SynthV3_Raw/{dataset_version}/sequence.0/"
+        global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
         print("Using COARE configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 1):  # CCS Cloud
         global_config.num_workers = 12
-        global_config.a_path = "/home/jupyter-neil.delgallego/"
-        global_config.b_path = "/home/jupyter-neil.delgallego/SynthWeather Dataset 10/{dataset_version}/rgb_noshadows/*/*.png"
+        global_config.a_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using CCS configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 2):  # RTX 2080Ti
         global_config.num_workers = 6
-        global_config.a_path = "C:/Datasets/Places Dataset/*.jpg"
-        global_config.b_path = "C:/Datasets/SynthV3_Raw/{dataset_version}/sequence.0/*.camera.png"
+        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using RTX 2080Ti configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 3):  # RTX 3090 PC
         global_config.num_workers = 12
-        global_config.a_path = "X:"
-        global_config.b_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb_noshadows/*/*.png"
+        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
 
-    elif (global_config.server_config == 4):  # RTX 2070 PC @RL208
+    elif (global_config.server_config == 4):  # @TITAN1 - 3
         global_config.num_workers = 4
-        global_config.batch_size = network_config["batch_size"][0]
-        global_config.load_size = network_config["load_size"][0]
-        global_config.path = "D:/Datasets/SynthV3_Raw/{dataset_version}/sequence.0/"
-        print("Using RTX 2070 @RL208 configuration. Workers: ", global_config.num_workers)
-
-    elif (global_config.server_config == 5):  # @TITAN1 - 3
-        global_config.num_workers = 4
+        global_config.a_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        global_config.a_path = "/home/neildelgallego/Places Dataset/*.jpg"
-        global_config.b_path = "/home/neildelgallego/SynthV3_Raw/{dataset_version}/sequence.0/*.camera.png"
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
 
-    if (dataset_a_version == "istd"):
-        global_config.a_path = global_config.a_path + "/ISTD_Dataset/train/train_C/*.png"
-    elif (dataset_a_version == "srd"):
-        global_config.a_path = global_config.a_path + "/SRD_Train/shadow_free/*.jpg"
-    else:
-        global_config.a_path = global_config.a_path + "/Places Dataset/*.jpg"
-    global_config.b_path = global_config.b_path.format(dataset_version=dataset_b_version)
+    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version)
+    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version)
+    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version)
+    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version)
 
 
 def main(argv):
@@ -104,8 +104,8 @@ def main(argv):
     np.random.seed(manualSeed)
 
     yaml_config = "./hyperparam_tables/{network_version}.yaml"
-    yaml_config = yaml_config.format(network_version=opts.sr_network_version)
-    hyperparam_path = "./hyperparam_tables/synth2real_iter.yaml"
+    yaml_config = yaml_config.format(network_version=opts.network_version)
+    hyperparam_path = "./hyperparam_tables/common_iter.yaml"
     with open(yaml_config) as f, open(hyperparam_path) as h:
         ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader))
 
@@ -117,21 +117,23 @@ def main(argv):
 
     network_config = ConfigHolder.getInstance().get_network_config()
     hyperparam_config = ConfigHolder.getInstance().get_hyper_params()
-    network_iteration = global_config.st_iteration
+    network_iteration = global_config.sr_iteration
     hyperparams_table = hyperparam_config["hyperparams"][network_iteration]
     print("Network iteration:", str(network_iteration), ". Hyper parameters: ", hyperparams_table, " Learning rates: ", network_config["g_lr"], network_config["d_lr"])
 
-    a_path = global_config.a_path
-    b_path = global_config.b_path
+    a_path_train = global_config.a_path_train
+    b_path_train = global_config.b_path_train
+    a_path_test = global_config.a_path_test
+    b_path_test = global_config.b_path_test
 
-    print("Dataset path A: ", a_path)
-    print("Dataset path B: ", b_path)
+    print("Dataset path A: ", a_path_train, a_path_test)
+    print("Dataset path B: ", b_path_train, b_path_test)
 
     plot_utils.VisdomReporter.initialize()
 
-    test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path, b_path)
+    test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
 
-    img2img_t = img2img_tester.Img2ImgTester(device)
+    img2img_t = paired_tester.PairedTester(device)
     start_epoch = global_config.last_epoch_st
     print("---------------------------------------------------------------------------")
     print("Started synth test loop for mode: synth2real", " Set start epoch: ", start_epoch)
@@ -145,6 +147,14 @@ def main(argv):
     pbar.update(current_progress)
 
     with torch.no_grad():
+        _, a_test_batch, b_test_batch = next(iter(test_loader_a))
+        a_test_batch = a_test_batch.to(device)
+        b_test_batch = b_test_batch.to(device)
+        input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+        if (global_config.plot_enabled == 1):
+            img2img_t.visualize_results(input_map, "Test")
+        img2img_t.report_metrics("Test")
+
         for i, (file_name, a_batch, b_batch) in enumerate(test_loader_a, 0):
             a_batch = a_batch.to(device)
             b_batch = b_batch.to(device)
@@ -158,48 +168,40 @@ def main(argv):
 
         pbar.close()
 
-        _, a_test_batch, b_test_batch = next(iter(test_loader_a))
-        a_test_batch = a_test_batch.to(device)
-        b_test_batch = b_test_batch.to(device)
-        input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-        if (global_config.plot_enabled == 1):
-            img2img_t.visualize_results(input_map, "Synth2Real")
-        img2img_t.report_metrics("Synth2Real")
-
-    network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_b_version = network_config["dataset_b_version"]
-
-    rgb_noshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb_noshadows/*/*.png"
-    rgb_withshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb/*/*.png"
-    rgb_noshadows_path = rgb_noshadows_path.format(dataset_version=dataset_b_version)
-    rgb_withshadows_path = rgb_withshadows_path.format(dataset_version=dataset_b_version)
-
-    test_rgb_noshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_noshadows_path)
-    test_rgb_withshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_withshadows_path)
-
-    #compute total progress
-    steps = global_config.test_size
-    needed_progress = int(test_count / steps) + 1
-    current_progress = 0
-    pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
-    pbar.update(current_progress)
-
-    if (global_config.save_images == 1):
-        with torch.no_grad():
-            for i, (noshadows_data, withshadows_data) in enumerate(zip(test_rgb_noshadows, test_rgb_withshadows)):
-                file_name, img_batch = noshadows_data
-                img_batch = img_batch.to(device, non_blocking = True)
-                input_map_a = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
-
-                file_name, img_batch = withshadows_data
-                img_batch = img_batch.to(device, non_blocking = True)
-                input_map_b = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
-
-                img2img_t.save_images(input_map_a, input_map_b)
-                pbar.set_description("Successfully saved images for batch")
-                pbar.update(1)
-
-            pbar.close()
+    # network_config = ConfigHolder.getInstance().get_network_config()
+    # dataset_b_version = network_config["dataset_b_version"]
+    #
+    # rgb_noshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb_noshadows/*/*.png"
+    # rgb_withshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb/*/*.png"
+    # rgb_noshadows_path = rgb_noshadows_path.format(dataset_version=dataset_b_version)
+    # rgb_withshadows_path = rgb_withshadows_path.format(dataset_version=dataset_b_version)
+    #
+    # test_rgb_noshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_noshadows_path)
+    # test_rgb_withshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_withshadows_path)
+    #
+    # #compute total progress
+    # steps = global_config.test_size
+    # needed_progress = int(test_count / steps) + 1
+    # current_progress = 0
+    # pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
+    # pbar.update(current_progress)
+    #
+    # if (global_config.save_images == 1):
+    #     with torch.no_grad():
+    #         for i, (noshadows_data, withshadows_data) in enumerate(zip(test_rgb_noshadows, test_rgb_withshadows)):
+    #             file_name, img_batch = noshadows_data
+    #             img_batch = img_batch.to(device, non_blocking = True)
+    #             input_map_a = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
+    #
+    #             file_name, img_batch = withshadows_data
+    #             img_batch = img_batch.to(device, non_blocking = True)
+    #             input_map_b = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
+    #
+    #             img2img_t.save_images(input_map_a, input_map_b)
+    #             pbar.set_description("Successfully saved images for batch")
+    #             pbar.update(1)
+    #
+    #         pbar.close()
 
 
 if __name__ == "__main__":

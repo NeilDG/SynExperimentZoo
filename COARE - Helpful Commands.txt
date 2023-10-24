@@ -4,7 +4,7 @@ clear
 
 //For directories
 cd scratch3/SynExperimentZoo
-cd scratch3/SynExperimentZoo
+cd scratch3/SynExperimentZoo-2
 cd scratch3/Visdom
 unzip "scratch3/SynthWeather Dataset 10.zip"
 
@@ -28,8 +28,8 @@ sbatch --dependency=afterany:466264 script_2.slurm "rgb2sm_v61.52_istd+srd" 1
 
 sbatch script_debug.slurm "mobisr_v01.00_mipd" 1
 sbatch slurm_download.sh 0
-sbatch script_1.slurm "rgb2sm_v61.53_istd+srd" 1
-sbatch script_2.slurm "rgb2sm_v61.76_istd+srd" 1
+sbatch script_1.slurm "mobisr_v01.00_mipd" 1
+sbatch script_2.slurm "mobisr_v01.00_mipd" 2
 
 sbatch --dependency=afterany:342338 script_debug.slurm
 sbatch --dependency=afterany:475267 script_1.slurm "rgb2sm_v61.53_istd+srd" 1
