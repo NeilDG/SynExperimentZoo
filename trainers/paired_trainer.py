@@ -52,9 +52,11 @@ class PairedTrainer:
         # dictionary keys
         self.G_LOSS_KEY = "g_loss"
         self.G_ADV_LOSS_KEY = "g_adv"
-        self.LIKENESS_LOSS_KEY = "likeness"
-        self.RMSE_LOSS_KEY = "rmse_loss"
+        self.L1_LOSS_KEY = "l1_loss"
+        self.COLOR_LOSS_KEY = "color_loss"
+        self.TV_LOSS_KEY = "tv_loss"
         self.SSIM_LOSS_KEY = "ssim_loss"
+        self.PERCEPTUAL_LOSS_KEY = "perceptual_loss"
 
         self.D_OVERALL_LOSS_KEY = "d_loss"
         self.D_B_LOSS_KEY = "d_b"
@@ -63,19 +65,23 @@ class PairedTrainer:
         self.losses_dict = {}
         self.losses_dict[self.G_LOSS_KEY] = []
         self.losses_dict[self.D_OVERALL_LOSS_KEY] = []
-        self.losses_dict[self.LIKENESS_LOSS_KEY] = []
+        self.losses_dict[self.L1_LOSS_KEY] = []
         self.losses_dict[self.G_ADV_LOSS_KEY] = []
-        self.losses_dict[self.RMSE_LOSS_KEY] = []
+        self.losses_dict[self.COLOR_LOSS_KEY] = []
+        self.losses_dict[self.TV_LOSS_KEY] = []
         self.losses_dict[self.SSIM_LOSS_KEY] = []
+        self.losses_dict[self.PERCEPTUAL_LOSS_KEY] = []
         self.losses_dict[self.D_B_LOSS_KEY] = []
 
         self.caption_dict = {}
         self.caption_dict[self.G_LOSS_KEY] = "Shadow G loss per iteration"
         self.caption_dict[self.D_OVERALL_LOSS_KEY] = "D loss per iteration"
-        self.caption_dict[self.LIKENESS_LOSS_KEY] = "L1 loss per iteration"
+        self.caption_dict[self.L1_LOSS_KEY] = "L1 loss per iteration"
         self.caption_dict[self.G_ADV_LOSS_KEY] = "G adv loss per iteration"
-        self.caption_dict[self.RMSE_LOSS_KEY] = "RMSE loss per iteration"
+        self.caption_dict[self.COLOR_LOSS_KEY] = "Color loss per iteration"
+        self.caption_dict[self.TV_LOSS_KEY] = "TV loss per iteration"
         self.caption_dict[self.SSIM_LOSS_KEY] = "SSIM loss per iteration"
+        self.caption_dict[self.PERCEPTUAL_LOSS_KEY] = "Perceptual loss per iteration"
         self.caption_dict[self.D_B_LOSS_KEY] = "D(B) real loss per iteration"
 
         # what to store in visdom?
@@ -119,6 +125,10 @@ class PairedTrainer:
             img_a2b = self.G_A2B(img_a)
 
             B_likeness_loss = self.common_losses.compute_l1_loss(img_a2b, img_b)
+            B_perceptual_loss = self.common_losses.compute_perceptual_loss(img_a2b, img_b)
+            B_color_loss = self.common_losses.compute_color_loss(img_a2b, img_b)
+            B_tv_loss = self.common_losses.compute_total_variation_loss(img_a2b)
+
             prediction = self.D_B(img_a2b)
             real_tensor = torch.ones_like(prediction)
             B_adv_loss = self.common_losses.compute_adversarial_loss(prediction, real_tensor)
@@ -135,8 +145,11 @@ class PairedTrainer:
                 if (iteration > 10):
                     self.losses_dict[self.G_LOSS_KEY].append(errG.item())
                     self.losses_dict[self.D_OVERALL_LOSS_KEY].append(errD.item())
-                    self.losses_dict[self.LIKENESS_LOSS_KEY].append(B_likeness_loss.item())
+                    self.losses_dict[self.L1_LOSS_KEY].append(B_likeness_loss.item())
                     self.losses_dict[self.G_ADV_LOSS_KEY].append(B_adv_loss.item())
+                    self.losses_dict[self.PERCEPTUAL_LOSS_KEY].append(B_perceptual_loss.item())
+                    self.losses_dict[self.COLOR_LOSS_KEY].append(B_color_loss.item())
+                    self.losses_dict[self.TV_LOSS_KEY].append(B_tv_loss.item())
                     self.losses_dict[self.D_B_LOSS_KEY].append(D_B_fake_loss.item() + D_B_real_loss.item())
 
         a2b = self.test(input_map, "Train")
@@ -152,7 +165,7 @@ class PairedTrainer:
 
             self.G_A2B.eval()
             if(label == "Test"):
-                img_a2b = tensor_utils.patched_infer(img_a, self.G_A2B, 64, (32, 32, 536, 536))
+                img_a2b = tensor_utils.patched_infer(img_a, self.G_A2B, 64, (536, 536, 32, 32))
                 return img_a2b
             else:
                 img_a2b = self.G_A2B(img_a)

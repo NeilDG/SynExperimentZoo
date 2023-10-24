@@ -167,12 +167,12 @@ def main(argv):
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 
-                    _, a_test_batch, b_test_batch = next(iter(test_loader))
-                    a_test_batch = a_test_batch.to(device, non_blocking = True)
-                    b_test_batch = b_test_batch.to(device, non_blocking = True)
-
-                    input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-                    img2img_t.visdom_visualize(input_map, "Test")
+                    # _, a_test_batch, b_test_batch = next(iter(test_loader))
+                    # a_test_batch = a_test_batch.to(device, non_blocking = True)
+                    # b_test_batch = b_test_batch.to(device, non_blocking = True)
+                    #
+                    # input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+                    # img2img_t.visdom_visualize(input_map, "Test")
 
     pbar.close()
 

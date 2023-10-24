@@ -75,7 +75,7 @@ class NetworkCreator():
             G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=network_config["use_cbam"], norm=norm_mode).to(self.gpu_device)
         elif (net_config == 2):
             G_A = unet_gan.UnetGenerator(input_nc=input_nc, output_nc=3, num_downs=num_blocks).to(self.gpu_device)
-        else:
+        elif (net_config == 3):
             print("Using AdainGEN")
             params = {'dim': 64,  # number of filters in the bottommost layer
                       'mlp_dim': 256,  # number of filters in MLP
@@ -86,6 +86,8 @@ class NetworkCreator():
                       'n_res': network_config["num_blocks"],  # number of residual blocks in content encoder/decoder
                       'pad_type': 'reflect'}
             G_A = usi3d_gan.AdaINGen(input_dim=3, output_dim=3, params=params).to(self.gpu_device)
+        else:
+            G_A = ffa_gan.FFABase(num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
 
         return G_A, D_A
 
