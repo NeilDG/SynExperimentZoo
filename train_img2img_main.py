@@ -48,6 +48,8 @@ def update_config(opts):
         global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
         global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
         global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
         print("Using COARE configuration. Workers: ", global_config.num_workers)
 
     elif(global_config.server_config == 1): #CCS Cloud
@@ -66,6 +68,7 @@ def update_config(opts):
         global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
         global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
         global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using RTX 2080Ti configuration. Workers: ", global_config.num_workers)
 
