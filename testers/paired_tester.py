@@ -18,19 +18,23 @@ class PairedTester():
         self.img2img_t = paired_trainer.PairedTrainer(self.gpu_device)
         self.l1_loss = nn.L1Loss(reduction='mean')
         self.mse_loss = nn.MSELoss(reduction='mean')
+        self.ssim_loss = kornia.losses.SSIMLoss(5)
 
         self.visdom_reporter = plot_utils.VisdomReporter.getInstance()
 
         self.l1_results = []
         self.mse_results = []
         self.psnr_results = []
+        self.ssim_results = []
 
-    def save_images(self, input_map_a, input_map_b):
-        img_a2b = self.img2img_t.test(input_map_a)  # a2b --> real2synth, b2a --> synth2real
-        file_name = input_map_a["file_name"]
+    def save_images(self, input_map):
+        img_a2b = self.img2img_t.test(input_map)  # a2b --> real2synth, b2a --> synth2real
+        file_name = input_map["file_name"]
+        img_b = input_map["img_b"]
 
-        img_path_like = "./reports/Synth2Real/high-like/"
-        img_path = "./reports/Synth2Real/high/"
+        version_name = network_config.ConfigHolder.getInstance().get_sr_version_name()
+        img_path_like = "./reports/" + version_name +  "/high-like/"
+        img_path = "./reports/" + version_name + "/high/"
 
         if not os.path.exists(img_path_like):
             os.makedirs(img_path_like, exist_ok=True)
@@ -40,15 +44,13 @@ class PairedTester():
 
         for i in range(0, len(file_name)):
             impath = img_path_like + file_name[i] + "-high-like.png"
-            torchvision.utils.save_image(img_a2b, impath, normalize = True)
+            torchvision.utils.save_image(img_a2b[i], impath, normalize = True)
             # print("Saved image (no shadows) : ", impath)
 
-        file_name = input_map_b["file_name"]
-        img_b = input_map_b["img_b"]
         for i in range(0, len(file_name)):
             impath = img_path + file_name[i] + ".png"
             torchvision.utils.save_image(img_b[i], impath, normalize = True)
-            # print("Saved image (with shadows) : ", impath)
+            print("Saved image : ", impath)
 
     #measures the performance of a given batch and stores it
     def measure_and_store(self, input_map):
@@ -69,6 +71,9 @@ class PairedTester():
         mse_result = self.mse_loss(img_a2b, target).cpu()
         self.mse_results.append(mse_result)
 
+        ssim_result = self.ssim_loss(img_a2b, target).cpu()
+        self.ssim_results.append(ssim_result)
+
     def visualize_results(self, input_map, dataset_title):
         version_name = network_config.ConfigHolder.getInstance().get_sr_version_name()
         self.img2img_t.visdom_visualize(input_map, "Test - " + version_name + " " + dataset_title)
@@ -85,9 +90,13 @@ class PairedTester():
         mse_mean = np.round(np.mean(self.mse_results), 4)
         self.mse_results.clear()
 
+        ssim_mean = np.round(np.mean(self.ssim_results), 4)
+        self.ssim_results.clear()
+
         last_epoch = global_config.last_epoch_st
         self.visdom_reporter.plot_text(dataset_title + " Results - " + version_name + " Last epoch: " + str(last_epoch) + "<br>"
                                         + "Dataset: " + str(global_config.dataset_target) + "<br>"
                                        + "PSNR: " +str(psnr_mean) + "<br>" 
                                        "Abs Rel: " + str(l1_mean) + "<br>"
-                                        "Sqr Rel: " + str(mse_mean) + "<br>")
+                                        "Sqr Rel: " + str(mse_mean) + "<br>"
+                                       "SSIM: " + str(ssim_mean) + "<br>")

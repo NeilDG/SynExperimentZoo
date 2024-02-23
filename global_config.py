@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+PROJECT_PATH = ""
 DATASET_PLACES_PATH = "X:/Places Dataset/"
 TEST_IMAGE_SIZE = (256, 256)
 
@@ -24,6 +25,9 @@ a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
 b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
 a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
 b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+
+burst_sr_lr_path = ""
+burst_sr_hr_path = ""
 
 sr_network_version = "VXX.XX"
 sr_iteration = -1

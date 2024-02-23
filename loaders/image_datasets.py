@@ -50,7 +50,7 @@ class PairedImageDataset(data.Dataset):
         else:
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
-                # transforms.Resize((4096, 4096), antialias=True),
+                transforms.Resize((512, 512), antialias=True),
                 transforms.ToTensor()
             ])
 

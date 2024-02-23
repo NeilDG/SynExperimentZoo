@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 *.pt
 
+reports/
 checkpoint/*.pt
 checkpoint/*.pt.checkpt
 checkpoint/*.pth.checkpt
