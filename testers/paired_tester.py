@@ -42,12 +42,13 @@ class PairedTester():
         if not os.path.exists(img_path):
             os.makedirs(img_path, exist_ok=True)
 
-        for i in range(0, len(file_name)):
-            impath = img_path_like + file_name[i] + "-high-like.png"
+        for i in range(0, len(img_b)):
+            if(file_name is not None):
+                impath = img_path_like + file_name[i] + "-high-like.png"
             torchvision.utils.save_image(img_a2b[i], impath, normalize = True)
             # print("Saved image (no shadows) : ", impath)
 
-        for i in range(0, len(file_name)):
+        for i in range(0, len(img_b)):
             impath = img_path + file_name[i] + ".png"
             torchvision.utils.save_image(img_b[i], impath, normalize = True)
             print("Saved image : ", impath)

@@ -2,10 +2,14 @@ import itertools
 import sys
 from optparse import OptionParser
 import random
+
+import datasets
 import torch
 import torch.nn.parallel
 import torch.utils.data
 import numpy as np
+from super_image import ImageLoader
+
 from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
@@ -14,6 +18,7 @@ from testers import paired_tester
 from tqdm import tqdm
 import yaml
 from yaml.loader import SafeLoader
+
 
 parser = OptionParser()
 parser.add_option('--server_config', type=int, help="Is running on COARE?", default=0)
@@ -173,63 +178,28 @@ def main(argv):
         #     img2img_t.visualize_results(input_map, "Test")
         #     img2img_t.report_metrics("Test")
 
-        _, a_test_batch, b_test_batch = next(iter(test_loader_b))
-        a_test_batch = a_test_batch.to(device)
-        b_test_batch = b_test_batch.to(device)
-        input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-
-        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
-            a_batch = a_batch.to(device)
-            b_batch = b_batch.to(device)
-
-            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
-            img2img_t.measure_and_store(input_map)
-            img2img_t.save_images(input_map)
-            pbar.update(1)
-
-            if ((i + 1) % 50 == 0):
-                break
-
-        if (global_config.plot_enabled == 1):
-            img2img_t.visualize_results(input_map, "Test")
-            img2img_t.report_metrics("Test")
-
-        pbar.close()
-
-    # network_config = ConfigHolder.getInstance().get_network_config()
-    # dataset_b_version = network_config["dataset_b_version"]
-    #
-    # rgb_noshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb_noshadows/*/*.png"
-    # rgb_withshadows_path = "X:/SynthWeather Dataset 10/{dataset_version}/rgb/*/*.png"
-    # rgb_noshadows_path = rgb_noshadows_path.format(dataset_version=dataset_b_version)
-    # rgb_withshadows_path = rgb_withshadows_path.format(dataset_version=dataset_b_version)
-    #
-    # test_rgb_noshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_noshadows_path)
-    # test_rgb_withshadows, test_count = dataset_loader.load_singleimg_dataset(rgb_withshadows_path)
-    #
-    # #compute total progress
-    # steps = global_config.test_size
-    # needed_progress = int(test_count / steps) + 1
-    # current_progress = 0
-    # pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
-    # pbar.update(current_progress)
-    #
-    # if (global_config.save_images == 1):
-    #     with torch.no_grad():
-    #         for i, (noshadows_data, withshadows_data) in enumerate(zip(test_rgb_noshadows, test_rgb_withshadows)):
-    #             file_name, img_batch = noshadows_data
-    #             img_batch = img_batch.to(device, non_blocking = True)
-    #             input_map_a = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
-    #
-    #             file_name, img_batch = withshadows_data
-    #             img_batch = img_batch.to(device, non_blocking = True)
-    #             input_map_b = {"file_name": file_name, "img_a": img_batch, "img_b": img_batch}
-    #
-    #             img2img_t.save_images(input_map_a, input_map_b)
-    #             pbar.set_description("Successfully saved images for batch")
-    #             pbar.update(1)
-    #
-    #         pbar.close()
+        # _, a_test_batch, b_test_batch = next(iter(test_loader_b))
+        # a_test_batch = a_test_batch.to(device)
+        # b_test_batch = b_test_batch.to(device)
+        # input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+        #
+        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
+        #     a_batch = a_batch.to(device)
+        #     b_batch = b_batch.to(device)
+        #
+        #     input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+        #     img2img_t.measure_and_store(input_map)
+        #     img2img_t.save_images(input_map)
+        #     pbar.update(1)
+        #
+        #     if ((i + 1) % 50 == 0):
+        #         break
+        #
+        # if (global_config.plot_enabled == 1):
+        #     img2img_t.visualize_results(input_map, "Test")
+        #     img2img_t.report_metrics("Test")
+        #
+        # pbar.close()
 
 
 if __name__ == "__main__":
