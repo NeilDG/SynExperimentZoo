@@ -74,10 +74,14 @@ def update_config(opts):
 
     elif (global_config.server_config == 3):  # RTX 3090 PC
         global_config.num_workers = 12
-        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
-        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
-        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        # global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        # global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
+        # global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        # global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
         global_config.burst_sr_lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
         global_config.burst_sr_hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
         global_config.div2k_lr_path = "X:/SuperRes Dataset/div2k/lr/*.png"

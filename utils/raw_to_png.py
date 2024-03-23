@@ -8,6 +8,8 @@ import imageio
 import rawpy
 import sys
 import os
+
+import torchvision
 from torchvision.utils import save_image
 
 
@@ -33,6 +35,10 @@ import pickle as pkl
 import torch.nn.functional as F
 import zipfile
 import shutil
+
+import global_config
+from loaders import dataset_loader
+
 
 def load_txt(path):
     with open(path, 'r') as fh:
@@ -269,7 +275,7 @@ def from_raw_to_png(file):
     imageio.imwrite(new_name, png_image)
 
 def read_canon_raw(file, index):
-    print("Converting canon raw file to image " + file)
+    # print("Converting canon raw file to image " + file)
 
     image = CanonImage.load(file)
     file_name = file + "/im_raw.png"
@@ -280,19 +286,19 @@ def read_canon_raw(file, index):
     # cv2.imwrite(new_name, im_data)
 
 def read_samsung_raw(file, index):
-    print("Converting samsung raw file to image " + file)
+    # print("Converting samsung raw file to image " + file)
 
     image = SamsungRAWImage.load(file)
     file_name = file + "/im_raw.png"
     new_name = file_name.replace("_raw.png", "_rgb_" + str(index) + ".png")
-    im_data = image.get_image_data(True, True, True) * 10.0
+    im_data = image.get_image_data(True, True, True)
     print(new_name)
     save_image(im_data, new_name)
 
 
 def convert_raw_dataset_to_png():
-    gt_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/"
-    lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_**/"
+    gt_path = "X:/SuperRes Dataset/v02_burstsr/*/*/canon/"
+    lr_path = "X:/SuperRes Dataset/v02_burstsr/*/*/samsung_**/"
 
     hr_path_list = glob.glob(gt_path)
     for i in range(0, len(hr_path_list)):
@@ -304,8 +310,30 @@ def convert_raw_dataset_to_png():
         read_samsung_raw(lr_path_list[i], i)
         print(lr_path_list[i])
 
-if __name__ == "__main__":
+def organize_burstsr_files_for_train():
+    lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+    hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
 
-    # raw_file = sys.argv[1]
-    # from_raw_to_png(raw_file)
+    global_config.test_size = 64
+    test_loader, test_count = dataset_loader.load_base_img2img_dataset(lr_path, hr_path)
+    new_lr_path = "X:/SuperRes Dataset/v02_burstsr/lr/"
+    new_hr_path = "X:/SuperRes Dataset/v02_burstsr/hr/"
+
+    if not os.path.exists(new_lr_path):
+        os.makedirs(new_lr_path, exist_ok=True)
+
+    if not os.path.exists(new_hr_path):
+        os.makedirs(new_hr_path, exist_ok=True)
+
+    for i, (file_name, a_batch, b_batch) in enumerate(test_loader, 0):
+        for j in range(0, len(a_batch)):
+            im_path = new_lr_path + file_name[j] + ".png"
+            torchvision.utils.save_image(a_batch[j], im_path, normalize=True)
+
+            im_path = new_hr_path + file_name[j] + ".png"
+            torchvision.utils.save_image(b_batch[j], im_path, normalize=True)
+
+
+if __name__ == "__main__":
     convert_raw_dataset_to_png()
+    organize_burstsr_files_for_train()

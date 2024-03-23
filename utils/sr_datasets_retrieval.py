@@ -37,36 +37,36 @@ def prepare_dir(dir):
 def main(argv):
     with patch("datasets.config.USE_PARQUET_EXPORT", False):
         # DOWNLOAD DIV2K
-        initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x4', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
-        eval_dataset = EvalDataset(initial_dataset)
-
-        input_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/lr/"
-        prepare_dir(input_dir)
-        store_input_dataset_to_local(input_dir, initial_dataset, eval_dataset)
-
-        target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x4/"
-        prepare_dir(input_dir)
-        store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
-
-        initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x2', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
-        eval_dataset = EvalDataset(initial_dataset)
-
-        target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x2/"
-        prepare_dir(input_dir)
-        store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
-
-        initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x8', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
-        eval_dataset = EvalDataset(initial_dataset)
-
-        target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x8/"
-        prepare_dir(input_dir)
-        store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
-
+        # initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x4', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
+        # eval_dataset = EvalDataset(initial_dataset)
+        #
+        # input_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/lr/"
+        # prepare_dir(input_dir)
+        # store_input_dataset_to_local(input_dir, initial_dataset, eval_dataset)
+        #
+        # target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x4/"
+        # prepare_dir(target_dir)
+        # store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
+        #
+        # initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x2', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
+        # eval_dataset = EvalDataset(initial_dataset)
+        #
+        # target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x2/"
+        # prepare_dir(target_dir)
+        # store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
+        #
+        # initial_dataset = load_dataset('eugenesiow/Div2k', 'bicubic_x8', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
+        # eval_dataset = EvalDataset(initial_dataset)
+        #
+        # target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/bicubic_x8/"
+        # prepare_dir(target_dir)
+        # store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
+        #
         initial_dataset = load_dataset('eugenesiow/Div2k', 'realistic_wild_x4', split='validation', cache_dir="./div2k_dataset/", save_infos=True)
         eval_dataset = EvalDataset(initial_dataset)
 
         target_dir = "X:/GithubProjects/SynExperimentZoo/reports/div2k/realistic_wild_x4/"
-        prepare_dir(input_dir)
+        prepare_dir(target_dir)
         store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
 
         # DOWNLOAD URBAN100
@@ -78,7 +78,7 @@ def main(argv):
         store_input_dataset_to_local(input_dir, initial_dataset, eval_dataset)
 
         target_dir = "X:/GithubProjects/SynExperimentZoo/reports/urban100/bicubic_x4/"
-        prepare_dir(input_dir)
+        prepare_dir(target_dir)
         store_highres_dataset_to_local(target_dir, initial_dataset, eval_dataset)
 
 
