@@ -80,6 +80,8 @@ def update_config(opts):
         global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.burst_sr_lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
         global_config.burst_sr_hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+        global_config.div2k_lr_path = "X:/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "X:/SuperRes Dataset/div2k/bicubic_x8/*.png"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
@@ -134,6 +136,8 @@ def main(argv):
     b_path_test = global_config.b_path_test
     burst_sr_lr_path = global_config.burst_sr_lr_path
     burst_sr_hr_path = global_config.burst_sr_hr_path
+    div2k_lr_path = global_config.div2k_lr_path
+    div2k_hr_path = global_config.div2k_hr_path
 
     print("Dataset path A: ", a_path_train, a_path_test)
     print("Dataset path B: ", b_path_train, b_path_test)
@@ -141,7 +145,8 @@ def main(argv):
     plot_utils.VisdomReporter.initialize()
 
     test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
-    test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
+    # test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
+    test_loader_div2k, test_count = dataset_loader.load_test_img2img_dataset(div2k_lr_path, div2k_hr_path)
 
     img2img_t = paired_tester.PairedTester(device)
     start_epoch = global_config.last_epoch_st
@@ -200,6 +205,29 @@ def main(argv):
         #     img2img_t.report_metrics("Test")
         #
         # pbar.close()
+
+        _, a_test_batch, b_test_batch = next(iter(test_loader_div2k))
+        a_test_batch = a_test_batch.to(device)
+        b_test_batch = b_test_batch.to(device)
+        input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+
+        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_div2k, 0):
+            a_batch = a_batch.to(device)
+            b_batch = b_batch.to(device)
+
+            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+            img2img_t.measure_and_store(input_map)
+            img2img_t.save_images(input_map)
+            pbar.update(1)
+
+            if ((i + 1) % 50 == 0):
+                break
+
+        if (global_config.plot_enabled == 1):
+            img2img_t.visualize_results(input_map, "Test")
+            img2img_t.report_metrics("Test")
+
+        pbar.close()
 
 
 if __name__ == "__main__":

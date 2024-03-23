@@ -28,6 +28,8 @@ b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
 
 burst_sr_lr_path = ""
 burst_sr_hr_path = ""
+div2k_lr_path = ""
+div2k_hr_path = ""
 
 sr_network_version = "VXX.XX"
 sr_iteration = -1
