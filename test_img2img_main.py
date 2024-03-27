@@ -76,12 +76,12 @@ def update_config(opts):
         global_config.num_workers = 12
         # global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
         # global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
-        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
-        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
+        # global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
+        # global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
         # global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
         # global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
-        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
-        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
+        # global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
+        # global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
         global_config.burst_sr_lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
         global_config.burst_sr_hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
         global_config.div2k_lr_path = "X:/SuperRes Dataset/div2k/lr/*.png"
@@ -148,7 +148,7 @@ def main(argv):
 
     plot_utils.VisdomReporter.initialize()
 
-    test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
+    # test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
     # test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
     test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
 
