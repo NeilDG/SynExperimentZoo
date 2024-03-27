@@ -17,4 +17,4 @@ min_epochs: 100
 max_epochs: 100
 
 dataset_version: "v02_burstsr"
-dataset_repeats: 3
+dataset_repeats: 50

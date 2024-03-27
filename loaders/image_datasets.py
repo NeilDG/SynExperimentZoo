@@ -36,6 +36,7 @@ class BasePairedImageDataset(data.Dataset):
         ])
 
         self.norm_op = transforms.Normalize((0.5, ), (0.5, ))
+        # self.upsample_size = global_config.upsample_size
 
     def __getitem__(self, idx):
         file_name = self.b_list[idx % len(self.b_list)].split("\\")[-1].split(".")[0]
@@ -43,11 +44,15 @@ class BasePairedImageDataset(data.Dataset):
         a_img = cv2.imread(self.a_list[idx])
         a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
         state = torch.get_rng_state()
-        a_img = self.initial_op(a_img)
 
         torch.set_rng_state(state)
         b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
         b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
+
+        ref_h, ref_w = b_img.shape[:2]
+        a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
+
+        a_img = self.initial_op(a_img)
         b_img = self.initial_op(b_img)
 
         return file_name, a_img, b_img
