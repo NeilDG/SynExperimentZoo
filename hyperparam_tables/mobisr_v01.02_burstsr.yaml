@@ -1,0 +1,20 @@
+model_type: 6
+input_nc: 3
+patch_size: 64
+
+#0 - 24GB, 1 - 32GB, 2 - 10 - 12GB
+batch_size: [24, 32, 8] #amount of images to accumulate before backprop
+load_size: [24, 32, 8] #amount of images to load in GPU. load_size <= batch_size
+
+num_blocks: 3
+weight_decay: 0.0
+dropout_rate: 0.0
+augment_key: ["none"]
+
+g_lr: 0.0002
+d_lr: 0.0005
+min_epochs: 100
+max_epochs: 100
+
+dataset_version: "v02_burstsr"
+dataset_repeats: 50

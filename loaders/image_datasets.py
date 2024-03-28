@@ -24,6 +24,42 @@ def normalize(light_angle):
 
     return scaled
 
+class BasePairedImageDataset(data.Dataset):
+    def __init__(self, a_list, b_list):
+        self.a_list = a_list
+        self.b_list = b_list
+
+        self.initial_op = transforms.Compose([
+            transforms.ToPILImage(),
+            # transforms.Resize((512, 512), antialias=True),
+            transforms.ToTensor()
+        ])
+
+        self.norm_op = transforms.Normalize((0.5, ), (0.5, ))
+        # self.upsample_size = global_config.upsample_size
+
+    def __getitem__(self, idx):
+        file_name = self.b_list[idx % len(self.b_list)].split("\\")[-1].split(".")[0]
+
+        a_img = cv2.imread(self.a_list[idx])
+        a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
+        state = torch.get_rng_state()
+
+        torch.set_rng_state(state)
+        b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
+        b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
+
+        ref_h, ref_w = b_img.shape[:2]
+        a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
+
+        a_img = self.initial_op(a_img)
+        b_img = self.initial_op(b_img)
+
+        return file_name, a_img, b_img
+
+    def __len__(self):
+        return len(self.a_list)
+
 class PairedImageDataset(data.Dataset):
     def __init__(self, a_list, b_list, transform_config):
         self.a_list = a_list
@@ -31,14 +67,15 @@ class PairedImageDataset(data.Dataset):
         self.transform_config = transform_config
 
         config_holder = ConfigHolder.getInstance()
-        self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
-        self.use_tanh = config_holder.get_network_attribute("use_tanh", False)
+        if(config_holder is not None):
+            self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
+            self.use_tanh = config_holder.get_network_attribute("use_tanh", False)
 
         if (self.transform_config == 1):
             patch_size = config_holder.get_network_attribute("patch_size", 32)
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
-                # transforms.Resize((256, 256), antialias=True),
+                # transforms.Resize(patch_size, antialias=True),
                 transforms.RandomCrop(patch_size),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
@@ -50,7 +87,7 @@ class PairedImageDataset(data.Dataset):
         else:
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
-                # transforms.Resize((4096, 4096), antialias=True),
+                transforms.Resize((512, 512), antialias=True),
                 transforms.ToTensor()
             ])
 
@@ -61,12 +98,14 @@ class PairedImageDataset(data.Dataset):
 
         a_img = cv2.imread(self.a_list[idx])
         a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
-        state = torch.get_rng_state()
-        a_img = self.initial_op(a_img)
-
-        torch.set_rng_state(state)
         b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
         b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
+        ref_h, ref_w = b_img.shape[:2]
+        a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
+
+        state = torch.get_rng_state()
+        a_img = self.initial_op(a_img)
+        torch.set_rng_state(state)
         b_img = self.initial_op(b_img)
 
         if(self.use_tanh):

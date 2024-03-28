@@ -6,6 +6,7 @@ import kornia
 import numpy as np
 import torch
 import torchvision.utils
+from super_image.data import EvalDataset
 from torch.utils import data
 import cv2
 import torchvision.transforms as transforms
@@ -53,9 +54,9 @@ def load_train_img2img_dataset(a_path, b_path):
         a_list += a_list_dup
         b_list += b_list_dup
 
-    temp_list = list(zip(a_list, b_list))
-    random.shuffle(temp_list)
-    a_list, b_list = zip(*temp_list)
+    # temp_list = list(zip(a_list, b_list))
+    # random.shuffle(temp_list)
+    # a_list, b_list = zip(*temp_list)
 
     img_length = len(a_list)
     print("Length of images: %d %d"  % (img_length, len(b_list)))
@@ -92,6 +93,29 @@ def load_test_img2img_dataset(a_path, b_path):
 
     return data_loader, img_length
 
+def load_base_img2img_dataset(a_path, b_path):
+    a_list = glob.glob(a_path)
+    b_list = glob.glob(b_path)
+
+    if (global_config.img_to_load > 0):
+        a_list = a_list[0: global_config.img_to_load]
+        b_list = b_list[0: global_config.img_to_load]
+
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
+
+    img_length = len(a_list)
+    print("Length of images: %d %d" % (img_length, len(b_list)))
+
+    data_loader = torch.utils.data.DataLoader(
+        image_datasets.BasePairedImageDataset(a_list, b_list),
+        batch_size=global_config.test_size,
+        num_workers=1
+    )
+
+    return data_loader, img_length
+
 def load_singleimg_dataset(a_path):
     a_list = glob.glob(a_path)
 
@@ -110,4 +134,13 @@ def load_singleimg_dataset(a_path):
     )
 
     return data_loader, img_length
+
+def load_huggingface_sr_dataset(eval_dataset:EvalDataset):
+    data_loader = torch.utils.data.DataLoader(
+        eval_dataset,
+        batch_size=global_config.test_size,
+        num_workers=4
+    )
+
+    return data_loader
 

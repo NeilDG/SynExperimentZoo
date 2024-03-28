@@ -8,7 +8,6 @@ from config.network_config import ConfigHolder
 import global_config
 import torch
 from utils import plot_utils, tensor_utils
-import lpips
 import torch.nn as nn
 import numpy as np
 from trainers import img2imgtrainer
@@ -17,7 +16,6 @@ class Img2ImgTester():
     def __init__(self, gpu_device):
         self.gpu_device = gpu_device
         self.img2img_t = img2imgtrainer.Img2ImgTrainer(self.gpu_device)
-        self.lpips_loss = lpips.LPIPS(net='vgg').to(self.gpu_device)
         self.l1_loss = nn.L1Loss(reduction='mean')
         self.mse_loss = nn.MSELoss(reduction='mean')
 
@@ -31,21 +29,21 @@ class Img2ImgTester():
         img_a2b, img_b2a = self.img2img_t.test(input_map_a)  # a2b --> real2synth, b2a --> synth2real
         file_name = input_map_a["file_name"]
 
-        noshadows_path = "X:/GithubProjects/NeuralNets-Experiment3/reports/Synth2Real/rgb_noshadows/"
-        withshadows_path = "X:/GithubProjects/NeuralNets-Experiment3/reports/Synth2Real/rgb/"
+        img_a_path = "./reports/Synth2Real/low/"
+        img_b_path = "./reports/Synth2Real/high/"
 
-        if not os.path.exists(noshadows_path):
-            os.makedirs(noshadows_path, exist_ok=True)
+        if not os.path.exists(img_a_path):
+            os.makedirs(img_a_path, exist_ok=True)
 
-        if not os.path.exists(withshadows_path):
-            os.makedirs(withshadows_path, exist_ok=True)
+        if not os.path.exists(img_b_path):
+            os.makedirs(img_b_path, exist_ok=True)
 
         for i in range(0, len(file_name)):
             impath = noshadows_path + file_name[i] + ".png"
             torchvision.utils.save_image(img_b2a[i], impath, normalize = True)
             # print("Saved image (no shadows) : ", impath)
 
-        img_a2b, img_b2a = self.img2img_t.test(input_map_b)  # a2b --> real2synth, b2a --> synth2real
+        img_a2b = self.img2img_t.test(input_map_b)  # a2b --> real2synth, b2a --> synth2real
         file_name = input_map_b["file_name"]
 
         for i in range(0, len(file_name)):

@@ -22,6 +22,8 @@ import torchvision.transforms as transforms
 import global_config
 from torchvision.transforms import functional as transform_functional
 
+
+
 # for attaching hooks on pretrained models
 class SaveFeatures(nn.Module):
     features = None;
@@ -107,11 +109,9 @@ def patched_infer(img_tensor, model_G, patch_size, padding):
         img_a2b_patch = torch.unsqueeze(model_G(img_patch), 1)
         img_a2b_patches = torch.cat([img_a2b_patches, img_a2b_patch], dim=1)
 
-    print("Shape of patches: ", np.shape(img_a2b_patches), patch_size, padding)
-
-    hpad_check = (orig_h + padding[2] + padding[3]) % patch_size
-    wpad_check = (orig_w + padding[0] + padding[1]) % patch_size
-    print("Hpad check: ", hpad_check, "Wpad check: ", wpad_check)
+    hpad_check = (orig_h + padding[0] + padding[1]) % patch_size
+    wpad_check = (orig_w + padding[2] + padding[3]) % patch_size
+    # print("Hpad check: ", hpad_check, "Wpad check: ", wpad_check)
     unpatch_op = kornia.contrib.CombineTensorPatches((orig_h, orig_w), patch_size, padding)
     img_a2b_patches = unpatch_op(img_a2b_patches)
     return img_a2b_patches

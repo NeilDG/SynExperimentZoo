@@ -3,21 +3,16 @@
 clear
 
 //For directories
-cd scratch3/NeuralNets-GenerativeExperiment-V61.XX.XX
-cd scratch3/NeuralNets-GenerativeExperiment-V61.XX.XX-2
+cd scratch3/SynExperimentZoo
+cd scratch3/SynExperimentZoo-2
 cd scratch3/Visdom
 unzip "scratch3/SynthWeather Dataset 10.zip"
 
-git clone --depth 1 -b "workspace/V61.XX.XX" "https://github.com/NeilDG/SynthShadowRemoval.git" "scratch3/NeuralNets-GenerativeExperiment-V61.XX.XX"
-git clone --depth 1 -b "workspace/V61.XX.XX" "https://github.com/NeilDG/NeuralNets-Experiment3.git" "scratch3/NeuralNets-GenerativeExperiment-V61.XX.XX-2"
-rm -rf "/scratch3/neil.delgallego/NeuralNets-GenerativeExperiment-V61.XX.XX"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/v66_usr_base"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/v66_usr"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/v86_srd"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/v66_istd"
-rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10/v66_places"
-rm -rf "/scratch3/NeuralNets-Experiment5-V01.XX.XX/"
+git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "scratch3/SynExperimentZoo"
+git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "scratch3/SynExperimentZoo-2"
+
+rm -rf "/scratch3/neil.delgallego/NeuralNets-GenerativeExperiment-V61.XX.XX-2"
+rm -rf "/scratch3/neil.delgallego/SynthV3_Raw/"
 
 gdown https://drive.google.com/uc?id=1B6erEfeB2_n_KYP5GtCQU-DHGE1bKEVE --o "scratch2/SynthWeather Dataset 10/"
 mv "/scratch1/scratch2/neil.delgallego/NeuralNets-GenerativeExperiment-V58.XX.XX/v26" "/scratch1/scratch2/neil.delgallego/SynthWeather Dataset 10/v26"
@@ -31,10 +26,10 @@ sbatch -w saliksik-cpu-23 --dependency=afterany:335892 visdom_run.slurm
 sbatch --dependency=afterany:466262 script_1.slurm "rgb2sm_v61.51_istd+srd" 1
 sbatch --dependency=afterany:466264 script_2.slurm "rgb2sm_v61.52_istd+srd" 1
 
-sbatch script_debug.slurm 1
+sbatch script_debug.slurm "mobisr_v01.00_mipd" 1
 sbatch slurm_download.sh 0
-sbatch script_1.slurm "rgb2sm_v61.53_istd+srd" 1
-sbatch script_2.slurm "rgb2sm_v61.76_istd+srd" 1
+sbatch script_1.slurm "mobisr_v01.00_mipd" 1
+sbatch script_2.slurm "mobisr_v01.00_mipd" 2
 
 sbatch --dependency=afterany:342338 script_debug.slurm
 sbatch --dependency=afterany:475267 script_1.slurm "rgb2sm_v61.53_istd+srd" 1
@@ -63,11 +58,11 @@ export XDG_RUNTIME_DIR=/scratch1/scratch2/neil.delgallego/Visdom/
 saliksik.asti.dost.gov.ph:8097
 
 //CCS SERVER-JUPYTERHUB
-git clone --depth 1 -b "workspace/V61.XX.XX" "https://github.com/NeilDG/SynthShadowRemoval.git" "NeuralNets-GenerativeExperiment-V61.XX.XX"
-git clone -b "workspace/V61.XX.XX" "https://github.com/NeilDG/SynthShadowRemoval.git" "NeuralNets-GenerativeExperiment-V61.XX.XX-2"
-git switch "workspace/V44.XX.XX"
-cd NeuralNets-GenerativeExperiment-V61.XX.XX
-cd NeuralNets-GenerativeExperiment-V61.XX.XX-2
+git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "SynExperimentZoo"
+git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "SynExperimentZoo-2"
+git switch "workspace/V01.XX.XX"
+cd SynExperimentZoo
+cd SynExperimentZoo-2
 python "ccs1_main.py"
 python "ccs2_main.py"
 python "ccs3_main.py"
