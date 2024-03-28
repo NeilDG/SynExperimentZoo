@@ -4,7 +4,7 @@ import torch
 
 import global_config
 from config.network_config import ConfigHolder
-from model import embedding_network, densenet_gan, ffa_gan
+from model import embedding_network, densenet_gan, ffa_gan, rrdbnet, network_swinir
 from model import vanilla_cycle_gan as cycle_gan
 from model import unet_gan
 from model import usi3d_gan
@@ -86,8 +86,18 @@ class NetworkCreator():
                       'n_res': network_config["num_blocks"],  # number of residual blocks in content encoder/decoder
                       'pad_type': 'reflect'}
             G_A = usi3d_gan.AdaINGen(input_dim=3, output_dim=3, params=params).to(self.gpu_device)
-        else:
+        elif (net_config == 4):
+            print("Using FFA Net")
             G_A = ffa_gan.FFABase(num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
+        elif (net_config == 5):
+            print("Using RRDBNet")
+            G_A = rrdbnet.RRDBNet(in_nc=input_nc, sf=1).to(self.gpu_device)
+        else:
+            print("Using SwinIR")
+            G_A = network_swinir.SwinIR(upscale=1,
+                   window_size=8, img_range=1., depths=[6, 6, 6, 6],
+                   embed_dim=60, num_heads=[6, 6, 6, 6], mlp_ratio=2, upsampler='pixelshuffledirect').to(self.gpu_device)
+
 
         return G_A, D_A
 

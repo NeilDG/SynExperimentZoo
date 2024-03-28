@@ -124,6 +124,7 @@ class PairedTrainer:
 
             img_a2b = self.G_A2B(img_a)
 
+            # print("Shapes of pred and target:", np.shape(img_a2b), np.shape(img_b))
             B_likeness_loss = self.common_losses.compute_l1_loss(img_a2b, img_b)
             B_perceptual_loss = self.common_losses.compute_perceptual_loss(img_a2b, img_b)
             B_color_loss = self.common_losses.compute_color_loss(img_a2b, img_b)

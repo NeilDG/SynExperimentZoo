@@ -75,7 +75,7 @@ class PairedImageDataset(data.Dataset):
             patch_size = config_holder.get_network_attribute("patch_size", 32)
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
-                # transforms.Resize((256, 256), antialias=True),
+                # transforms.Resize(patch_size, antialias=True),
                 transforms.RandomCrop(patch_size),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
@@ -98,12 +98,14 @@ class PairedImageDataset(data.Dataset):
 
         a_img = cv2.imread(self.a_list[idx])
         a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
-        state = torch.get_rng_state()
-        a_img = self.initial_op(a_img)
-
-        torch.set_rng_state(state)
         b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
         b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
+        ref_h, ref_w = b_img.shape[:2]
+        a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
+
+        state = torch.get_rng_state()
+        a_img = self.initial_op(a_img)
+        torch.set_rng_state(state)
         b_img = self.initial_op(b_img)
 
         if(self.use_tanh):

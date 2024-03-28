@@ -54,9 +54,9 @@ def load_train_img2img_dataset(a_path, b_path):
         a_list += a_list_dup
         b_list += b_list_dup
 
-    temp_list = list(zip(a_list, b_list))
-    random.shuffle(temp_list)
-    a_list, b_list = zip(*temp_list)
+    # temp_list = list(zip(a_list, b_list))
+    # random.shuffle(temp_list)
+    # a_list, b_list = zip(*temp_list)
 
     img_length = len(a_list)
     print("Length of images: %d %d"  % (img_length, len(b_list)))
