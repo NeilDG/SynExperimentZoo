@@ -2,32 +2,32 @@ import itertools
 import sys
 from optparse import OptionParser
 import random
+
+import datasets
 import torch
 import torch.nn.parallel
 import torch.utils.data
-import torchvision.utils as vutils
 import numpy as np
-import matplotlib.pyplot as plt
+from super_image import ImageLoader
 
 from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
-from trainers import paired_trainer
+from testers import paired_tester
 from tqdm import tqdm
-from tqdm.auto import trange
-from time import sleep
 import yaml
 from yaml.loader import SafeLoader
+
 
 parser = OptionParser()
 parser.add_option('--server_config', type=int, help="Is running on COARE?", default=0)
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--img_to_load', type=int, help="Image to load?", default=-1)
 parser.add_option('--network_version', type=str, default="vXX.XX")
+parser.add_option('--save_images', type=int, default=0)
 parser.add_option('--iteration', type=int, default=1)
 parser.add_option('--plot_enabled', type=int, default=1)
-parser.add_option('--save_per_iter', type=int, default=500)
 
 def update_config(opts):
     global_config.server_config = opts.server_config
@@ -36,12 +36,14 @@ def update_config(opts):
     global_config.cuda_device = opts.cuda_device
     global_config.sr_network_version = opts.network_version
     global_config.sr_iteration = opts.iteration
-    global_config.test_size = 2
+    global_config.test_size = 1
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_version = network_config["dataset_version"]
+    low_path = network_config["low_path"]
+    high_path = network_config["high_path"]
 
-    if(global_config.server_config == 0): #COARE
+    if (global_config.server_config == 0):  # COARE
         global_config.num_workers = 6
         global_config.disable_progress_bar = True
         global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
@@ -52,7 +54,7 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][0]
         print("Using COARE configuration. Workers: ", global_config.num_workers)
 
-    elif(global_config.server_config == 1): #CCS Cloud
+    elif (global_config.server_config == 1):  # CCS Cloud
         global_config.num_workers = 12
         global_config.a_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
         global_config.b_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
@@ -62,7 +64,7 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][1]
         print("Using CCS configuration. Workers: ", global_config.num_workers)
 
-    elif(global_config.server_config == 2): #RTX 2080Ti
+    elif (global_config.server_config == 2):  # RTX 2080Ti
         global_config.num_workers = 6
         global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
         global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
@@ -72,16 +74,16 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using RTX 2080Ti configuration. Workers: ", global_config.num_workers)
 
-    elif(global_config.server_config == 3): #RTX 3090 PC
+    elif (global_config.server_config == 3):  # RTX 3090 PC
         global_config.num_workers = 12
-        # global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
-        # global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
-        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
-        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
-        # global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        # global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
-        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/*.png"
-        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/*.png"
+        global_config.a_path_train = "X:/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.burst_sr_lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+        global_config.burst_sr_hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+        global_config.div2k_lr_path = "X:/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "X:/SuperRes Dataset/div2k/bicubic_x4/*.png"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
@@ -96,11 +98,10 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
 
-    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version)
-    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version)
-    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version)
-    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version)
-
+    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version, low_path=low_path)
+    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version, high_path=high_path)
+    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version, low_path=low_path)
+    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version, high_path=high_path)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -134,54 +135,102 @@ def main(argv):
     b_path_train = global_config.b_path_train
     a_path_test = global_config.a_path_test
     b_path_test = global_config.b_path_test
+    burst_sr_lr_path = global_config.burst_sr_lr_path
+    burst_sr_hr_path = global_config.burst_sr_hr_path
+    div2k_lr_path = global_config.div2k_lr_path
+    div2k_hr_path = global_config.div2k_hr_path
 
     print("Dataset path A: ", a_path_train, a_path_test)
     print("Dataset path B: ", b_path_train, b_path_test)
 
     plot_utils.VisdomReporter.initialize()
 
-    train_loader, train_count = dataset_loader.load_train_img2img_dataset(a_path_train, b_path_train)
-    test_loader, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
-    img2img_t = paired_trainer.PairedTrainer(device)
+    # test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
+    # test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
+    test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
 
-    iteration = 0
+    img2img_t = paired_tester.PairedTester(device)
     start_epoch = global_config.last_epoch_st
     print("---------------------------------------------------------------------------")
-    print("Started Training loop for mode: synth2real", " Set start epoch: ", start_epoch)
+    print("Started synth test loop for mode: ", ConfigHolder.getInstance().get_sr_version_name(), " Set start epoch: ", start_epoch)
     print("---------------------------------------------------------------------------")
 
     # compute total progress
-    load_size = global_config.load_size
-    needed_progress = int((network_config["max_epochs"]) * (train_count / load_size))
-    current_progress = int(start_epoch * (train_count / load_size))
+    steps = global_config.test_size
+    needed_progress = int(test_count / steps) + 1
+    current_progress = 0
     pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
     pbar.update(current_progress)
 
-    for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (_, a_batch, b_batch) in enumerate(train_loader, 0):
-            a_batch = a_batch.to(device, non_blocking = True)
-            b_batch = b_batch.to(device, non_blocking = True)
-            input_map = {"img_a" : a_batch, "img_b" : b_batch}
-            img2img_t.train(epoch, iteration, input_map)
+    with torch.no_grad():
+        # _, a_test_batch, b_test_batch = next(iter(test_loader_a))
+        # a_test_batch = a_test_batch.to(device)
+        # b_test_batch = b_test_batch.to(device)
+        # input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+        #
+        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_a, 0):
+        #     a_batch = a_batch.to(device)
+        #     b_batch = b_batch.to(device)
+        #
+        #     input_map = {"file_name": file_name, "img_a" : a_batch, "img_b" : b_batch}
+        #     img2img_t.measure_and_store(input_map)
+        #     img2img_t.save_images(input_map)
+        #     pbar.update(1)
+        #
+        #     if((i + 1) % 4 == 0):
+        #         break
+        #
+        # if (global_config.plot_enabled == 1):
+        #     img2img_t.visualize_results(input_map, "Test")
+        #     img2img_t.report_metrics("Test")
 
-            iteration = iteration + 1
+        # _, a_test_batch, b_test_batch = next(iter(test_loader_b))
+        # a_test_batch = a_test_batch.to(device)
+        # b_test_batch = b_test_batch.to(device)
+        # input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+        #
+        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
+        #     a_batch = a_batch.to(device)
+        #     b_batch = b_batch.to(device)
+        #
+        #     input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+        #     img2img_t.measure_and_store(input_map)
+        #     img2img_t.save_images(input_map)
+        #     pbar.update(1)
+        #
+        #     if ((i + 1) % 50 == 0):
+        #         break
+        #
+        # if (global_config.plot_enabled == 1):
+        #     img2img_t.visualize_results(input_map, "Test")
+        #     img2img_t.report_metrics("Test")
+        #
+        # pbar.close()
+
+        _, a_test_batch, b_test_batch = next(iter(test_loader_div2k))
+        a_test_batch = a_test_batch.to(device)
+        b_test_batch = b_test_batch.to(device)
+        input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+
+        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_div2k, 0):
+            a_batch = a_batch.to(device)
+            b_batch = b_batch.to(device)
+
+            # print("Shapes: ", np.shape(a_batch), np.shape(b_batch))
+            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+            img2img_t.measure_and_store(input_map)
+            img2img_t.save_images(input_map)
             pbar.update(1)
 
-            if(iteration % opts.save_per_iter == 0):
-                img2img_t.save_states(epoch, iteration, True)
+            if ((i + 1) % 50 == 0):
+                break
 
-                if(global_config.plot_enabled == 1):
-                    img2img_t.visdom_plot(iteration)
-                    img2img_t.visdom_visualize(input_map, "Train")
+        if (global_config.plot_enabled == 1):
+            img2img_t.visualize_results(input_map, "Test")
+            img2img_t.report_metrics("Test")
 
-                    # _, a_test_batch, b_test_batch = next(iter(test_loader))
-                    # a_test_batch = a_test_batch.to(device, non_blocking = True)
-                    # b_test_batch = b_test_batch.to(device, non_blocking = True)
-                    #
-                    # input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-                    # img2img_t.visdom_visualize(input_map, "Test")
+        pbar.close()
 
-    pbar.close()
 
 if __name__ == "__main__":
     main(sys.argv)

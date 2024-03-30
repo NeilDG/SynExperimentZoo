@@ -4,7 +4,7 @@ import torch
 
 import global_config
 from config.network_config import ConfigHolder
-from model import embedding_network, densenet_gan, ffa_gan, rrdbnet, network_swinir
+from model import embedding_network, densenet_gan, ffa_gan, rrdbnet, network_swinir, network_srmd
 from model import vanilla_cycle_gan as cycle_gan
 from model import unet_gan
 from model import usi3d_gan
@@ -92,12 +92,14 @@ class NetworkCreator():
         elif (net_config == 5):
             print("Using RRDBNet")
             G_A = rrdbnet.RRDBNet(in_nc=input_nc, sf=1).to(self.gpu_device)
-        else:
+        elif(net_config == 6):
             print("Using SwinIR")
             G_A = network_swinir.SwinIR(upscale=1,
                    window_size=8, img_range=1., depths=[6, 6, 6, 6],
                    embed_dim=60, num_heads=[6, 6, 6, 6], mlp_ratio=2, upsampler='pixelshuffledirect').to(self.gpu_device)
-
+        else:
+            print("Using SRMD")
+            G_A = network_srmd.SRMD(in_nc=input_nc, out_nc=3, nc=64, nb=num_blocks, upscale=1, act_mode='R', upsample_mode='pixelshuffle').to(self.gpu_device)
 
         return G_A, D_A
 
