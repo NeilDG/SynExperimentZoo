@@ -16,7 +16,7 @@ d_lr: 0.0005
 min_epochs: 100
 max_epochs: 100
 
-dataset_version: "v02_burstsr"
-low_path: "/low/*.png"
-high_path: "/high/*.png"
+dataset_version: "Flickr2K"
+low_path: "/Flickr2K_LR_bicubic/X4/*.png"
+high_path: "/Flickr2K_HR/*.png"
 dataset_repeats: 50

@@ -183,7 +183,7 @@ class PairedTrainer:
             img_a = input_map["img_a"]
             img_b = input_map["img_b"]
 
-            print("Test shapes: ", np.shape(img_a), np.shape(img_b))
+            # print("Test shapes: ", np.shape(img_a), np.shape(img_b))
             img_a2b = self.test(input_map, label)
 
             self.visdom_reporter.plot_image(img_a, str(label) + " Input A Images - " + network_version + str(self.iteration))
