@@ -49,7 +49,7 @@ then
   OUTPUT_DIR="/scratch3/neil.delgallego/SuperRes Dataset/"
 elif [ $SERVER_CONFIG == 4 ]
 then
-  OUTPUT_DIR="/Documents/SuperRes Dataset/"
+  OUTPUT_DIR="~/Documents/SuperRes Dataset/"
 else
   OUTPUT_DIR="/home/jupyter-neil.delgallego/SuperRes Dataset/"
 fi
