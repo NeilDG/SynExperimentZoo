@@ -29,3 +29,5 @@ pip install matplotlib
 pip install --upgrade --no-cache-dir gdown
 pip install PyYAML
 pip install ITTR_pytorch
+pip install super_image
+pip install timm
