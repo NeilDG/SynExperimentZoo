@@ -12,7 +12,7 @@ def main(argv):
     if (opts.server_config == 0):
         output_dir = "/scratch3/neil.delgallego/SuperRes Dataset/"
     elif (opts.server_config == 4):
-        output_dir = "/Documents/SuperRes Dataset/"
+        output_dir = "~/Documents/SuperRes Dataset/"
     else:
         output_dir = "/home/jupyter-neil.delgallego/SuperRes Dataset/"
 
