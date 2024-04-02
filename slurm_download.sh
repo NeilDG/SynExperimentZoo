@@ -33,21 +33,21 @@ source activate NeilGAN_V2
 #pip install super_image
 #pip install timm
 
-if [ $SERVER_CONFIG == 0 ]
+if [ "$SERVER_CONFIG" == 0 ]
 then
-  srun python "gdown_download.py" --server_config=$SERVER_CONFIG
-elif [ $SERVER_CONFIG == 4 ]
+  srun python "gdown_download.py" --server_config="$SERVER_CONFIG"
+elif [ "$SERVER_CONFIG" == 4 ]
 then
-  python3 "gdown_download.py" --server_config=$SERVER_CONFIG
+  python3 "gdown_download.py" --server_config="$SERVER_CONFIG"
 else
-  python "gdown_download.py" --server_config=$SERVER_CONFIG
+  python "gdown_download.py" --server_config="$SERVER_CONFIG"
 fi
 
 
-if [ $SERVER_CONFIG == 0 ]
+if [ "$SERVER_CONFIG" == 0 ]
 then
   OUTPUT_DIR="/scratch3/neil.delgallego/SuperRes Dataset/"
-elif [ $SERVER_CONFIG == 4 ]
+elif [ "$SERVER_CONFIG" == 4 ]
 then
   OUTPUT_DIR="~/Documents/SuperRes Dataset/"
 else
