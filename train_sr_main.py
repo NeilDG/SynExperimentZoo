@@ -87,10 +87,10 @@ def update_config(opts):
 
     elif (global_config.server_config == 4):  # @TITAN1 - 3
         global_config.num_workers = 4
-        global_config.a_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "/home/neildelgallego/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "/home/neildelgallego/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_train = "/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/Documents/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
