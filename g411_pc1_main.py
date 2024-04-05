@@ -5,6 +5,12 @@ import os
 def train_sr_main():
     os.system("python \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
               "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.00_burstsr\" --iteration=3")
+
+    os.system("python \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.00_burstsr\" --iteration=1")
+
+    os.system("python \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.00_burstsr\" --iteration=2")
     #
     # os.system("python \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
     #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v01.00_flickr2k\" --iteration=3")
