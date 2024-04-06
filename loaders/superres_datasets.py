@@ -69,21 +69,32 @@ class PairedImageDataset(data.Dataset):
         config_holder = ConfigHolder.getInstance()
         if(config_holder is not None):
             self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
-            self.use_tanh = config_holder.get_network_attribute("use_tanh", False)
+            self.use_tanh = config_holder.get_network_attribute("use_tanh", True)
 
         if (self.transform_config == 1):
             patch_size = config_holder.get_network_attribute("patch_size", 32)
-            self.initial_op = transforms.Compose([
+            transform_list = [
                 transforms.ToPILImage(),
                 # transforms.Resize(patch_size, antialias=True),
                 transforms.RandomCrop(patch_size),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomVerticalFlip(),
-                transforms.RandomAdjustSharpness(1.25),
-                transforms.RandomAutocontrast(),
-                transforms.RandomInvert(),
-                transforms.ToTensor()
-            ])
+                transforms.RandomVerticalFlip()
+            ]
+            if "random_sharpness_contrast" in self.augment_mode:
+                transform_list.append(transforms.RandomAdjustSharpness(1.25))
+                transform_list.append(transforms.RandomAutocontrast())
+                print("Data augmentation: Added random sharpness and contrast")
+
+            if "random_invert" in self.augment_mode:
+                transform_list.append(transforms.RandomInvert())
+                print("Data augmentation: Added random invert")
+
+            if "augmix" in self.augment_mode:
+                transform_list.append(transforms.AugMix())
+                print("Data augmentation: Added augmix")
+
+            transform_list.append(transforms.ToTensor())
+            self.initial_op = transforms.Compose(transform_list)
         else:
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
@@ -91,7 +102,8 @@ class PairedImageDataset(data.Dataset):
                 transforms.ToTensor()
             ])
 
-        self.norm_op = transforms.Normalize((0.5, ), (0.5, ))
+        self.norm_op = transforms.Compose([
+            transforms.Normalize((0.5, ), (0.5, ))])
 
     def __getitem__(self, idx):
         file_name = self.b_list[idx % len(self.b_list)].split("\\")[-1].split(".")[0]
