@@ -10,6 +10,9 @@ def train_sr_main():
               "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.01_div2k\" --iteration=3")
 
     os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.02_div2k\" --iteration=3")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
               "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.00_flickr2k\" --iteration=3")
 
 def test_sr_main():
