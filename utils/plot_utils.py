@@ -30,8 +30,8 @@ class VisdomReporter:
             self.vis = visdom.Visdom(SALIKSIK_SERVER, use_incoming_socket=False, port=8097) #TODO: Note that this is set to TRUE for observation.
         elif(global_config.server_config == 1):
             self.vis = None
-        elif(global_config.plot_enabled == 0):
-            self.vis = None
+        # elif(global_config.plot_enabled == 0):
+        #     self.vis = None
         else:
             self.vis= visdom.Visdom()
         
@@ -50,9 +50,6 @@ class VisdomReporter:
             self.vis.images(img_group, win = self.image_windows[hash(caption)], opts = dict(caption = caption))
 
     def plot_text(self, text):
-        if(global_config.plot_enabled == 0):
-            return
-
         if(hash(text) not in self.text_windows):
             self.text_windows[hash(text)] = self.vis.text(text, opts = dict(caption = text))
         else:
