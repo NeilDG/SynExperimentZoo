@@ -31,7 +31,7 @@ class BasePairedImageDataset(data.Dataset):
 
         self.initial_op = transforms.Compose([
             transforms.ToPILImage(),
-            # transforms.Resize((512, 512), antialias=True),
+            transforms.Resize((512, 512), antialias=True),
             transforms.ToTensor()
         ])
 
