@@ -26,31 +26,16 @@ def train_sr_main():
 
 def test_sr_main():
     # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=1 --network_version=\"mobisr_v01.00_burstsr\" --iteration=3")
-    #
-    # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=0 --network_version=\"mobisr_v01.01_burstsr\" --iteration=3")
-    #
-    # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=0 --network_version=\"mobisr_v01.02_burstsr\" --iteration=3")
-    #
-    # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=0 --network_version=\"mobisr_v01.03_burstsr\" --iteration=3")
-    #
-    # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=0 --network_version=\"mobisr_v01.04_burstsr\" --iteration=3")
+    #           "--plot_enabled=1 --network_version=\"mobisr_v01.00_div2k\" --iteration=3")
 
     os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-              "--plot_enabled=1 --network_version=\"mobisr_v01.02_flickr2k\" --iteration=3")
+              "--plot_enabled=1 --network_version=\"mobisr_v01.01_div2k\" --iteration=3")
 
     # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=1 --network_version=\"mobisr_v01.03_div2k\" --iteration=3")
+    #           "--plot_enabled=0 --network_version=\"mobisr_v01.02_div2k\" --iteration=3")
     #
     # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=1 --network_version=\"mobisr_v01.04_div2k\" --iteration=3")
-    #
-    # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-    #           "--plot_enabled=1 --network_version=\"mobisr_v01.05_div2k\" --iteration=3")
+    #           "--plot_enabled=0 --network_version=\"mobisr_v01.00_flickr2k\" --iteration=3")
 
 def download_ml_hypersim():
     os.system("python \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
