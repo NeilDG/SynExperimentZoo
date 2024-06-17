@@ -85,7 +85,7 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
 
-    elif (global_config.server_config == 4):  # @TITAN1 - 3
+    elif (global_config.server_config == 4):  #Titan RTX 3060
         global_config.num_workers = 4
         global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
@@ -95,14 +95,14 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
 
-    elif (global_config.server_config == 5):
-        global_config.num_workers = 6
-        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
+    elif (global_config.server_config == 5): #Titan RTX 2070
+        global_config.num_workers = 4
+        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.batch_size = network_config["batch_size"][3]
+        global_config.load_size = network_config["load_size"][3]
         print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
 
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version, low_path=low_path)
