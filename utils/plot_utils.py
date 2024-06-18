@@ -26,7 +26,7 @@ class VisdomReporter:
         return VisdomReporter._sharedInstance
 
     def __init__(self):
-        if(global_config.server_config == 0):
+        if(global_config.server_config == -99):
             self.vis = visdom.Visdom(SALIKSIK_SERVER, use_incoming_socket=False, port=8097) #TODO: Note that this is set to TRUE for observation.
         elif(global_config.server_config == 1):
             self.vis = None

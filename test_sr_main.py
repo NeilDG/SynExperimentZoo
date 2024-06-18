@@ -43,16 +43,19 @@ def update_config(opts):
     low_path = network_config["low_path"]
     high_path = network_config["high_path"]
 
-    if (global_config.server_config == 0):  # COARE
-        global_config.num_workers = 6
-        global_config.disable_progress_bar = True
-        global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
-        global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
-        global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
-        global_config.batch_size = network_config["batch_size"][0]
-        global_config.load_size = network_config["load_size"][0]
-        print("Using COARE configuration. Workers: ", global_config.num_workers)
+    if (global_config.server_config == 0):  #RTX 4060Ti PC
+        global_config.num_workers = 8
+        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.burst_sr_lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/low/*.png"
+        global_config.burst_sr_hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/high/*.png"
+        global_config.div2k_lr_path = "C:/Datasets/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "C:/Datasets/SuperRes Dataset/div2k/bicubic_x4/*.png"
+        global_config.batch_size = network_config["batch_size"][1]
+        global_config.load_size = network_config["load_size"][1]
+        print("Using G411-RTX4060Ti configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 1):  # CCS Cloud
         global_config.num_workers = 12
@@ -97,6 +100,30 @@ def update_config(opts):
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
+
+    elif (global_config.server_config == 5): #Titan RTX 2070
+        global_config.num_workers = 4
+        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.batch_size = network_config["batch_size"][3]
+        global_config.load_size = network_config["load_size"][3]
+        print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
+
+    elif (global_config.server_config == 6): #G411 RTX 3060
+        global_config.num_workers = 6
+        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.burst_sr_lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+        global_config.burst_sr_hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+        global_config.div2k_lr_path = "C:/Datasets/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "C:/Datasets/SuperRes Dataset/div2k/bicubic_x4/*.png"
+        global_config.batch_size = network_config["batch_size"][2]
+        global_config.load_size = network_config["load_size"][2]
+        print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
 
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version, low_path=low_path)
     global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version, high_path=high_path)
@@ -179,23 +206,23 @@ def main(argv):
             img2img_t.visualize_results(input_map, "Train Dataset")
         img2img_t.report_metrics("Train Dataset")
 
-        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
-            a_batch = a_batch.to(device)
-            b_batch = b_batch.to(device)
-
-            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
-            img2img_t.measure_and_store(input_map)
-            img2img_t.save_images(input_map)
-            pbar.update(1)
-
-            if ((i + 1) % 50 == 0):
-                break
-
-        if (global_config.plot_enabled == 1):
-            img2img_t.visualize_results(input_map, "Test - BurstSR")
-        img2img_t.report_metrics("Test - BurstSR")
-
-        pbar.close()
+        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
+        #     a_batch = a_batch.to(device)
+        #     b_batch = b_batch.to(device)
+        #
+        #     input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+        #     img2img_t.measure_and_store(input_map)
+        #     img2img_t.save_images(input_map)
+        #     pbar.update(1)
+        #
+        #     if ((i + 1) % 50 == 0):
+        #         break
+        #
+        # if (global_config.plot_enabled == 1):
+        #     img2img_t.visualize_results(input_map, "Test - BurstSR")
+        # img2img_t.report_metrics("Test - BurstSR")
+        #
+        # pbar.close()
 
         for i, (file_name, a_batch, b_batch) in enumerate(test_loader_div2k, 0):
             a_batch = a_batch.to(device)
