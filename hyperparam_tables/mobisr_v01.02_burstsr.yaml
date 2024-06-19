@@ -13,8 +13,8 @@ augment_key: ["none"]
 
 g_lr: 0.0002
 d_lr: 0.0005
-min_epochs: 100
-max_epochs: 100
+min_epochs: 200
+max_epochs: 200
 
 dataset_version: "v02_burstsr"
 low_path: "/low/*.png"
