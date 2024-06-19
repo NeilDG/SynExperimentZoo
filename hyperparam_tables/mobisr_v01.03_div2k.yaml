@@ -13,10 +13,10 @@ augment_key: ["none"]
 
 g_lr: 0.0002
 d_lr: 0.0005
-min_epochs: 100
-max_epochs: 100
+min_epochs: 200
+max_epochs: 200
 
-dataset_version: "Flickr2K"
-low_path: "/Flickr2K_LR_bicubic/X4/*.png"
-high_path: "/Flickr2K_HR/*.png"
-dataset_repeats: 50
+dataset_version: "div2k"
+low_path: "/dpsr_x4/*.png"
+high_path: "/bicubic_x4/*.png"
+dataset_repeats: 500

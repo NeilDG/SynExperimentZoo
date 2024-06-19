@@ -2,9 +2,9 @@ model_type: 6
 input_nc: 3
 patch_size: 64
 
-#0 - 24GB, 1 - 32GB, 2 - 10 - 12GB
-batch_size: [24, 32, 16] #amount of images to accumulate before backprop
-load_size: [24, 32, 16] #amount of images to load in GPU. load_size <= batch_size
+#0 - 24GB, 1 - 16GB, 2 - 10 - 12GB, 3 - 8GB
+batch_size: [24, 32, 16, 12] #amount of images to accumulate before backprop
+load_size: [24, 32, 16, 12] #amount of images to load in GPU. load_size <= batch_size
 
 num_blocks: 3
 weight_decay: 0.0
@@ -13,8 +13,8 @@ augment_key: ["none"]
 
 g_lr: 0.0002
 d_lr: 0.0005
-min_epochs: 100
-max_epochs: 100
+min_epochs: 200
+max_epochs: 200
 
 dataset_version: "v02_burstsr"
 low_path: "/low/*.png"
