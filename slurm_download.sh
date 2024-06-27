@@ -10,7 +10,7 @@
 
 #About this script:
 #Download of dataset
-SERVER_CONFIG=$1
+SERVER_CONFIG=4
 
 module load anaconda/3-2021.11
 module load cuda/10.1_cudnn-7.6.5
@@ -29,38 +29,38 @@ source activate NeilGAN_V2
 #pip install matplotlib
 #pip install --upgrade --no-cache-dir gdown
 #pip install PyYAML
+#pip install ITTR_pytorch
+#pip install super_image
+#pip install timm
 
-if [ $SERVER_CONFIG == 0 ]
+if [ "$SERVER_CONFIG" == 0 ]
 then
-  srun python "gdown_download.py" --server_config=$SERVER_CONFIG
-elif [ $SERVER_CONFIG == 5 ]
+  srun python "gdown_download.py" --server_config="$SERVER_CONFIG"
+elif [ "$SERVER_CONFIG" == 4 ]
 then
-  python3 "gdown_download.py" --server_config=$SERVER_CONFIG
+  python3 "gdown_download.py" --server_config="$SERVER_CONFIG"
 else
-  python "gdown_download.py" --server_config=$SERVER_CONFIG
+  python "gdown_download.py" --server_config="$SERVER_CONFIG"
 fi
 
 
-if [ $SERVER_CONFIG == 0 ]
+if [ "$SERVER_CONFIG" == 0 ]
 then
-  OUTPUT_DIR="/scratch3/neil.delgallego/SynthWeather Dataset 10/"
-elif [ $SERVER_CONFIG == 4 ]
+  OUTPUT_DIR="/scratch3/neil.delgallego/SuperRes Dataset/"
+elif [ "$SERVER_CONFIG" == 4 ]
 then
-  OUTPUT_DIR="D:/NeilDG/Datasets/SynthWeather Dataset 10/"
-elif [ $SERVER_CONFIG == 5 ]
-then
-  OUTPUT_DIR="/home/neildelgallego/SynthWeather Dataset 10/"
+  OUTPUT_DIR="~/Documents/SuperRes Dataset/"
 else
-  OUTPUT_DIR="/home/jupyter-neil.delgallego/SynthWeather Dataset 10/"
+  OUTPUT_DIR="/home/jupyter-neil.delgallego/SuperRes Dataset/"
 fi
 
 
-#DATASET_NAME="ISTD_Dataset"
+#DATASET_NAME="Flickr2K"
 #echo "$OUTPUT_DIR/$DATASET_NAME.zip"
 #zip -F "$OUTPUT_DIR/$DATASET_NAME.zip" --out "$OUTPUT_DIR/$DATASET_NAME+fixed.zip"
 #unzip "$OUTPUT_DIR/$DATASET_NAME+fixed.zip" -d "$OUTPUT_DIR"
 #rm -rf "$OUTPUT_DIR/$DATASET_NAME+fixed.zip"
-#
+
 #DATASET_NAME="SRD_Train"
 #echo "$OUTPUT_DIR/$DATASET_NAME.zip"
 #zip -F "$OUTPUT_DIR/$DATASET_NAME.zip" --out "$OUTPUT_DIR/$DATASET_NAME+fixed.zip"
@@ -77,17 +77,9 @@ fi
 #zip -F "$OUTPUT_DIR/$DATASET_NAME.zip" --out "$OUTPUT_DIR/$DATASET_NAME+fixed.zip"
 #unzip "$OUTPUT_DIR/$DATASET_NAME+fixed.zip" -d "$OUTPUT_DIR"
 
-DATASET_NAME="v90_istd"
+DATASET_NAME="Flickr2K"
 echo "$OUTPUT_DIR/$DATASET_NAME.zip"
 unzip -q "$OUTPUT_DIR/$DATASET_NAME.zip" -d "$OUTPUT_DIR"
-
-DATASET_NAME="v91_istd"
-echo "$OUTPUT_DIR/$DATASET_NAME.zip"
-unzip -q "$OUTPUT_DIR/$DATASET_NAME.zip" -d "$OUTPUT_DIR"
-
-#DATASET_NAME="v_istd+srd"
-#echo "$OUTPUT_DIR/$DATASET_NAME.zip"
-#unzip -q "$OUTPUT_DIR/$DATASET_NAME.zip" -d "$OUTPUT_DIR"
 
 #if [ $SERVER_CONFIG == 1 ]
 #then

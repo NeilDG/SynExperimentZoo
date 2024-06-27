@@ -91,7 +91,7 @@ rm -rf "SynthWeather Dataset 10/v54_istd"
 rm -rf "SynthWeather Dataset 10/v86_srd"
 rm -rf "SynthV3_Raw/v06_iid"
 mkdir "SynthWeather Dataset 10"
-
+chmod +x ./slurm_install.sh
 
 zip -r "checkpoints.zip" "rgb2albedo_v9.01_7.pt" "rgb2albedo_v9.01_8.pt" "rgb2albedo_v9.01_9.pt" "rgb2albedo_v9.01_10.pt" "rgb2albedo_v9.01_11.pt" "rgb2albedo_v9.01_12.pt" "rgb2albedo_v9.01_13.pt" "rgb2albedo_v9.01_14.pt" \
 "rgb2mask_v9.01_7.pt" "rgb2mask_v9.01_8.pt" "rgb2mask_v9.01_9.pt" "rgb2mask_v9.01_10.pt" "rgb2mask_v9.01_11.pt" "rgb2mask_v9.01_12.pt" "rgb2mask_v9.01_13.pt" "rgb2mask_v9.01_14.pt" \

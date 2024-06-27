@@ -26,7 +26,7 @@ class ConfigHolder():
 
     def get_network_attribute(self, key, default):
         if(key in global_config.loaded_network_config):
-            # print("Key ", key, " found. Returning ", self.yaml_config[key])
+            # print("Key ", key, " found. Returning ", global_config.loaded_network_config[key])
             return global_config.loaded_network_config[key]
         else:
             return default

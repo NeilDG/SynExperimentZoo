@@ -96,7 +96,7 @@ class PairedTester():
 
         last_epoch = global_config.last_epoch_st
         self.visdom_reporter.plot_text(dataset_title + " Results - " + version_name + " Last epoch: " + str(last_epoch) + "<br>"
-                                        + "Dataset: " + str(global_config.dataset_target) + "<br>"
+                                        + "Dataset: " + str(dataset_title) + "<br>"
                                        + "PSNR: " +str(psnr_mean) + "<br>" 
                                        "Abs Rel: " + str(l1_mean) + "<br>"
                                         "Sqr Rel: " + str(mse_mean) + "<br>"

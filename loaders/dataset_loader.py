@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 import global_config
 from config.network_config import ConfigHolder
-from loaders import image_datasets
+from loaders import superres_datasets
 import os
 
 def load_single_test_dataset(path_a, opts):
@@ -63,7 +63,7 @@ def load_train_img2img_dataset(a_path, b_path):
 
     num_workers = global_config.num_workers
     data_loader = torch.utils.data.DataLoader(
-        image_datasets.PairedImageDataset(a_list, b_list, 1),
+        superres_datasets.PairedImageDataset(a_list, b_list, 1),
         batch_size=global_config.load_size,
         num_workers=num_workers
     )
@@ -86,7 +86,7 @@ def load_test_img2img_dataset(a_path, b_path):
     print("Length of images: %d %d" % (img_length, len(b_list)))
 
     data_loader = torch.utils.data.DataLoader(
-        image_datasets.PairedImageDataset(a_list, b_list, 2),
+        superres_datasets.PairedImageDataset(a_list, b_list, 2),
         batch_size=global_config.test_size,
         num_workers=1
     )
@@ -109,7 +109,7 @@ def load_base_img2img_dataset(a_path, b_path):
     print("Length of images: %d %d" % (img_length, len(b_list)))
 
     data_loader = torch.utils.data.DataLoader(
-        image_datasets.BasePairedImageDataset(a_list, b_list),
+        superres_datasets.BasePairedImageDataset(a_list, b_list),
         batch_size=global_config.test_size,
         num_workers=1
     )
@@ -128,7 +128,7 @@ def load_singleimg_dataset(a_path):
     print("Length of images: %d" % (img_length))
 
     data_loader = torch.utils.data.DataLoader(
-        image_datasets.SingleImageDataset(a_list, 1),
+        superres_datasets.SingleImageDataset(a_list, 1),
         batch_size=global_config.test_size,
         num_workers=4
     )

@@ -1,34 +1,31 @@
 #Script to use for running heavy training.
 
 import os
-def train_shadow_matte():
-    os.system("python3 \"shadow_train_main.py\" --server_config=3 --img_to_load=-1 --train_mode=\"train_shadow_matte\" "
-              "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2sm_v62.00_istd\" --iteration=1")
 
-    os.system("python3 \"shadow_train_main.py\" --server_config=3 --img_to_load=-1 --train_mode=\"train_shadow_matte\" "
-              "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2sm_v62.01_istd\" --iteration=1")
-
-    # os.system("python3 \"shadow_train_main.py\" --server_config=3 --img_to_load=-1 --train_mode=\"train_shadow_matte\" "
-    #           "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2sm_v62.02_istd\" --iteration=1")
+def train_sr_main():
+    # os.system("python3 \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
+    #           "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.02_flickr2k\" --iteration=3")
     #
-    # os.system("python3 \"shadow_train_main.py\" --server_config=3 --img_to_load=-1 --train_mode=\"train_shadow_matte\" "
-    #           "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2sm_v62.03_istd\" --iteration=1")
+    # os.system("python3 \"train_sr_main.py\" --server_config=5 --img_to_load=-1 "
+    #           "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.03_flickr2k\" --iteration=3")
 
-def train_shadow_removal():
-    os.system("python3 \"shadow_train_main.py\" --server_config=3 --img_to_load=-1 --train_mode=\"train_shadow\" "
-              "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2ns_v61.00_places\" --iteration=1")
+    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.03_div2k\" --iteration=3")
 
-def train_img2img():
-    os.system("python3 \"train_img2img_main.py\" --server_config=5 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"synth2srd_v01.00\" --iteration=5")
+    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.04_div2k\" --iteration=3")
 
-    os.system("python3 \"train_img2img_main.py\" --server_config=5 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"synth2istd_v01.00\" --iteration=5")
+def test_sr_main():
+    os.system("python3 \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=1 --network_version=\"mobisr_v01.00_burstsr\" --iteration=3")
 
+def download_ml_hypersim():
+    os.system("python3 \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
 
 def main():
-    # train_img2img()
-    train_shadow_matte()
+    train_sr_main()
+    # test_sr_main()
+    # download_ml_hypersim()
     # os.system("shutdown /s /t 1")
 
 

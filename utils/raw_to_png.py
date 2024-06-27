@@ -3,7 +3,6 @@ import glob
 
 # python dng_to_png.py path_to_my_dng_file.dng
 
-import numpy as np
 import imageio
 import rawpy
 import sys
@@ -311,13 +310,13 @@ def convert_raw_dataset_to_png():
         print(lr_path_list[i])
 
 def organize_burstsr_files_for_train():
-    lr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
-    hr_path = "X:/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+    lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+    hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
 
     global_config.test_size = 64
     test_loader, test_count = dataset_loader.load_base_img2img_dataset(lr_path, hr_path)
-    new_lr_path = "X:/SuperRes Dataset/v02_burstsr/lr/"
-    new_hr_path = "X:/SuperRes Dataset/v02_burstsr/hr/"
+    new_lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/lr/"
+    new_hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/hr/"
 
     if not os.path.exists(new_lr_path):
         os.makedirs(new_lr_path, exist_ok=True)
