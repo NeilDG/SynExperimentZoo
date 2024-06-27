@@ -206,23 +206,23 @@ def main(argv):
             img2img_t.visualize_results(input_map, "Train Dataset")
         img2img_t.report_metrics("Train Dataset")
 
-        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
-        #     a_batch = a_batch.to(device)
-        #     b_batch = b_batch.to(device)
-        #
-        #     input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
-        #     img2img_t.measure_and_store(input_map)
-        #     img2img_t.save_images(input_map)
-        #     pbar.update(1)
-        #
-        #     if ((i + 1) % 50 == 0):
-        #         break
-        #
-        # if (global_config.plot_enabled == 1):
-        #     img2img_t.visualize_results(input_map, "Test - BurstSR")
-        # img2img_t.report_metrics("Test - BurstSR")
-        #
-        # pbar.close()
+        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
+            a_batch = a_batch.to(device)
+            b_batch = b_batch.to(device)
+
+            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+            img2img_t.measure_and_store(input_map)
+            img2img_t.save_images(input_map)
+            pbar.update(1)
+
+            if ((i + 1) % 50 == 0):
+                break
+
+        if (global_config.plot_enabled == 1):
+            img2img_t.visualize_results(input_map, "Test - BurstSR")
+        img2img_t.report_metrics("Test - BurstSR")
+
+        pbar.close()
 
         for i, (file_name, a_batch, b_batch) in enumerate(test_loader_div2k, 0):
             a_batch = a_batch.to(device)

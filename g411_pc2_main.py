@@ -8,14 +8,14 @@ def train_sr_main():
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --network_version=\"mobisr_v01.05_burstsr\" --iteration=3")
+              "--plot_enabled=1 --network_version=\"mobisr_v01.02_flickr2k\" --iteration=3")
 
 def download_ml_hypersim():
     os.system("python \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
 
 def main():
-    train_sr_main()
-    # test_sr_main()
+    # train_sr_main()
+    test_sr_main()
     # download_ml_hypersim()
     # os.system("shutdown /s /t 1")
 
