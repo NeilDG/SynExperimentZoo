@@ -17,7 +17,7 @@ def main():
     train_sr_main()
     # test_sr_main()
     # download_ml_hypersim()
-    # os.system("shutdown /s /t 1")
+    os.system("shutdown /s /t 1")
 
 
 if __name__ == "__main__":
