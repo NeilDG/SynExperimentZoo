@@ -29,7 +29,7 @@ def test_sr_main():
     #           "--plot_enabled=1 --network_version=\"mobisr_v01.00_div2k\" --iteration=3")
 
     os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-              "--plot_enabled=1 --network_version=\"mobisr_v01.01_div2k\" --iteration=3")
+              "--plot_enabled=1 --network_version=\"mobisr_v01.05_div2k\" --iteration=3")
 
     # os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
     #           "--plot_enabled=0 --network_version=\"mobisr_v01.02_div2k\" --iteration=3")
