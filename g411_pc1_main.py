@@ -4,7 +4,16 @@ import os
 
 def train_sr_main():
     os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.07_div2k\" --iteration=3")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.05_div2k\" --iteration=1")
+
+    os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.05_div2k\" --iteration=2")
+
+    os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.05_div2k\" --iteration=4")
+
+    os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.05_div2k\" --iteration=5")
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
@@ -17,7 +26,7 @@ def main():
     train_sr_main()
     # test_sr_main()
     # download_ml_hypersim()
-    os.system("shutdown /s /t 1")
+    # os.system("shutdown /s /t 1")
 
 
 if __name__ == "__main__":
