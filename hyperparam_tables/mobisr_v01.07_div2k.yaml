@@ -19,4 +19,4 @@ max_epochs: 200
 dataset_version: "div2k"
 low_path: "/dpsr_x4/*.png"
 high_path: "/bicubic_x4/*.png"
-dataset_repeats: 100
+dataset_repeats: 500
