@@ -3,7 +3,7 @@
 import os
 
 def train_sr_main():
-    os.system("python \"train_sr_main.py\" --server_config=60--img_to_load=-1 "
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
               "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v01.05_div2k\" --iteration=6")
 
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
