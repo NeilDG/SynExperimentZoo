@@ -43,7 +43,6 @@ def update_config(opts):
     low_path = network_config["low_path"]
     high_path = network_config["high_path"]
 
-
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
         global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
@@ -176,8 +175,8 @@ def main(argv):
 
     for epoch in range(start_epoch, network_config["max_epochs"]):
         for i, (_, a_batch, b_batch) in enumerate(train_loader, 0):
-            a_batch = a_batch.to(device, non_blocking = True)
-            b_batch = b_batch.to(device, non_blocking = True)
+            a_batch = a_batch.to(device)
+            b_batch = b_batch.to(device)
             input_map = {"img_a" : a_batch, "img_b" : b_batch}
             img2img_t.train(epoch, iteration, input_map)
 
