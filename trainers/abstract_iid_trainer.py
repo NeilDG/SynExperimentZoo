@@ -17,18 +17,18 @@ class NetworkCreator():
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
 
-        net_config = network_config["model_type"]
+        model_type = network_config["model_type"]
         input_nc = network_config["input_nc"]
         num_blocks = network_config["num_blocks"]
         dropout_rate = network_config["dropout_rate"]
 
-        if (net_config == 1):
+        if (model_type == 1):
             G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif (net_config == 2):
+        elif (model_type == 2):
             G_A = unet_gan.UnetGenerator(input_nc=input_nc, output_nc=3, num_downs=num_blocks).to(self.gpu_device)
-        elif (net_config == 3):
+        elif (model_type == 3):
             G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=True).to(self.gpu_device)
-        elif(net_config == 4):
+        elif(model_type == 4):
             params = {'dim': 64,                     # number of filters in the bottommost layer
                       'mlp_dim': 256,                # number of filters in MLP
                       'style_dim': 8,                # length of style code
@@ -38,11 +38,11 @@ class NetworkCreator():
                       'n_res': num_blocks,                    # number of residual blocks in content encoder/decoder
                       'pad_type': 'reflect'}
             G_A = usi3d_gan.AdaINGen(input_dim=input_nc, output_dim=3, params=params, use_dropout=network_config["use_dropout"]).to(self.gpu_device)
-        elif(net_config == 5):
+        elif(model_type == 5):
             G_A = ffa_gan.FFA(input_nc, num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif(net_config == 6):
+        elif(model_type == 6):
             G_A = ffa_gan.FFABase(num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif (net_config == 7):
+        elif (model_type == 7):
             params = {'dim': 64,  # number of filters in the bottommost layer
                       'mlp_dim': 256,  # number of filters in MLP
                       'style_dim': 8,  # length of style code
@@ -63,7 +63,7 @@ class NetworkCreator():
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
 
-        net_config = network_config["model_type"]
+        model_type = network_config["model_type"]
         input_nc = network_config["input_nc"]
         num_blocks = network_config["num_blocks"]
         dropout_rate = network_config["dropout_rate"]
@@ -71,11 +71,11 @@ class NetworkCreator():
 
         D_A = cycle_gan.Discriminator(input_nc=3).to(self.gpu_device)  # use CycleGAN's discriminator
 
-        if (net_config == 1):
+        if (model_type == 1):
             G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=network_config["use_cbam"], norm=norm_mode).to(self.gpu_device)
-        elif (net_config == 2):
+        elif (model_type == 2):
             G_A = unet_gan.UnetGenerator(input_nc=input_nc, output_nc=3, num_downs=num_blocks).to(self.gpu_device)
-        elif (net_config == 3):
+        elif (model_type == 3):
             print("Using AdainGEN")
             params = {'dim': 64,  # number of filters in the bottommost layer
                       'mlp_dim': 256,  # number of filters in MLP
@@ -86,13 +86,13 @@ class NetworkCreator():
                       'n_res': network_config["num_blocks"],  # number of residual blocks in content encoder/decoder
                       'pad_type': 'reflect'}
             G_A = usi3d_gan.AdaINGen(input_dim=3, output_dim=3, params=params).to(self.gpu_device)
-        elif (net_config == 4):
+        elif (model_type == 4):
             print("Using FFA Net")
             G_A = ffa_gan.FFABase(num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif (net_config == 5):
+        elif (model_type == 5):
             print("Using RRDBNet")
             G_A = rrdbnet.RRDBNet(in_nc=input_nc, sf=1).to(self.gpu_device)
-        elif(net_config == 6):
+        elif(model_type == 6):
             print("Using SwinIR")
             G_A = network_swinir.SwinIR(upscale=1,
                    window_size=8, img_range=1., depths=[6, 6, 6, 6],

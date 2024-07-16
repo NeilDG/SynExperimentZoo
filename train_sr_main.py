@@ -39,7 +39,7 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version = network_config["dataset_version"]
+    dataset_version = network_config["dataset_version"] + "_patched" #TODO: hardcoded _patched suffix. To fix
     low_path = network_config["low_path"]
     high_path = network_config["high_path"]
 
