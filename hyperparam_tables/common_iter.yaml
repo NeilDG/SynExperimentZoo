@@ -39,7 +39,14 @@ hyperparams:
     perceptual_weight: 10.0
     tv_weight: 0.0
     is_bce: 1
-
+    
+  7:
+    l1_weight: 5.0
+    adv_weight: 1.0
+    color_weight: 1.0
+    perceptual_weight: 10.0
+    tv_weight: 100.0
+    is_bce: 0
     
   9:
     l1_weight: 1.0
@@ -55,4 +62,20 @@ hyperparams:
     color_weight: 1.0
     perceptual_weight: 1.0
     tv_weight: 400.0
+    is_bce: 1
+    
+  11:
+    l1_weight: 0.01
+    adv_weight: 1.0
+    color_weight: 0.0
+    perceptual_weight: 10.0
+    tv_weight: 100.0
+    is_bce: 0
+
+  12:
+    l1_weight: 0.01
+    adv_weight: 1.0
+    color_weight: 0.0
+    perceptual_weight: 10.0
+    tv_weight: 100.0
     is_bce: 1
