@@ -51,7 +51,7 @@ def update_config(opts):
         global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
-        print("Using G411-RTX4060Ti configuration. Workers: ", global_config.num_workers)
+        print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
 
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
@@ -61,7 +61,7 @@ def update_config(opts):
         global_config.b_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
-        print("Using CCS configuration. Workers: ", global_config.num_workers)
+        print("Using CCS configuration.", global_config, network_config)
 
     elif(global_config.server_config == 2): #RTX 2080Ti
         global_config.num_workers = 6
@@ -71,7 +71,7 @@ def update_config(opts):
         global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        print("Using RTX 2080Ti configuration. Workers: ", global_config.num_workers)
+        print("Using RTX 2080Ti configuration.", global_config, network_config)
 
     elif(global_config.server_config == 3): #RTX 3090 PC
         global_config.num_workers = 12
@@ -81,7 +81,7 @@ def update_config(opts):
         global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
-        print("Using RTX 3090 configuration. Workers: ", global_config.num_workers)
+        print("Using RTX 3090 configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 4):  #Titan RTX 3060
         global_config.num_workers = 4
@@ -91,7 +91,7 @@ def update_config(opts):
         global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
+        print("Using TITAN Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 5): #Titan RTX 2070
         global_config.num_workers = 4
@@ -101,7 +101,7 @@ def update_config(opts):
         global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][3]
         global_config.load_size = network_config["load_size"][3]
-        print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
+        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 6): #G411 RTX 3060
         global_config.num_workers = 8
@@ -111,7 +111,7 @@ def update_config(opts):
         global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
+        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version, low_path=low_path)
     global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version, high_path=high_path)
