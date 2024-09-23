@@ -39,7 +39,8 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version = network_config["dataset_version"] + "_patched" #TODO: hardcoded _patched suffix. To fix
+    dataset_version_train = network_config["dataset_version"] + "_patched" #TODO: hardcoded _patched suffix. To fix
+    dataset_version_test = network_config["dataset_version"]
     low_path = network_config["low_path"]
     high_path = network_config["high_path"]
 
@@ -113,10 +114,10 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
-    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version, low_path=low_path)
-    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version, high_path=high_path)
-    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version, low_path=low_path)
-    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version, high_path=high_path)
+    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version_train, low_path=low_path)
+    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version_train, high_path=high_path)
+    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version_test, low_path=low_path)
+    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_version_test, high_path=high_path)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
