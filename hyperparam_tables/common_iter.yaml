@@ -79,3 +79,21 @@ hyperparams:
     perceptual_weight: 10.0
     tv_weight: 100.0
     is_bce: 1
+    
+  13:
+    l1_weight: 5.0
+    adv_weight: 1.0
+    color_weight: 0.0
+    perceptual_weight: 10.0
+    tv_weight: 100.0
+    bicubic_weight: 1.0
+    is_bce: 0
+
+  14:
+    l1_weight: 5.0
+    adv_weight: 1.0
+    color_weight: 0.0
+    perceptual_weight: 10.0
+    tv_weight: 100.0
+    bicubic_weight: 1.0
+    is_bce: 1
