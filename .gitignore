@@ -137,3 +137,4 @@ checkpoint/*.pth
 checkpoint/best/
 checkpoint/by_epoch/
 checkpoint/by_sample/
+checkpoint/old/

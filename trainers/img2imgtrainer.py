@@ -48,8 +48,6 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
         self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters(), self.G_B2A.parameters()), lr=network_config["g_lr"], weight_decay=network_config["weight_decay"])
         self.optimizerD = torch.optim.Adam(itertools.chain(self.D_A.parameters(), self.D_B.parameters()), lr=network_config["d_lr"], weight_decay=network_config["weight_decay"])
-        self.schedulerG = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizerG, patience=1000000 / self.batch_size, threshold=0.00005)
-        self.schedulerD = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizerD, patience=1000000 / self.batch_size, threshold=0.00005)
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
         self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pt'
@@ -156,8 +154,8 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
             self.fp16_scaler.scale(errD).backward()
             if (accum_batch_size % self.batch_size == 0):
-                self.schedulerD.step(errD)
                 self.fp16_scaler.step(self.optimizerD)
+                self.fp16_scaler.update()
 
             self.optimizerG.zero_grad()
             self.G_A2B.train()
@@ -189,7 +187,6 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
             self.fp16_scaler.scale(errG).backward()
 
             if (accum_batch_size % self.batch_size == 0):
-                self.schedulerG.step(errG)
                 self.fp16_scaler.step(self.optimizerG)
                 self.fp16_scaler.update()
 

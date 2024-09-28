@@ -41,12 +41,13 @@ class PairedTrainer:
 
         self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters()), lr=network_config["g_lr"])
         self.optimizerD = torch.optim.Adam(itertools.chain(self.D_B.parameters()), lr=network_config["d_lr"])
-        self.schedulerG = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizerG, patience=100000 / self.batch_size, threshold=0.00005)
-        self.schedulerD = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizerD, patience=100000 / self.batch_size, threshold=0.00005)
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
         self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
         self.load_saved_state()
+
+        self.optimizerG.zero_grad()
+        self.optimizerD.zero_grad()
 
     def initialize_dict(self):
         # dictionary keys
@@ -57,6 +58,7 @@ class PairedTrainer:
         self.TV_LOSS_KEY = "tv_loss"
         self.SSIM_LOSS_KEY = "ssim_loss"
         self.PERCEPTUAL_LOSS_KEY = "perceptual_loss"
+        self.BICUBIC_LOSS_KEY = "bicubic_loss"
 
         self.D_OVERALL_LOSS_KEY = "d_loss"
         self.D_B_LOSS_KEY = "d_b"
@@ -71,6 +73,7 @@ class PairedTrainer:
         self.losses_dict[self.TV_LOSS_KEY] = []
         self.losses_dict[self.SSIM_LOSS_KEY] = []
         self.losses_dict[self.PERCEPTUAL_LOSS_KEY] = []
+        self.losses_dict[self.BICUBIC_LOSS_KEY] = []
         self.losses_dict[self.D_B_LOSS_KEY] = []
 
         self.caption_dict = {}
@@ -82,6 +85,7 @@ class PairedTrainer:
         self.caption_dict[self.TV_LOSS_KEY] = "TV loss per iteration"
         self.caption_dict[self.SSIM_LOSS_KEY] = "SSIM loss per iteration"
         self.caption_dict[self.PERCEPTUAL_LOSS_KEY] = "Perceptual loss per iteration"
+        self.caption_dict[self.BICUBIC_LOSS_KEY] = "Bicubic loss per iteration"
         self.caption_dict[self.D_B_LOSS_KEY] = "D(B) real loss per iteration"
 
         # what to store in visdom?
@@ -102,7 +106,6 @@ class PairedTrainer:
         accum_batch_size = self.load_size * iteration
 
         with amp.autocast():
-            self.optimizerD.zero_grad()
             self.D_B.train()
 
             output = self.G_A2B(img_a)
@@ -115,13 +118,9 @@ class PairedTrainer:
 
             errD = D_B_real_loss + D_B_fake_loss
             self.fp16_scaler.scale(errD).backward()
-            if (accum_batch_size % self.batch_size == 0):
-                self.schedulerD.step(errD)
-                self.fp16_scaler.step(self.optimizerD)
+            torch.nn.utils.clip_grad_norm_(self.D_B.parameters(), max_norm=1.0)  # gradient clip
 
-            self.optimizerG.zero_grad()
             self.G_A2B.train()
-
             img_a2b = self.G_A2B(img_a)
 
             # print("Shapes of pred and target:", np.shape(img_a2b), np.shape(img_b))
@@ -129,18 +128,23 @@ class PairedTrainer:
             B_perceptual_loss = self.common_losses.compute_perceptual_loss(img_a2b, img_b)
             B_color_loss = self.common_losses.compute_color_loss(img_a2b, img_b)
             B_tv_loss = self.common_losses.compute_total_variation_loss(img_a2b)
+            B_bicubic_loss = self.common_losses.compute_bicubic_loss(img_a2b, img_b)
 
             prediction = self.D_B(img_a2b)
             real_tensor = torch.ones_like(prediction)
             B_adv_loss = self.common_losses.compute_adversarial_loss(prediction, real_tensor)
 
-            errG = B_likeness_loss  + B_adv_loss
+            errG = B_likeness_loss + B_perceptual_loss + B_color_loss + B_tv_loss + B_bicubic_loss + B_adv_loss
             self.fp16_scaler.scale(errG).backward()
+            torch.nn.utils.clip_grad_norm_(self.G_A2B.parameters(), max_norm=1.0)  # gradient clip
 
             if (accum_batch_size % self.batch_size == 0):
-                self.schedulerG.step(errG)
+                self.fp16_scaler.step(self.optimizerD)
                 self.fp16_scaler.step(self.optimizerG)
                 self.fp16_scaler.update()
+
+                self.optimizerD.zero_grad()
+                self.optimizerG.zero_grad()
 
                 # what to put to losses dict for visdom reporting?
                 if (iteration > 10):
@@ -151,6 +155,7 @@ class PairedTrainer:
                     self.losses_dict[self.PERCEPTUAL_LOSS_KEY].append(B_perceptual_loss.item())
                     self.losses_dict[self.COLOR_LOSS_KEY].append(B_color_loss.item())
                     self.losses_dict[self.TV_LOSS_KEY].append(B_tv_loss.item())
+                    self.losses_dict[self.BICUBIC_LOSS_KEY].append(B_bicubic_loss.item())
                     self.losses_dict[self.D_B_LOSS_KEY].append(D_B_fake_loss.item() + D_B_real_loss.item())
 
         a2b = self.test(input_map, "Train")

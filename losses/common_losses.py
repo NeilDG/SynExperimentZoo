@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 from config.network_config import ConfigHolder
 from losses import vgg_loss
+from losses import bicubic_loss
 
 
 #
@@ -18,6 +19,7 @@ class LossRepository():
         self.ssim_loss = kornia.losses.SSIMLoss(5)
         self.vgg_loss = vgg_loss.VGGPerceptualLoss()
         self.vgg_loss.to(self.gpu_device)
+        self.bicubic_loss_proper = bicubic_loss.BicubicDegradationLoss()
 
     def compute_adversarial_loss(self, pred, target):
         config_holder = ConfigHolder.getInstance()
@@ -82,5 +84,14 @@ class LossRepository():
         weight = config_holder.get_hyper_params_weight(self.iteration, "ssim_weight")
         if (weight > 0.0):
             return self.ssim_loss(pred, target) * weight
+        else:
+            return torch.zeros_like(self.l1_loss(pred, target))
+
+
+    def compute_bicubic_loss(self, pred, target):
+        config_holder = ConfigHolder.getInstance()
+        weight = config_holder.get_hyper_params_weight(self.iteration, "bicubic_weight")
+        if (weight > 0.0):
+            return self.bicubic_loss_proper(pred, target) * weight
         else:
             return torch.zeros_like(self.l1_loss(pred, target))
