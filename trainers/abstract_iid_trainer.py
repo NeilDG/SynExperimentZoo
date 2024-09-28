@@ -68,11 +68,12 @@ class NetworkCreator():
         num_blocks = network_config["num_blocks"]
         dropout_rate = network_config["dropout_rate"]
         norm_mode = config_holder.get_network_attribute("norm_mode", "batch")
+        use_cbam = config_holder.get_network_attribute("use_cbam", False)
 
         D_A = cycle_gan.Discriminator(input_nc=3).to(self.gpu_device)  # use CycleGAN's discriminator
 
         if (model_type == 1):
-            G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=network_config["use_cbam"], norm=norm_mode).to(self.gpu_device)
+            G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=use_cbam, norm=norm_mode).to(self.gpu_device)
         elif (model_type == 2):
             G_A = unet_gan.UnetGenerator(input_nc=input_nc, output_nc=3, num_downs=num_blocks).to(self.gpu_device)
         elif (model_type == 3):
