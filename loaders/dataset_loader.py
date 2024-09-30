@@ -41,31 +41,31 @@ def load_train_img2img_dataset(a_path, b_path):
     network_config = ConfigHolder.getInstance().get_network_config()
     a_list = glob.glob(a_path)
     b_list = glob.glob(b_path)
-    a_list_dup = glob.glob(a_path)
-    b_list_dup = glob.glob(b_path)
 
     if (global_config.img_to_load > 0):
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
-        a_list_dup = a_list_dup[0: global_config.img_to_load]
-        b_list_dup = b_list_dup[0: global_config.img_to_load]
 
-    for i in range(0, network_config["dataset_repeats"]): #TEMP: formerly 0-1
-        a_list += a_list_dup
-        b_list += b_list_dup
+    # Ensure a_list and b_list have at least 200,000 elements
+    ideal_sample_size = 300000
+    if len(a_list) < ideal_sample_size:
+        extend_length = ideal_sample_size - len(a_list)
+        a_list.extend(a_list * (extend_length // len(a_list) + 1))
+        b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
-    # temp_list = list(zip(a_list, b_list))
-    # random.shuffle(temp_list)
-    # a_list, b_list = zip(*temp_list)
+    # # Repeat the dataset for multiple passes (optional)
+    # for i in range(0, network_config["dataset_repeats"]):
+    #     a_list.extend(a_list)  # Extend with original list for repeats
+    #     b_list.extend(b_list)
 
     img_length = len(a_list)
-    print("Length of images: %d %d"  % (img_length, len(b_list)))
-
     num_workers = global_config.num_workers
+    print("Length of images: %d %d. Num workers: %d" % (img_length, len(b_list), num_workers))
+
     data_loader = torch.utils.data.DataLoader(
         superres_datasets.PairedImageDataset(a_list, b_list, 1),
         batch_size=global_config.load_size,
-        num_workers=num_workers, pin_memory=True, prefetch_factor=8
+        num_workers=num_workers, pin_memory=True, prefetch_factor=4
     )
 
     return data_loader, img_length

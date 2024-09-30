@@ -13,52 +13,6 @@ class NetworkCreator():
     def __init__(self, gpu_device):
         self.gpu_device = gpu_device
 
-    def initialize_rgb_network(self):
-        config_holder = ConfigHolder.getInstance()
-        network_config = config_holder.get_network_config()
-
-        model_type = network_config["model_type"]
-        input_nc = network_config["input_nc"]
-        num_blocks = network_config["num_blocks"]
-        dropout_rate = network_config["dropout_rate"]
-
-        if (model_type == 1):
-            G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif (model_type == 2):
-            G_A = unet_gan.UnetGenerator(input_nc=input_nc, output_nc=3, num_downs=num_blocks).to(self.gpu_device)
-        elif (model_type == 3):
-            G_A = cycle_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, dropout_rate=dropout_rate, use_cbam=True).to(self.gpu_device)
-        elif(model_type == 4):
-            params = {'dim': 64,                     # number of filters in the bottommost layer
-                      'mlp_dim': 256,                # number of filters in MLP
-                      'style_dim': 8,                # length of style code
-                      'n_layer': 3,                  # number of layers in feature merger/splitor
-                      'activ': 'relu',               # activation function [relu/lrelu/prelu/selu/tanh]
-                      'n_downsample': 2,             # number of downsampling layers in content encoder
-                      'n_res': num_blocks,                    # number of residual blocks in content encoder/decoder
-                      'pad_type': 'reflect'}
-            G_A = usi3d_gan.AdaINGen(input_dim=input_nc, output_dim=3, params=params, use_dropout=network_config["use_dropout"]).to(self.gpu_device)
-        elif(model_type == 5):
-            G_A = ffa_gan.FFA(input_nc, num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif(model_type == 6):
-            G_A = ffa_gan.FFABase(num_blocks, dropout_rate=dropout_rate).to(self.gpu_device)
-        elif (model_type == 7):
-            params = {'dim': 64,  # number of filters in the bottommost layer
-                      'mlp_dim': 256,  # number of filters in MLP
-                      'style_dim': 8,  # length of style code
-                      'n_layer': 3,  # number of layers in feature merger/splitor
-                      'activ': 'relu',  # activation function [relu/lrelu/prelu/selu/tanh]
-                      'n_downsample': 2,  # number of downsampling layers in content encoder
-                      'n_res': num_blocks,  # number of residual blocks in content encoder/decoder
-                      'pad_type': 'reflect'}
-            G_A = usi3d_gan.AdaINGenConcat(input_dim=input_nc, output_dim=3, params=params, use_dropout=network_config["use_dropout"]).to(self.gpu_device)
-        else:
-            G_A = cycle_gan.GeneratorV2(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, has_dropout=False, multiply=False).to(self.gpu_device)
-
-        D_A = cycle_gan.Discriminator(input_nc=3).to(self.gpu_device)  # use CycleGAN's discriminator
-
-        return G_A, D_A
-
     def initialize_img2img_network(self):
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
