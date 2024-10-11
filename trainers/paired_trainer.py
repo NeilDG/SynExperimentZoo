@@ -118,7 +118,7 @@ class PairedTrainer:
 
             errD = D_B_real_loss + D_B_fake_loss
             self.fp16_scaler.scale(errD).backward()
-            torch.nn.utils.clip_grad_norm_(self.D_B.parameters(), max_norm=1.0)  # gradient clip
+            # torch.nn.utils.clip_grad_norm_(self.D_B.parameters(), max_norm=1.0)  # gradient clip
 
             self.G_A2B.train()
             img_a2b = self.G_A2B(img_a)
@@ -136,7 +136,7 @@ class PairedTrainer:
 
             errG = B_likeness_loss + B_perceptual_loss + B_color_loss + B_tv_loss + B_bicubic_loss + B_adv_loss
             self.fp16_scaler.scale(errG).backward()
-            torch.nn.utils.clip_grad_norm_(self.G_A2B.parameters(), max_norm=1.0)  # gradient clip
+            # torch.nn.utils.clip_grad_norm_(self.G_A2B.parameters(), max_norm=1.0)  # gradient clip
 
             if (accum_batch_size % self.batch_size == 0):
                 self.fp16_scaler.step(self.optimizerD)
