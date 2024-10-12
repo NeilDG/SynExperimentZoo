@@ -11,8 +11,9 @@ unzip "scratch3/SynthWeather Dataset 10.zip"
 git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "scratch3/SynExperimentZoo"
 git clone --depth 1 -b "workspace/V01.XX.XX" "https://github.com/NeilDG/SynExperimentZoo.git" "scratch3/SynExperimentZoo-2"
 
-rm -rf "/scratch3/neil.delgallego/NeuralNets-GenerativeExperiment-V61.XX.XX-2"
-rm -rf "/scratch3/neil.delgallego/SynthV3_Raw/"
+rm -rf "/scratch3/neil.delgallego/"
+rm -rf "/scratch3/neil.delgallego/ISTD_Dataset"
+rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10"
 
 gdown https://drive.google.com/uc?id=1B6erEfeB2_n_KYP5GtCQU-DHGE1bKEVE --o "scratch2/SynthWeather Dataset 10/"
 mv "/scratch1/scratch2/neil.delgallego/NeuralNets-GenerativeExperiment-V58.XX.XX/v26" "/scratch1/scratch2/neil.delgallego/SynthWeather Dataset 10/v26"
