@@ -18,6 +18,18 @@ def dc_gan_weights_init(m):
             nn.init.normal_(m.weight.data, 1.0, 0.02)
             nn.init.constant_(m.bias.data, 0)
 
+def weights_zero_init(m):
+    """
+    Initializes the weights of a module using the following parameters
+    """
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0)
+    elif isinstance(m, nn.BatchNorm2d):
+        nn.init.constant_(m.weight, 1)
+        nn.init.constant_(m.bias, 0)
+
 
 def normal_weights_init(m):
     classname = m.__class__.__name__
@@ -122,7 +134,8 @@ class Generator(nn.Module):
                     nn.Tanh() ]
 
         self.model = nn.Sequential(*model)
-        self.model.apply(dc_gan_weights_init)
+        # self.model.apply(dc_gan_weights_init)
+        self.model.apply(weights_zero_init)
 
     def forward(self, x):
         return self.model(x)

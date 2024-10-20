@@ -1,4 +1,4 @@
-hyperparams:
+loss_weights:
   1:
     l1_weight: 1.0
     adv_weight: 1.0

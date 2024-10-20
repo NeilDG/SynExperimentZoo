@@ -20,8 +20,8 @@ class NetworkCreator():
         model_type = network_config["model_type"]
         input_nc = network_config["input_nc"]
         num_blocks = network_config["num_blocks"]
-        dropout_rate = network_config["dropout_rate"]
-        norm_mode = config_holder.get_network_attribute("norm_mode", "batch")
+        dropout_rate = config_holder.get_hyperparameter("dropout_rate", 0.0)
+        norm_mode = config_holder.get_hyperparameter("norm_mode", "batch")
         use_cbam = config_holder.get_network_attribute("use_cbam", False)
 
         D_A = cycle_gan.Discriminator(input_nc=3).to(self.gpu_device)  # use CycleGAN's discriminator

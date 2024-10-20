@@ -25,17 +25,51 @@ parser.add_option('--server_config', type=int, help="Is running on COARE?", defa
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--img_to_load', type=int, help="Image to load?", default=-1)
 parser.add_option('--network_version', type=str, default="vXX.XX")
-parser.add_option('--iteration', type=int, default=1)
+# parser.add_option('--iteration', type=int, default=1)
 parser.add_option('--plot_enabled', type=int, default=1)
 parser.add_option('--save_per_iter', type=int, default=500)
+
+
+def parse_string(input_string):
+    """
+    Parses a string of the format "AA.BB.CC.DD" and returns a tuple containing:
+        - a new string with "AA.BB"
+        - the integer value of "CC"
+        - the integer value of "DD"
+
+    Args:
+        input_string: The string to parse (format "AA.BB.CC.DD").
+
+    Returns:
+        A tuple containing the parsed string and the two integer values.
+
+    Raises:
+        ValueError: If the input string is not in the correct format.
+    """
+    # Split the string by "."
+    parts = input_string.split(".")
+
+    # Check if there are exactly four parts
+    if len(parts) != 4:
+        raise ValueError("Input string must be in the format 'AA.BB.CC.DD'")
+
+    # Extract the first two parts as a string
+    parsed_string = ".".join(parts[:2])
+
+    # Convert the last two parts to integers
+    try:
+        int_cc = int(parts[2])
+        int_dd = int(parts[3])
+    except ValueError:
+        raise ValueError("CC and DD must be integers")
+
+    return parsed_string, int_cc, int_dd
 
 def update_config(opts):
     global_config.server_config = opts.server_config
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.sr_network_version = opts.network_version
-    global_config.sr_iteration = opts.iteration
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
@@ -129,11 +163,14 @@ def main(argv):
     torch.manual_seed(manualSeed)
     np.random.seed(manualSeed)
 
+    global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = parse_string(opts.network_version)
+
     yaml_config = "./hyperparam_tables/{network_version}.yaml"
-    yaml_config = yaml_config.format(network_version=opts.network_version)
-    hyperparam_path = "./hyperparam_tables/common_iter.yaml"
-    with open(yaml_config) as f, open(hyperparam_path) as h:
-        ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader))
+    yaml_config = yaml_config.format(network_version=global_config.sr_network_version)
+    hyperparam_path = "./hyperparam_tables/common_hyper.yaml"
+    loss_weights_path = "./hyperparam_tables/common_weights.yaml"
+    with open(yaml_config) as f, open(hyperparam_path) as h, open(loss_weights_path) as l:
+        ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader), yaml.load(l, SafeLoader))
 
     update_config(opts)
     print(opts)
@@ -142,10 +179,12 @@ def main(argv):
     print("Torch CUDA version: %s" % torch.version.cuda)
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    hyperparam_config = ConfigHolder.getInstance().get_hyper_params()
-    network_iteration = global_config.sr_iteration
-    hyperparams_table = hyperparam_config["hyperparams"][network_iteration]
-    print("Network iteration:", str(network_iteration), ". Hyper parameters: ", hyperparams_table, " Learning rates: ", network_config["g_lr"], network_config["d_lr"])
+    hyperparams_table = ConfigHolder.getInstance().get_all_hyperparams()
+    loss_config = ConfigHolder.getInstance().get_loss_weights()
+    loss_iteration = global_config.loss_iteration
+
+    loss_config_table = loss_config["loss_weights"][loss_iteration]
+    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " Learning rates: ", hyperparams_table["g_lr"], hyperparams_table["d_lr"])
 
     a_path_train = global_config.a_path_train
     b_path_train = global_config.b_path_train

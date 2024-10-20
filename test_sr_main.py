@@ -153,7 +153,7 @@ def main(argv):
     print("Torch CUDA version: %s" % torch.version.cuda)
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    hyperparam_config = ConfigHolder.getInstance().get_hyper_params()
+    hyperparam_config = ConfigHolder.getInstance().get_loss_weights()
     network_iteration = global_config.sr_iteration
     hyperparams_table = hyperparam_config["hyperparams"][network_iteration]
     print("Network iteration:", str(network_iteration), ". Hyper parameters: ", hyperparams_table, " Learning rates: ", network_config["g_lr"], network_config["d_lr"])

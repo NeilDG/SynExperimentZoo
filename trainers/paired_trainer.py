@@ -22,8 +22,9 @@ class PairedTrainer:
     def initialize_train_config(self):
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
-        self.iteration = global_config.sr_iteration
-        self.common_losses = common_losses.LossRepository(self.gpu_device, self.iteration)
+        hyperparam_config = config_holder.get_all_hyperparams()
+        self.iteration = global_config.loss_iteration
+        self.common_losses = common_losses.LossRepository(self.gpu_device)
 
         self.D_B_pool = image_pool.ImagePool(50)
         self.fp16_scaler = amp.GradScaler()
@@ -39,8 +40,8 @@ class PairedTrainer:
         network_creator = abstract_iid_trainer.NetworkCreator(self.gpu_device)
         self.G_A2B, self.D_B = network_creator.initialize_img2img_network()
 
-        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters()), lr=network_config["g_lr"])
-        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_B.parameters()), lr=network_config["d_lr"])
+        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters()), lr=hyperparam_config["g_lr"])
+        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_B.parameters()), lr=hyperparam_config["d_lr"])
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
         self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'

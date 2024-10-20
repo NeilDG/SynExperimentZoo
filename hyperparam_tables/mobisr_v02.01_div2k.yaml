@@ -11,8 +11,6 @@ weight_decay: 0.0
 dropout_rate: 0.0
 augment_key: ["none"]
 
-g_lr: 0.0002
-d_lr: 0.0002
 min_epochs: 400
 max_epochs: 400
 
