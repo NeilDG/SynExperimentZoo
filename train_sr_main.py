@@ -148,7 +148,7 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
-    elif (global_config.server_config == 6): #RTX 3060 Laguna PCs
+    elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
         global_config.num_workers = 16
         global_config.a_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
