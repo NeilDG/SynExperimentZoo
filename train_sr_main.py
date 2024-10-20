@@ -149,7 +149,7 @@ def update_config(opts):
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
-        global_config.num_workers = 16
+        global_config.num_workers = 8
         global_config.a_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.a_path_test = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
