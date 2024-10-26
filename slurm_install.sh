@@ -16,7 +16,7 @@ module load cuda
 source activate NeilZoo
 
 #do fresh install
-python.exe -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 pip-review --local --auto
 pip install -I numpy==1.26.4
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
