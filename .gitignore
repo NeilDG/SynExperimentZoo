@@ -140,4 +140,4 @@ checkpoint/by_sample/
 checkpoint/old/
 .idea/SynExperimentZoo.iml
 .idea/misc.xml
-/.idea
+.idea/
