@@ -49,9 +49,9 @@ def patchify():
     patch_size = (64, 64)  # Size of the patches
     stride = (64, 64)  # Stride for patching
 
-    input_dir = "X:/SuperRes Dataset/div2k/*/"  # Path to the image dataset
-    reference_dir = "X:/SuperRes Dataset/div2k/bicubic_x4/"  # Reference size of the HR image
-    output_dir = "X:/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
+    input_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/*/"  # Path to the image dataset
+    reference_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/bicubic_x4/"  # Reference size of the HR image
+    output_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
 
     # Get all image paths
     image_paths = glob.glob(os.path.join(input_dir, "*.png"))
