@@ -3,11 +3,17 @@
 import os
 
 def train_sr_main():
-    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.00_div2k\" --iteration=1")
+    os.system("python \"train_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.1\"")
 
-    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.00_div2k\" --iteration=2")
+    os.system("python \"train_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.2\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.3\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.4\"")
 
 def test_sr_main():
     os.system("python3 \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
