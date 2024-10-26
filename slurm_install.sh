@@ -13,7 +13,7 @@
 
 module load anaconda
 module load cuda
-source activate NeilGAN_V2
+source activate NeilZoo
 
 #do fresh install
 python.exe -m pip install --upgrade pip
