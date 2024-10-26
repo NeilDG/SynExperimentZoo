@@ -15,7 +15,7 @@ nvidia-smi
 module load anaconda/3-2021.11
 module load cuda/10.1_cudnn-7.6.5
 
-source activate NeilGAN_V2
+source activate NeilZoo
 
 srun python train_img2img_main.py \
 --server_config=0 --img_to_load=-1 \
