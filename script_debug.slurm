@@ -16,7 +16,7 @@ module load anaconda
 module load cuda
 source activate NeilZoo
 
-srun python train_sr_main.py --server_config=0 --img_to_load=-1 \
+srun python train_sr_main.py --server_config=8 --img_to_load=-1 \
 --plot_enabled=0 --save_per_iter=500 --network_version=$NETWORK_VERSION
 
 conda deactivate
