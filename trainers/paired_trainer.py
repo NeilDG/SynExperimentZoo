@@ -6,7 +6,7 @@ from config.network_config import ConfigHolder
 from losses import common_losses
 import global_config
 import torch
-import torch.cuda.amp as amp
+import torch.amp as amp
 import itertools
 
 from model.modules import image_pool
@@ -106,7 +106,7 @@ class PairedTrainer:
         img_b = input_map["img_b"]
         accum_batch_size = self.load_size * iteration
 
-        with amp.autocast():
+        with amp.autocast(device_type=str(self.gpu_device)):
             self.D_B.train()
 
             output = self.G_A2B(img_a)
@@ -214,12 +214,12 @@ class PairedTrainer:
 
     def load_saved_state(self):
         try:
-            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device)
+            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device, weights_only=True)
         except:
             # check if a .checkpt is available, load it
             try:
                 checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
-                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device)
+                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device, weights_only=True)
             except:
                 checkpoint = None
                 print("No existing checkpoint file found. Creating new SR network: ", self.NETWORK_CHECKPATH)

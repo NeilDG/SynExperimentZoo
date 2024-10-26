@@ -1,10 +1,12 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 import kornia.losses
 import torch.nn as nn
 import torch
 from config.network_config import ConfigHolder
 from losses import vgg_loss
 from losses import bicubic_loss
-
 
 #
 # Class to contain common losses used for training networks

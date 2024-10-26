@@ -1,17 +1,7 @@
 import glob
 import random
-from pathlib import Path
-
-import kornia
-import numpy as np
 import torch
-import torchvision.utils
-from super_image.data import EvalDataset
-from torch.utils import data
-import cv2
-import torchvision.transforms as transforms
-from tqdm import tqdm
-
+# from super_image.data import EvalDataset
 import global_config
 from config.network_config import ConfigHolder
 from loaders import superres_datasets
@@ -135,12 +125,12 @@ def load_singleimg_dataset(a_path):
 
     return data_loader, img_length
 
-def load_huggingface_sr_dataset(eval_dataset:EvalDataset):
-    data_loader = torch.utils.data.DataLoader(
-        eval_dataset,
-        batch_size=global_config.test_size,
-        num_workers=4
-    )
-
-    return data_loader
+# def load_huggingface_sr_dataset(eval_dataset:EvalDataset):
+#     data_loader = torch.utils.data.DataLoader(
+#         eval_dataset,
+#         batch_size=global_config.test_size,
+#         num_workers=4
+#     )
+#
+#     return data_loader
 

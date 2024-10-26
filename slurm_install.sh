@@ -16,14 +16,15 @@ module load cuda/10.1_cudnn-7.6.5
 source activate NeilGAN_V2
 
 #do fresh install
+python.exe -m pip install --upgrade pip
 pip-review --local --auto
-pip install numpy==1.26.4
-pip install -I torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install -I numpy==1.26.4
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 pip install scikit-learn
 pip install scikit-image
 pip install visdom
 pip install kornia
-pip install -I opencv-python
+pip install opencv-python
 pip install --upgrade pillow
 pip install gputil
 pip install matplotlib

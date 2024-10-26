@@ -138,3 +138,6 @@ checkpoint/best/
 checkpoint/by_epoch/
 checkpoint/by_sample/
 checkpoint/old/
+.idea/SynExperimentZoo.iml
+.idea/misc.xml
+.idea/misc.xml

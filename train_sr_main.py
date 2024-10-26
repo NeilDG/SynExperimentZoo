@@ -1,69 +1,27 @@
-import itertools
 import sys
 from optparse import OptionParser
 import random
 import torch
 import torch.nn.parallel
 import torch.utils.data
-import torchvision.utils as vutils
 import numpy as np
-import matplotlib.pyplot as plt
-
 from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
 from trainers import paired_trainer
 from tqdm import tqdm
-from tqdm.auto import trange
-from time import sleep
 import yaml
 from yaml.loader import SafeLoader
+import util_script_main as utils_script
 
 parser = OptionParser()
 parser.add_option('--server_config', type=int, help="Is running on COARE?", default=0)
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--img_to_load', type=int, help="Image to load?", default=-1)
 parser.add_option('--network_version', type=str, default="vXX.XX")
-# parser.add_option('--iteration', type=int, default=1)
 parser.add_option('--plot_enabled', type=int, default=1)
 parser.add_option('--save_per_iter', type=int, default=500)
-
-
-def parse_string(input_string):
-    """
-    Parses a string of the format "AA.BB.CC.DD" and returns a tuple containing:
-        - a new string with "AA.BB"
-        - the integer value of "CC"
-        - the integer value of "DD"
-
-    Args:
-        input_string: The string to parse (format "AA.BB.CC.DD").
-
-    Returns:
-        A tuple containing the parsed string and the two integer values.
-
-    Raises:
-        ValueError: If the input string is not in the correct format.
-    """
-    # Split the string by "."
-    parts = input_string.split(".")
-
-    # Check if there are exactly four parts
-    if len(parts) != 4:
-        raise ValueError("Input string must be in the format 'AA.BB.CC.DD'")
-
-    # Extract the first two parts as a string
-    parsed_string = ".".join(parts[:2])
-
-    # Convert the last two parts to integers
-    try:
-        int_cc = int(parts[2])
-        int_dd = int(parts[3])
-    except ValueError:
-        raise ValueError("CC and DD must be integers")
-
-    return parsed_string, int_cc, int_dd
 
 def update_config(opts):
     global_config.server_config = opts.server_config
@@ -173,7 +131,7 @@ def main(argv):
     torch.manual_seed(manualSeed)
     np.random.seed(manualSeed)
 
-    global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = parse_string(opts.network_version)
+    global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = utils_script.parse_string(opts.network_version)
 
     yaml_config = "./hyperparam_tables/{network_version}.yaml"
     yaml_config = yaml_config.format(network_version=global_config.sr_network_version)
@@ -236,7 +194,7 @@ def main(argv):
             if(iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if(global_config.plot_enabled == 1):
+                if(global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 4 == 0):
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 

@@ -10,6 +10,41 @@ import numpy as np
 import global_config
 import cv2
 
+def parse_string(input_string):
+    """
+    Parses a string of the format "AA.BB.CC.DD" and returns a tuple containing:
+        - a new string with "AA.BB"
+        - the integer value of "CC"
+        - the integer value of "DD"
+
+    Args:
+        input_string: The string to parse (format "AA.BB.CC.DD").
+
+    Returns:
+        A tuple containing the parsed string and the two integer values.
+
+    Raises:
+        ValueError: If the input string is not in the correct format.
+    """
+    # Split the string by "."
+    parts = input_string.split(".")
+
+    # Check if there are exactly four parts
+    if len(parts) != 4:
+        raise ValueError("Input string must be in the format 'AA.BB.CC.DD'")
+
+    # Extract the first two parts as a string
+    parsed_string = ".".join(parts[:2])
+
+    # Convert the last two parts to integers
+    try:
+        int_cc = int(parts[2])
+        int_dd = int(parts[3])
+    except ValueError:
+        raise ValueError("CC and DD must be integers")
+
+    return parsed_string, int_cc, int_dd
+
 def patchify():
     patch_size = (64, 64)  # Size of the patches
     stride = (64, 64)  # Stride for patching
