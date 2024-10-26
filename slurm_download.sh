@@ -12,9 +12,9 @@
 #Download of dataset
 SERVER_CONFIG=4
 
-module load anaconda/3-2021.11
-module load cuda/10.1_cudnn-7.6.5
-source activate NeilGAN_V2
+module load anaconda
+module load cuda
+source activate NeilZoo
 
 #do fresh install
 #pip-review --local --auto
