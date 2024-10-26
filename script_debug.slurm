@@ -7,7 +7,7 @@
 #SBATCH --mail-user=neil.delgallego@dlsu.edu.ph
 #SBATCH --mail-type=END
 
-ITERATION=$1
+NETWORK_VERSION=$1
 echo "CUDA_DEVICE=/dev/nvidia/$CUDA_VISIBLE_DEVICES"
 nvidia-smi
 
@@ -16,9 +16,8 @@ module load anaconda
 module load cuda
 source activate NeilZoo
 
-srun python train_img2img_main.py \
---server_config=0 --img_to_load=-1 \
---plot_enabled=0 --save_per_iter=500 --network_version=$NETWORK_VERSION --iteration=$ITERATION
+srun python train_sr_main.py --server_config=0 --img_to_load=-1 \
+--plot_enabled=0 --save_per_iter=500 --network_version=$NETWORK_VERSION
 
 conda deactivate
 
