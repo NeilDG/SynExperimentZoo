@@ -29,6 +29,7 @@ sbatch --dependency=afterany:466264 script_2.slurm "rgb2sm_v61.52_istd+srd" 1
 
 sbatch script_debug.slurm "mobisr_v01.00_mipd" 1
 sbatch slurm_download.sh 0
+sbatch slurm_install.sh
 sbatch script_1.slurm "mobisr_v01.00_mipd" 1
 sbatch script_2.slurm "mobisr_v01.00_mipd" 2
 
