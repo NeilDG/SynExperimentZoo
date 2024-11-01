@@ -133,7 +133,7 @@ def update_config(opts):
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
-    device = torch.device(opts.cuda_device if (torch.cuda.is_available()) else "cpu")
+    device = torch.device(opts.cuda_device)
     print("Device: %s" % device)
 
     manualSeed = 0
@@ -153,7 +153,7 @@ def main(argv):
     update_config(opts)
     print(opts)
     print("=====================BEGIN============================")
-    print("Server config? %d Has GPU available? %d Count: %d" % (global_config.server_config, torch.cuda.is_available(), torch.cuda.device_count()))
+    print("Server config? %d GPU Count: %d" % (global_config.server_config, torch.cuda.device_count()))
     print("Torch CUDA version: %s" % torch.version.cuda)
 
     network_config = ConfigHolder.getInstance().get_network_config()
