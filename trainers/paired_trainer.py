@@ -106,7 +106,7 @@ class PairedTrainer:
         img_b = input_map["img_b"]
         accum_batch_size = self.load_size * iteration
 
-        with amp.autocast(device_type=str(self.gpu_device)):
+        with amp.autocast(device_type="cuda"):
             self.D_B.train()
 
             output = self.G_A2B(img_a)
