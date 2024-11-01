@@ -4,10 +4,10 @@ import os
 
 def train_sr_main():
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.11.1")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.11.1\"")
 
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.12.1")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.12.1\"")
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=0 --img_to_load=-1 "
