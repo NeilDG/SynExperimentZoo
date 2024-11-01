@@ -31,8 +31,10 @@ sbatch script_util.slurm
 sbatch script_debug.slurm "mobisr_v02.06_div2k.04.1"
 sbatch slurm_download.sh 0
 sbatch slurm_install.sh
-sbatch script_1.slurm "mobisr_v01.00_mipd" 1
-sbatch script_2.slurm "mobisr_v01.00_mipd" 2
+sbatch script_1.slurm "mobisr_v02.06_div2k.01.1"
+sbatch script_2.slurm "mobisr_v02.06_div2k.02.1"
+sbatch script_1.slurm "mobisr_v02.06_div2k.03.1"
+sbatch script_2.slurm "mobisr_v02.06_div2k.04.1"
 
 sbatch --dependency=afterany:342338 script_debug.slurm
 sbatch --dependency=afterany:475267 script_1.slurm "rgb2sm_v61.53_istd+srd" 1
