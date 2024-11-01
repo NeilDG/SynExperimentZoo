@@ -51,6 +51,9 @@ clear
 squeue -a
 squeue -u neil.delgallego
 squeue -w "saliksik-gpu-01, saliksik-gpu-02, saliksik-gpu-03, saliksik-gpu-04, saliksik-gpu-05, saliksik-gpu-06, saliksik-gpu-09, saliksik-gpu-10"
+//For checking GPU usage while a job is being executed in GPU. Once typed, type "nvidia-smi" in bash. Note that this does not work when two GPUs are being used since this is the limit of runnable jobs.
+srun --pty --overlap --jobid <job-id> bash
+
 //For cancelling job
 scancel <jobid>
 

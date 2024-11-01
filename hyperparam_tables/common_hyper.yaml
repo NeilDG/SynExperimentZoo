@@ -31,7 +31,43 @@ hyperparams:
     weight_decay: 0.0
     dropout_rate: 0.0
     augment_key: ["none"]
-    norm_mode: "instance"
+    norm_mode: "batch"
+    weights_init: "zero_one"
+    g_lr: 0.0004
+    d_lr: 0.0001
+  07:
+    weight_decay: 0.0
+    dropout_rate: 0.0
+    augment_key: ["none"]
+    norm_mode: "batch"
+    weights_init: "dc_gan"
+    g_lr: 0.0002
+    d_lr: 0.0002
+  08:
+    norm_mode: "batch"
+    weights_init: "zero_one"
+    g_lr: 0.0002
+    d_lr: 0.0002
+  09:
+    norm_mode: "batch"
+    weights_init: "dc_gan"
+    g_lr: 0.0002
+    d_lr: 0.0001
+  10:
+    norm_mode: "batch"
+    weights_init: "zero_one"
+    g_lr: 0.0002
+    d_lr: 0.0001
+  11:
+    norm_mode: "batch"
+    weights_init: "dc_gan"
+    g_lr: 0.0004
+    d_lr: 0.0001
+  12:
+    weight_decay: 0.0
+    dropout_rate: 0.0
+    augment_key: ["none"]
+    norm_mode: "batch"
     weights_init: "zero_one"
     g_lr: 0.0004
     d_lr: 0.0001
