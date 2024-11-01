@@ -122,8 +122,8 @@ def update_config(opts):
         global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
         print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
 
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version_train, low_path=low_path)
