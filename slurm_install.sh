@@ -17,6 +17,7 @@ conda create -n NeilZoo python=3.12
 conda deactivate
 
 # Installation of necessary libraries
+module load anaconda
 conda activate NeilZoo
 
 #do fresh install
