@@ -23,7 +23,7 @@ conda activate NeilZoo
 python3 -m pip install --upgrade pip
 pip-review --local --auto
 pip install -I numpy==1.26.4
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install scikit-learn
 pip install scikit-image
 pip install visdom

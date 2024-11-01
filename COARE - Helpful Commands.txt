@@ -42,8 +42,7 @@ sbatch -w saliksik-gpu-06 slurm_install_gpu.slurm
 sbatch -w saliksik-gpu-02 script_1.slurm "rgb2sm_v61.53_istd+srd" 1
 sbatch --dependency=afterany:475270 -w saliksik-gpu-03 script_2.slurm "rgb2sm_v61.76_istd+srd" 1
 
-sbatch -w saliksik-gpu-09 script_3.slurm "rgb2sm_v61.75_istd+srd" 1
-sbatch -w saliksik-gpu-10 script_4.slurm "rgb2sm_v61.76_istd+srd" 1
+sbatch -w saliksik-gpu-09 script_1.slurm "mobisr_v02.06_div2k.01.1"
 
 //Check status of job
 clear
