@@ -134,7 +134,7 @@ def update_config(opts):
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
-    device = torch.device(opts.cuda_device)
+    device = torch.device(opts.cuda_device if (torch.cuda.is_available()) else "cpu")
     print("Device: %s" % device)
 
     manualSeed = 0
