@@ -1,5 +1,5 @@
 hyperparams:
-  01:
+  1:
     weight_decay: 0.0
     dropout_rate: 0.0
     augment_key: ["none"]
@@ -7,27 +7,27 @@ hyperparams:
     weights_init: "dc_gan"
     g_lr: 0.0002
     d_lr: 0.0002
-  02:
+  2:
     norm_mode: "instance"
     weights_init: "zero_one"
     g_lr: 0.0002
     d_lr: 0.0002
-  03:
+  3:
     norm_mode: "instance"
     weights_init: "dc_gan"
     g_lr: 0.0002
     d_lr: 0.0001
-  04:
+  4:
     norm_mode: "instance"
     weights_init: "zero_one"
     g_lr: 0.0002
     d_lr: 0.0001
-  05:
+  5:
     norm_mode: "instance"
     weights_init: "dc_gan"
     g_lr: 0.0004
     d_lr: 0.0001
-  06:
+  6:
     weight_decay: 0.0
     dropout_rate: 0.0
     augment_key: ["none"]
@@ -35,7 +35,7 @@ hyperparams:
     weights_init: "zero_one"
     g_lr: 0.0004
     d_lr: 0.0001
-  07:
+  7:
     weight_decay: 0.0
     dropout_rate: 0.0
     augment_key: ["none"]
@@ -43,12 +43,12 @@ hyperparams:
     weights_init: "dc_gan"
     g_lr: 0.0002
     d_lr: 0.0002
-  08:
+  8:
     norm_mode: "batch"
     weights_init: "zero_one"
     g_lr: 0.0002
     d_lr: 0.0002
-  09:
+  9:
     norm_mode: "batch"
     weights_init: "dc_gan"
     g_lr: 0.0002
@@ -71,6 +71,3 @@ hyperparams:
     weights_init: "zero_one"
     g_lr: 0.0004
     d_lr: 0.0001
-    
-   
-  
