@@ -72,7 +72,7 @@ class PairedTester():
         mse_result = self.mse_loss(img_a2b, target).cpu()
         self.mse_results.append(mse_result)
 
-        ssim_result = self.ssim_loss(img_a2b, target).cpu()
+        ssim_result = 1.0 - self.ssim_loss(img_a2b, target).cpu()
         self.ssim_results.append(ssim_result)
 
     def visualize_results(self, input_map, dataset_title):
