@@ -30,10 +30,10 @@ pip uninstall --yes scikit-image
 pip uninstall --yes visdom
 pip uninstall --yes kornia
 pip uninstall --yes opencv-python
-pip uninstall --yes --upgrade pillow
+pip uninstall --yes pillow
 pip uninstall --yes gputil
 pip uninstall --yes matplotlib
-pip uninstall --yes --upgrade --no-cache-dir gdown
+pip uninstall --yes gdown
 pip uninstall --yes PyYAML
 pip uninstall --yes ITTR_pytorch
 pip uninstall --yes super_image
