@@ -2,7 +2,6 @@ import sys
 from optparse import OptionParser
 import random
 import torch
-import torch.nn.parallel
 import torch.utils.data
 import numpy as np
 from config.network_config import ConfigHolder
