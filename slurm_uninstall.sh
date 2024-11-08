@@ -21,8 +21,10 @@ module load anaconda
 conda activate NeilZoo
 
 #do fresh install
-pip uninstall --yes -I numpy==1.26.4
-pip uninstall --yes -I torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip uninstall --yes numpy
+pip uninstall --yes torch
+pip uninstall --yes torchvision
+pip uninstall --yes torchaudio
 pip uninstall --yes scikit-learn
 pip uninstall --yes scikit-image
 pip uninstall --yes visdom
