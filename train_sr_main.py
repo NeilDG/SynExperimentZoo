@@ -115,7 +115,7 @@ def update_config(opts):
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 8): #COARE
-        global_config.num_workers = 12
+        global_config.num_workers = 6
         global_config.disable_progress_bar = True
         global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
