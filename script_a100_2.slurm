@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J A100_2
-#SBATCH --partition=gpu
+#SBATCH --partition=gpu_a100
 #SBATCH --qos=gpu-a100_default
 #SBATCH --cpus-per-task=8
 #SBATCH -G 1
