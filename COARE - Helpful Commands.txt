@@ -36,6 +36,13 @@ sbatch script_2.slurm "mobisr_v02.06_div2k.02.1"
 sbatch script_1.slurm "mobisr_v02.06_div2k.03.1"
 sbatch script_2.slurm "mobisr_v02.06_div2k.04.1"
 
+sbatch script_a100_1.slurm "mobisr_v02.06_div2k.05.1"
+sbatch script_a100_2.slurm "mobisr_v02.06_div2k.05.2"
+sbatch script_a100_1.slurm "mobisr_v02.06_div2k.05.3"
+sbatch script_a100_2.slurm "mobisr_v02.06_div2k.05.4"
+sbatch script_a100_1.slurm "mobisr_v02.06_div2k.05.5"
+sbatch script_a100_2.slurm "mobisr_v02.06_div2k.05.6"
+
 sbatch --dependency=afterany:342338 script_debug.slurm
 sbatch --dependency=afterany:475267 script_1.slurm "rgb2sm_v61.53_istd+srd" 1
 sbatch -w saliksik-gpu-06 slurm_install_gpu.slurm
