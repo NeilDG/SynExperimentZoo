@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J SR_1
 #SBATCH --partition=gpu
-#SBATCH --qos=12c-1h_2gpu
+#SBATCH --qos=gpu-p40_default
 #SBATCH --cpus-per-task=6
 #SBATCH -G 1
 #SBATCH --ntasks=1
