@@ -28,17 +28,11 @@ hyperparams:
     g_lr: 0.0004
     d_lr: 0.0001
   6:
-    weight_decay: 0.0
-    dropout_rate: 0.0
-    augment_key: ["none"]
     norm_mode: "batch"
     weights_init: "zero_one"
     g_lr: 0.0004
     d_lr: 0.0001
   7:
-    weight_decay: 0.0
-    dropout_rate: 0.0
-    augment_key: ["none"]
     norm_mode: "batch"
     weights_init: "dc_gan"
     g_lr: 0.0002
@@ -64,9 +58,6 @@ hyperparams:
     g_lr: 0.0004
     d_lr: 0.0001
   12:
-    weight_decay: 0.0
-    dropout_rate: 0.0
-    augment_key: ["none"]
     norm_mode: "batch"
     weights_init: "zero_one"
     g_lr: 0.0004

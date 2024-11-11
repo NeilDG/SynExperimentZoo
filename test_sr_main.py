@@ -33,7 +33,7 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.test_size = 1
+    global_config.test_size = 8
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_version = network_config["dataset_version"]
@@ -217,7 +217,7 @@ def main(argv):
             img2img_t.save_images(input_map)
             pbar.update(1)
 
-            if ((i + 1) % 50 == 0):
+            if ((i + 1) % 4 == 0):
                 break
 
         if (global_config.plot_enabled == 1):
@@ -236,7 +236,7 @@ def main(argv):
             img2img_t.save_images(input_map)
             pbar.update(1)
 
-            if ((i + 1) % 50 == 0):
+            if ((i + 1) % 4 == 0):
                 break
 
         if (global_config.plot_enabled == 1):
