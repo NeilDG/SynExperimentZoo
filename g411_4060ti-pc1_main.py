@@ -4,14 +4,17 @@ import os
 
 def train_sr_main():
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.01_div2k\" --iteration=1")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.2\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.3\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.06_div2k.01.4\"")
 
 def test_sr_main():
-    # os.system("python \"test_sr_main.py\" --server_config=0 --img_to_load=-1 "
-    #           "--plot_enabled=0 --network_version=\"mobisr_v01.00_div2k\" --iteration=1")
-
     os.system("python \"test_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --network_version=\"mobisr_v01.00_div2k\" --iteration=5")
+              "--plot_enabled=1 --network_version=\"mobisr_v02.05_div2k.01.1")
 
 
 def download_ml_hypersim():

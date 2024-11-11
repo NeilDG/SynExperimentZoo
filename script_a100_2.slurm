@@ -1,9 +1,11 @@
 #!/bin/bash
-#SBATCH -J ZDB
-#SBATCH --partition=debug
-#SBATCH --qos=240c-1h_debug
+#SBATCH -J A100_2
+#SBATCH --partition=gpu_a100
+#SBATCH --qos=gpu-a100_default
+#SBATCH --cpus-per-task=8
+#SBATCH -G 1
 #SBATCH --ntasks=1
-#SBATCH --output=script_debug.out
+#SBATCH --output=script_4.out
 #SBATCH --mail-user=neil.delgallego@dlsu.edu.ph
 #SBATCH --mail-type=END
 
@@ -20,4 +22,3 @@ srun python train_sr_main.py --server_config=8 --img_to_load=-1 \
 --plot_enabled=0 --save_per_iter=500 --network_version=$NETWORK_VERSION
 
 conda deactivate
-

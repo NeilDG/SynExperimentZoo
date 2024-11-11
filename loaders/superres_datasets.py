@@ -1,18 +1,7 @@
-import os.path
-import random
-
 import torch
 import cv2
-import numpy as np
-from torch import nn
 from torch.utils import data
-from matplotlib import pyplot as plt
 import torchvision.transforms as transforms
-import torchvision.transforms.functional
-import torch.nn.functional as F
-import global_config
-import kornia
-from pathlib import Path
 
 from config.network_config import ConfigHolder
 
@@ -112,8 +101,8 @@ class PairedImageDataset(data.Dataset):
         a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
         b_img = cv2.imread(self.b_list[(idx % len(self.b_list))])
         b_img = cv2.cvtColor(b_img, cv2.COLOR_BGR2RGB)
-        ref_h, ref_w = b_img.shape[:2]
-        a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
+        # ref_h, ref_w = b_img.shape[:2]
+        # a_img = cv2.resize(a_img, (ref_w, ref_h), interpolation=cv2.INTER_LINEAR)
 
         state = torch.get_rng_state()
         a_img = self.initial_op(a_img)

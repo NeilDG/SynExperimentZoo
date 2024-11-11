@@ -106,7 +106,7 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
     def compute_identity_loss(self, pred, target):
         config_holder = ConfigHolder.getInstance()
-        weight = config_holder.get_hyper_params_weight(self.iteration, "id_weight")
+        weight = config_holder.get_loss_weight_by_key(self.iteration, "id_weight")
         if (weight > 0.0):
             return self.l1_loss(pred, target) * weight
         else:
@@ -114,7 +114,7 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
     def compute_cycle_loss(self, pred, target):
         config_holder = ConfigHolder.getInstance()
-        weight = config_holder.get_hyper_params_weight(self.iteration, "cycle_weight")
+        weight = config_holder.get_loss_weight_by_key(self.iteration, "cycle_weight")
         if (weight > 0.0):
             return self.l1_loss(pred, target) * weight
         else:

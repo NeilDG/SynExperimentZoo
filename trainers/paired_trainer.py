@@ -6,7 +6,7 @@ from config.network_config import ConfigHolder
 from losses import common_losses
 import global_config
 import torch
-import torch.cuda.amp as amp
+import torch.amp as amp
 import itertools
 
 from model.modules import image_pool
@@ -22,8 +22,9 @@ class PairedTrainer:
     def initialize_train_config(self):
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
-        self.iteration = global_config.sr_iteration
-        self.common_losses = common_losses.LossRepository(self.gpu_device, self.iteration)
+        hyperparam_config = config_holder.get_all_hyperparams()
+        self.iteration = global_config.loss_iteration
+        self.common_losses = common_losses.LossRepository(self.gpu_device)
 
         self.D_B_pool = image_pool.ImagePool(50)
         self.fp16_scaler = amp.GradScaler()
@@ -39,8 +40,8 @@ class PairedTrainer:
         network_creator = abstract_iid_trainer.NetworkCreator(self.gpu_device)
         self.G_A2B, self.D_B = network_creator.initialize_img2img_network()
 
-        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters()), lr=network_config["g_lr"])
-        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_B.parameters()), lr=network_config["d_lr"])
+        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters()), lr=hyperparam_config["g_lr"])
+        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_B.parameters()), lr=hyperparam_config["d_lr"])
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
         self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
@@ -105,7 +106,7 @@ class PairedTrainer:
         img_b = input_map["img_b"]
         accum_batch_size = self.load_size * iteration
 
-        with amp.autocast():
+        with amp.autocast(device_type="cuda"):
             self.D_B.train()
 
             output = self.G_A2B(img_a)
@@ -118,7 +119,7 @@ class PairedTrainer:
 
             errD = D_B_real_loss + D_B_fake_loss
             self.fp16_scaler.scale(errD).backward()
-            torch.nn.utils.clip_grad_norm_(self.D_B.parameters(), max_norm=1.0)  # gradient clip
+            # torch.nn.utils.clip_grad_norm_(self.D_B.parameters(), max_norm=1.0)  # gradient clip
 
             self.G_A2B.train()
             img_a2b = self.G_A2B(img_a)
@@ -136,7 +137,7 @@ class PairedTrainer:
 
             errG = B_likeness_loss + B_perceptual_loss + B_color_loss + B_tv_loss + B_bicubic_loss + B_adv_loss
             self.fp16_scaler.scale(errG).backward()
-            torch.nn.utils.clip_grad_norm_(self.G_A2B.parameters(), max_norm=1.0)  # gradient clip
+            # torch.nn.utils.clip_grad_norm_(self.G_A2B.parameters(), max_norm=1.0)  # gradient clip
 
             if (accum_batch_size % self.batch_size == 0):
                 self.fp16_scaler.step(self.optimizerD)
@@ -206,19 +207,19 @@ class PairedTrainer:
 
         if (is_temp):
             torch.save(save_dict, self.NETWORK_CHECKPATH + ".checkpt")
-            print("Saved checkpoint state: %s Epoch: %d" % (len(save_dict), (epoch + 1)))
+            print("Saved checkpoint state: %s Epoch: %d" % (len(self.NETWORK_VERSION), (epoch + 1)))
         else:
             torch.save(save_dict, self.NETWORK_CHECKPATH)
-            print("Saved stable model state: %s Epoch: %d" % (len(save_dict), (epoch + 1)))
+            print("Saved stable model state: %s Epoch: %d" % (len(self.NETWORK_VERSION), (epoch + 1)))
 
     def load_saved_state(self):
         try:
-            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device)
+            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device, weights_only=True)
         except:
             # check if a .checkpt is available, load it
             try:
                 checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
-                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device)
+                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device, weights_only=True)
             except:
                 checkpoint = None
                 print("No existing checkpoint file found. Creating new SR network: ", self.NETWORK_CHECKPATH)

@@ -1,4 +1,4 @@
-hyperparams:
+loss_weights:
   1:
     l1_weight: 1.0
     adv_weight: 1.0
@@ -13,4 +13,8 @@ hyperparams:
     l1_weight: 0.01
     perceptual_weight: 1.0
     adv_weight: 1.0
+  5:
+    l1_weight: 1.0
+    perceptual_weight: 0.0
+    adv_weight: 0.0000001
   

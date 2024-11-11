@@ -3,11 +3,11 @@
 import os
 
 def train_sr_main():
-    os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.06.1\"")
+    os.system("python \"train_sr_main.py\" --server_config=7 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.09.1\"")
 
-    os.system("python \"train_sr_main.py\" --server_config=6 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.05.1\"")
+    os.system("python \"train_sr_main.py\" --server_config=7 --img_to_load=-1 "
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_div2k.09.2\"")
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "

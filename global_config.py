@@ -32,7 +32,8 @@ div2k_lr_path = ""
 div2k_hr_path = ""
 
 sr_network_version = "VXX.XX"
-sr_iteration = -1
+hyper_iteration = -1
+loss_iteration = -1
 
 loaded_network_config = None
 sm_network_config = None

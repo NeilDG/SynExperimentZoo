@@ -1,31 +1,23 @@
-import itertools
 import sys
 from optparse import OptionParser
 import random
 import torch
-import torch.nn.parallel
-import torch.utils.data
-import torchvision.utils as vutils
 import numpy as np
-import matplotlib.pyplot as plt
-
 from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
 from trainers import paired_trainer
 from tqdm import tqdm
-from tqdm.auto import trange
-from time import sleep
 import yaml
 from yaml.loader import SafeLoader
+import util_script_main as utils_script
 
 parser = OptionParser()
 parser.add_option('--server_config', type=int, help="Is running on COARE?", default=0)
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--img_to_load', type=int, help="Image to load?", default=-1)
 parser.add_option('--network_version', type=str, default="vXX.XX")
-parser.add_option('--iteration', type=int, default=1)
 parser.add_option('--plot_enabled', type=int, default=1)
 parser.add_option('--save_per_iter', type=int, default=500)
 
@@ -34,8 +26,6 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.sr_network_version = opts.network_version
-    global_config.sr_iteration = opts.iteration
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
@@ -114,6 +104,27 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
+    elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
+        global_config.num_workers = 6
+        global_config.a_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.batch_size = network_config["batch_size"][2]
+        global_config.load_size = network_config["load_size"][2]
+        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
+
+    elif (global_config.server_config == 8): #COARE
+        global_config.num_workers = 6
+        global_config.disable_progress_bar = True
+        global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
+        print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
+
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version_train, low_path=low_path)
     global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version_train, high_path=high_path)
     global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version_test, low_path=low_path)
@@ -129,23 +140,28 @@ def main(argv):
     torch.manual_seed(manualSeed)
     np.random.seed(manualSeed)
 
+    global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = utils_script.parse_string(opts.network_version)
+
     yaml_config = "./hyperparam_tables/{network_version}.yaml"
-    yaml_config = yaml_config.format(network_version=opts.network_version)
-    hyperparam_path = "./hyperparam_tables/common_iter.yaml"
-    with open(yaml_config) as f, open(hyperparam_path) as h:
-        ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader))
+    yaml_config = yaml_config.format(network_version=global_config.sr_network_version)
+    hyperparam_path = "./hyperparam_tables/common_hyper.yaml"
+    loss_weights_path = "./hyperparam_tables/common_weights.yaml"
+    with open(yaml_config) as f, open(hyperparam_path) as h, open(loss_weights_path) as l:
+        ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader), yaml.load(l, SafeLoader))
 
     update_config(opts)
     print(opts)
     print("=====================BEGIN============================")
-    print("Server config? %d Has GPU available? %d Count: %d" % (global_config.server_config, torch.cuda.is_available(), torch.cuda.device_count()))
+    print("Server config? %d GPU Count: %d" % (global_config.server_config, torch.cuda.device_count()))
     print("Torch CUDA version: %s" % torch.version.cuda)
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    hyperparam_config = ConfigHolder.getInstance().get_hyper_params()
-    network_iteration = global_config.sr_iteration
-    hyperparams_table = hyperparam_config["hyperparams"][network_iteration]
-    print("Network iteration:", str(network_iteration), ". Hyper parameters: ", hyperparams_table, " Learning rates: ", network_config["g_lr"], network_config["d_lr"])
+    hyperparams_table = ConfigHolder.getInstance().get_all_hyperparams()
+    loss_config = ConfigHolder.getInstance().get_loss_weights()
+    loss_iteration = global_config.loss_iteration
+
+    loss_config_table = loss_config["loss_weights"][loss_iteration]
+    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " Learning rates: ", hyperparams_table["g_lr"], hyperparams_table["d_lr"])
 
     a_path_train = global_config.a_path_train
     b_path_train = global_config.b_path_train
@@ -187,7 +203,7 @@ def main(argv):
             if(iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if(global_config.plot_enabled == 1):
+                if(global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 4 == 0):
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 

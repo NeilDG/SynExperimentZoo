@@ -21,21 +21,21 @@ module load anaconda
 conda activate NeilZoo
 
 #do fresh install
-python3 -m pip install --upgrade pip
-pip-review --local --auto
-pip install -I numpy==1.26.4
-pip install -I torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-pip install scikit-learn
-pip install scikit-image
-pip install visdom
-pip install kornia
-pip install opencv-python
-pip install --upgrade pillow
-pip install gputil
-pip install matplotlib
-pip install --upgrade --no-cache-dir gdown
-pip install PyYAML
-pip install ITTR_pytorch
-pip install super_image
-pip install timm
-pip install datasets
+pip uninstall --yes numpy
+pip uninstall --yes torch
+pip uninstall --yes torchvision
+pip uninstall --yes torchaudio
+pip uninstall --yes scikit-learn
+pip uninstall --yes scikit-image
+pip uninstall --yes visdom
+pip uninstall --yes kornia
+pip uninstall --yes opencv-python
+pip uninstall --yes pillow
+pip uninstall --yes gputil
+pip uninstall --yes matplotlib
+pip uninstall --yes gdown
+pip uninstall --yes PyYAML
+pip uninstall --yes ITTR_pytorch
+pip uninstall --yes super_image
+pip uninstall --yes timm
+pip uninstall --yes datasets
