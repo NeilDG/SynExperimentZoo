@@ -26,6 +26,7 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
+    global_config.save_per_iter = opts.save_per_iter
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
@@ -203,7 +204,7 @@ def main(argv):
             if(iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if(global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 4 == 0):
+                if(global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 16 == 0):
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 

@@ -147,8 +147,8 @@ class PairedTrainer:
                 self.optimizerD.zero_grad()
                 self.optimizerG.zero_grad()
 
-                # what to put to losses dict for visdom reporting?
-                if (iteration > 10):
+                # what to put to losses dict for visdom reporting? Only start writing data after at least 1 save
+                if (iteration > global_config.save_per_iter):
                     self.losses_dict[self.G_LOSS_KEY].append(errG.item())
                     self.losses_dict[self.D_OVERALL_LOSS_KEY].append(errD.item())
                     self.losses_dict[self.L1_LOSS_KEY].append(B_likeness_loss.item())
@@ -207,10 +207,10 @@ class PairedTrainer:
 
         if (is_temp):
             torch.save(save_dict, self.NETWORK_CHECKPATH + ".checkpt")
-            print("Saved checkpoint state: %s Epoch: %d" % (self.NETWORK_VERSION), (epoch + 1))
+            print("Saved checkpoint state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
         else:
             torch.save(save_dict, self.NETWORK_CHECKPATH)
-            print("Saved stable model state: %s Epoch: %d" % (self.NETWORK_VERSION), (epoch + 1))
+            print("Saved stable model state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
 
     def load_saved_state(self):
         try:
