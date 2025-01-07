@@ -14,9 +14,9 @@ def train_sr_main():
 
     os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
               "--plot_enabled=0 --save_per_iter=500 --network_version=\"mobisr_v02.06_div2k.06.4\"")
-
-    os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
-              "--plot_enabled=0 --save_per_iter=500 --network_version=\"mobisr_v02.06_div2k.06.5\"")
+    #
+    # os.system("python3 \"train_sr_main.py\" --server_config=4 --img_to_load=-1 "
+    #           "--plot_enabled=0 --save_per_iter=500 --network_version=\"mobisr_v02.06_div2k.06.5\"")
 
 def test_sr_main():
     os.system("python3 \"test_sr_main.py\" --server_config=4 --img_to_load=-1 "
