@@ -35,7 +35,7 @@ def load_train_img2img_dataset(a_path, b_path):
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
 
-    # Ensure a_list and b_list have at least 200,000 elements
+    # Ensure a_list and b_list have at least X00,000 elements
     ideal_sample_size = 300000
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
@@ -147,6 +147,60 @@ def load_cityscapes_dataset():
     )
 
     return data_loader, len(dataset)
+
+def load_cityscapes_gan_dataset_train(a_path):
+    a_list = glob.glob(a_path)
+
+    if (global_config.img_to_load > 0):
+        a_list = a_list[0: global_config.img_to_load]
+
+    # Ensure a_list and b_list have at least X00,000 elements
+    ideal_sample_size = 300000
+    if len(a_list) < ideal_sample_size:
+        extend_length = ideal_sample_size - len(a_list)
+        a_list.extend(a_list * (extend_length // len(a_list) + 1))
+
+    random.shuffle(a_list)
+    img_length = len(a_list)
+
+    print("Loading Cityscapes train. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
+
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, 1)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, img_length
+
+def load_cityscapes_gan_dataset_test(a_path):
+    a_list = glob.glob(a_path)
+
+    if (global_config.img_to_load > 0):
+        a_list = a_list[0: global_config.img_to_load]
+
+    # Ensure a_list and b_list have at least X00,000 elements
+    ideal_sample_size = 300000
+    if len(a_list) < ideal_sample_size:
+        extend_length = ideal_sample_size - len(a_list)
+        a_list.extend(a_list * (extend_length // len(a_list) + 1))
+
+    random.shuffle(a_list)
+    img_length = len(a_list)
+
+    print("Loading Cityscapes test. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
+
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, 2)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=1,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, img_length
 
 def load_voc_dataset():
     dataset = segmentation_datasets.CustomVOCSegmentationDataset(1)
