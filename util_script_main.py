@@ -89,9 +89,9 @@ def patchify(input_dir, reference_dir, output_dir):
 
 
 def main():
-    input_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/*/"  # Path to the image dataset
-    reference_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/bicubic_x4/"  # Reference size of the HR image
-    output_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
+    input_dir = "X:/SuperRes Dataset/div2k/*/"  # Path to the image dataset
+    reference_dir = "X:/SuperRes Dataset/div2k/bicubic_x4/"  # Reference size of the HR image
+    output_dir = "X:/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
     patchify(input_dir, reference_dir, output_dir)
 
 if __name__=="__main__":

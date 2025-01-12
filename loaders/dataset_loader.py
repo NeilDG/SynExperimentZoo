@@ -1,11 +1,10 @@
 import glob
 import random
 import torch
-# from super_image.data import EvalDataset
 import global_config
 from config.network_config import ConfigHolder
-from loaders import superres_datasets
-import os
+from loaders import superres_datasets, segmentation_datasets
+
 
 def load_single_test_dataset(path_a, opts):
     print("Dataset path: ", path_a)
@@ -133,4 +132,34 @@ def load_singleimg_dataset(a_path):
 #     )
 #
 #     return data_loader
+
+def load_cityscapes_dataset():
+    dataset = segmentation_datasets.CustomCityscapesDataset(1)
+
+    num_workers = global_config.num_workers
+    print("Loading Cityscapes. Num workers: %d" % (num_workers))
+
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, len(dataset)
+
+def load_voc_dataset():
+    dataset = segmentation_datasets.CustomVOCSegmentationDataset(1)
+
+    num_workers = global_config.num_workers
+    print("Loading VOC segmentation Dataset. Samples: %d Num workers: %d" % (len(dataset), num_workers))
+
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, len(dataset)
 

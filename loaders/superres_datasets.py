@@ -1,8 +1,10 @@
 import torch
 import cv2
+import torchvision
 from torch.utils import data
 import torchvision.transforms as transforms
 
+import global_config
 from config.network_config import ConfigHolder
 
 def normalize(light_angle):
