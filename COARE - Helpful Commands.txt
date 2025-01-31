@@ -24,8 +24,8 @@ sbatch visdom_run.slurm
 sbatch -w saliksik-cpu-23 visdom_run.slurm
 sbatch -w saliksik-cpu-23 --dependency=afterany:335892 visdom_run.slurm
 
-sbatch --dependency=afterany:34307 script_1.slurm "mobisr_v02.06_div2k.01.1"
-sbatch --dependency=afterany:34308 script_2.slurm "mobisr_v02.06_div2k.02.1"
+sbatch --dependency=afterany:39852 script_1.slurm "mobisr_v02.06_div2k.01.1"
+sbatch --dependency=afterany:39849 script_2.slurm "mobisr_v02.06_div2k.04.1"
 
 sbatch script_util.slurm
 sbatch script_debug.slurm "mobisr_v02.06_div2k.04.1"
