@@ -130,12 +130,20 @@ def main():
     # output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/"  # Directory to save the patches
     # patchify(input_dir, reference_dir, output_dir)
 
-    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/gtFine/train/*/*_color.png"  # Path to the input dataset
-    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/gtFine/train/"  # Directory to save the patches
+    # input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/gtFine/train/*/*_color.png"  # Path to the input dataset
+    # output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/gtFine/train/"  # Directory to save the patches
+    # patchify_without_ref(input_dir, output_dir)
+    #
+    # input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
+    # output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/leftImg8bit/train/"  # Directory to save the patches
+    # patchify_without_ref(input_dir, output_dir)
+
+    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/gtFine/val/*/*_color.png"  # Path to the input dataset
+    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/gtFine/val/"  # Directory to save the patches
     patchify_without_ref(input_dir, output_dir)
 
-    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
-    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/leftImg8bit/train/"  # Directory to save the patches
+    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/val/*/*.png"  # Path to the input dataset
+    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes_patched/leftImg8bit/val/"  # Directory to save the patches
     patchify_without_ref(input_dir, output_dir)
 
 if __name__=="__main__":

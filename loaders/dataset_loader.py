@@ -133,9 +133,10 @@ def load_cityscapes_gan_dataset_train(a_path, b_path):
 
     if (global_config.img_to_load > 0):
         a_list = a_list[0: global_config.img_to_load]
+        b_list = b_list[0: global_config.img_to_load]
 
     # Ensure a_list and b_list have at least X00,000 elements
-    ideal_sample_size = 300000
+    ideal_sample_size = len(a_list) * 10
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
         a_list.extend(a_list * (extend_length // len(a_list) + 1))
@@ -153,7 +154,7 @@ def load_cityscapes_gan_dataset_train(a_path, b_path):
         dataset,
         batch_size=global_config.load_size,
         num_workers=global_config.num_workers,
-        shuffle=True, pin_memory=True, prefetch_factor=4
+        shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
     return data_loader, img_length
@@ -164,13 +165,14 @@ def load_cityscapes_gan_dataset_test(a_path, b_path):
 
     if (global_config.img_to_load > 0):
         a_list = a_list[0: global_config.img_to_load]
+        b_list = b_list[0: global_config.img_to_load]
 
     # Ensure a_list and b_list have at least X00,000 elements
-    ideal_sample_size = 300000
-    if len(a_list) < ideal_sample_size:
-        extend_length = ideal_sample_size - len(a_list)
-        a_list.extend(a_list * (extend_length // len(a_list) + 1))
-        b_list.extend(b_list * (extend_length // len(b_list) + 1))
+    # ideal_sample_size = 300000
+    # if len(a_list) < ideal_sample_size:
+    #     extend_length = ideal_sample_size - len(a_list)
+    #     a_list.extend(a_list * (extend_length // len(a_list) + 1))
+    #     b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
     temp_list = list(zip(a_list, b_list))
     random.shuffle(temp_list)
@@ -184,7 +186,7 @@ def load_cityscapes_gan_dataset_test(a_path, b_path):
         dataset,
         batch_size=global_config.load_size,
         num_workers=1,
-        shuffle=True, pin_memory=True, prefetch_factor=4
+        shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
     return data_loader, img_length

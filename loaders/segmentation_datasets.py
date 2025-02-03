@@ -131,7 +131,7 @@ class CityscapesGANDataset(data.Dataset):
         else:
             self.initial_op = transforms.Compose([
                 transforms.ToPILImage(),
-                transforms.RandomCrop(512),
+                transforms.RandomCrop(64),
                 transforms.ToTensor()
             ])
 

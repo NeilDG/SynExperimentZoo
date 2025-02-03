@@ -7,7 +7,7 @@ from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
-from trainers import paired_trainer
+from testers import paired_tester
 from tqdm import tqdm
 import yaml
 from yaml.loader import SafeLoader
@@ -140,52 +140,40 @@ def main(argv):
 
     plot_utils.VisdomReporter.initialize()
 
-    print(global_config.seg_path_rgb_path_train)
-    print(global_config.seg_path_mask_path_train)
     print(global_config.seg_path_rgb_path_test)
     print(global_config.seg_path_mask_path_test)
 
-    train_loader, train_count = dataset_loader.load_cityscapes_gan_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train)
-    test_loader, test_count = dataset_loader.load_cityscapes_gan_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
-    img2img_t = paired_trainer.PairedTrainer(device)
+    test_loader_a, test_count = dataset_loader.load_cityscapes_gan_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
+    img2img_t = paired_tester.PairedTester(device)
 
     iteration = 0
     start_epoch = global_config.last_epoch_st
     print("---------------------------------------------------------------------------")
-    print("Started Training loop for mode: synthseg", " Set start epoch: ", start_epoch)
+    print("Started test loop for mode: synthseg", " Set start epoch: ", start_epoch)
     print("---------------------------------------------------------------------------")
 
     # compute total progress
     load_size = global_config.load_size
-    needed_progress = int((network_config["max_epochs"]) * (train_count / load_size))
-    current_progress = int(start_epoch * (train_count / load_size))
+    needed_progress = int((network_config["max_epochs"]) * (test_count / load_size))
+    current_progress = int(start_epoch * (test_count / load_size))
     pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
     pbar.update(current_progress)
 
-    for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (_, img_batch, target_batch) in enumerate(train_loader, 0):
-            img_batch = img_batch.to(device)
-            target_batch = target_batch.to(device)
-            input_map = {"img_a" : img_batch, "img_b" : target_batch}
-            img2img_t.train(epoch, iteration, input_map)
+    for i, (file_name, img_batch, target_batch) in enumerate(test_loader_a, 0):
+        img_batch = img_batch.to(device)
+        target_batch = target_batch.to(device)
+        input_map = {"file_name": file_name, "img_a": img_batch, "img_b": target_batch}
 
-            iteration = iteration + 1
-            pbar.update(1)
+        img2img_t.measure_and_store(input_map)
+        img2img_t.save_images(input_map)
+        pbar.update(1)
 
-            if (iteration % opts.save_per_iter == 0):
-                img2img_t.save_states(epoch, iteration, True)
+        if ((i + 1) % 4 == 0):
+            break
 
-                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
-                # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter) == 0:
-                    img2img_t.visdom_plot(iteration)
-                    img2img_t.visdom_visualize(input_map, "Train")
-
-                    _, a_test_batch, b_test_batch = next(iter(test_loader))
-                    a_test_batch = a_test_batch.to(device, non_blocking=True)
-                    b_test_batch = b_test_batch.to(device, non_blocking=True)
-
-                    input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-                    img2img_t.visdom_visualize(input_map, "Test")
+    if (global_config.plot_enabled == 1):
+        img2img_t.visualize_results(input_map, "Test Dataset")
+    img2img_t.report_metrics("Test Dataset")
 
     pbar.close()
 

@@ -7,11 +7,12 @@ num_blocks: 6
 batch_size: [1536, 1024, 1024, 256] #amount of images to accumulate before backprop
 load_size: [768, 512, 512, 128] #amount of images to load in GPU. load_size <= batch_size
 
-min_epochs: 400
-max_epochs: 400
+min_epochs: 100
+max_epochs: 100
 
 dataset_version: "CityScapes"
 img_path_train: "/leftImg8bit/train/*/*.png"
-mask_path_train: "/gtFine/train/*/*_color.png"
+mask_path_train: "/gtFine/train/*/*.png"
+
 img_path_test: "/leftImg8bit/val/*/*.png"
-mask_path_test: "/gtFine/val/*/*_color.png"
+mask_path_test: "/gtFine/val/*/*.png"
