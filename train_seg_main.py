@@ -30,12 +30,18 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version_train = network_config["dataset_version"]
-    img_path = network_config["img_path"]
-    mask_path = network_config["mask_path"]
+    dataset_version = network_config["dataset_version"]
+    img_path_train = network_config["img_path_train"]
+    mask_path_train = network_config["mask_path_train"]
+    img_path_test= network_config["img_path_test"]
+    mask_path_test = network_config["mask_path_test"]
 
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
+        global_config.seg_path_rgb_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
+        global_config.seg_path_rgb_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_test= "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
@@ -55,7 +61,8 @@ def update_config(opts):
 
     elif(global_config.server_config == 3): #RTX 3090 PC
         global_config.num_workers = 12
-        global_config.seg_path_root_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_rgb_path_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. ", global_config, network_config)
@@ -90,7 +97,10 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][0]
         print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
 
-    global_config.seg_path_root_train = global_config.seg_path_root_train.format(dataset_version=dataset_version_train, img_path=img_path, mask_path=mask_path)
+    global_config.seg_path_rgb_path_train = global_config.seg_path_rgb_path_train.format(dataset_version=dataset_version, img_path=img_path_train)
+    global_config.seg_path_mask_path_train = global_config.seg_path_mask_path_train.format(dataset_version=dataset_version, mask_path=mask_path_train)
+    global_config.seg_path_rgb_path_test = global_config.seg_path_rgb_path_test.format(dataset_version=dataset_version, img_path=img_path_test)
+    global_config.seg_path_mask_path_test = global_config.seg_path_mask_path_test.format(dataset_version=dataset_version, mask_path=mask_path_test)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -127,8 +137,8 @@ def main(argv):
 
     plot_utils.VisdomReporter.initialize()
 
-    train_loader, train_count = dataset_loader.load_cityscapes_gan_dataset_train(global_config.seg_path_root_train)
-    test_loader, test_count = dataset_loader.load_cityscapes_gan_dataset_test(global_config.seg_path_root_train)
+    train_loader, train_count = dataset_loader.load_cityscapes_gan_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train)
+    test_loader, test_count = dataset_loader.load_cityscapes_gan_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
     img2img_t = paired_trainer.PairedTrainer(device)
 
     iteration = 0
@@ -158,7 +168,8 @@ def main(argv):
             if (iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
+                # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
+                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter) == 0:
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 

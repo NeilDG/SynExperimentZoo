@@ -5,27 +5,6 @@ import global_config
 from config.network_config import ConfigHolder
 from loaders import superres_datasets, segmentation_datasets
 
-
-def load_single_test_dataset(path_a, opts):
-    print("Dataset path: ", path_a)
-    a_list = glob.glob(path_a)
-    random.shuffle(a_list)
-    if (opts.img_to_load > 0):
-        a_list = a_list[0: opts.img_to_load]
-
-    # a_list = a_list[100000:328497] #TODO: Temp only
-
-    print("Length of images: %d" % len(a_list))
-
-    data_loader = torch.utils.data.DataLoader(
-        image_datasets.SingleImageDataset(a_list, 2),
-        batch_size=128,
-        num_workers=1,
-        shuffle=True
-    )
-
-    return data_loader
-
 def load_train_img2img_dataset(a_path, b_path):
     network_config = ConfigHolder.getInstance().get_network_config()
     a_list = glob.glob(a_path)
@@ -148,8 +127,9 @@ def load_cityscapes_dataset():
 
     return data_loader, len(dataset)
 
-def load_cityscapes_gan_dataset_train(a_path):
+def load_cityscapes_gan_dataset_train(a_path, b_path):
     a_list = glob.glob(a_path)
+    b_list = glob.glob(b_path)
 
     if (global_config.img_to_load > 0):
         a_list = a_list[0: global_config.img_to_load]
@@ -159,13 +139,16 @@ def load_cityscapes_gan_dataset_train(a_path):
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
         a_list.extend(a_list * (extend_length // len(a_list) + 1))
+        b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
-    random.shuffle(a_list)
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
     img_length = len(a_list)
 
     print("Loading Cityscapes train. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
 
-    dataset = segmentation_datasets.CityscapesGANDataset(a_list, 1)
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, b_list, 1)
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=global_config.load_size,
@@ -175,8 +158,9 @@ def load_cityscapes_gan_dataset_train(a_path):
 
     return data_loader, img_length
 
-def load_cityscapes_gan_dataset_test(a_path):
+def load_cityscapes_gan_dataset_test(a_path, b_path):
     a_list = glob.glob(a_path)
+    b_list = glob.glob(b_path)
 
     if (global_config.img_to_load > 0):
         a_list = a_list[0: global_config.img_to_load]
@@ -186,13 +170,16 @@ def load_cityscapes_gan_dataset_test(a_path):
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
         a_list.extend(a_list * (extend_length // len(a_list) + 1))
+        b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
-    random.shuffle(a_list)
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
     img_length = len(a_list)
 
-    print("Loading Cityscapes test. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
+    print("Loading Cityscapes test. Length of images: %d" % (img_length))
 
-    dataset = segmentation_datasets.CityscapesGANDataset(a_list, 2)
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, b_list, 2)
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=global_config.load_size,

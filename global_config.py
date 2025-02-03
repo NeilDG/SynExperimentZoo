@@ -26,7 +26,10 @@ b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
 a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
 b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
 
-seg_path_root_train = "X:/Segmentation Dataset/VOC/"
+seg_path_rgb_path_train = ""
+seg_path_mask_path_train = ""
+seg_path_rgb_path_test = ""
+seg_path_mask_path_test = ""
 
 burst_sr_lr_path = ""
 burst_sr_hr_path = ""
