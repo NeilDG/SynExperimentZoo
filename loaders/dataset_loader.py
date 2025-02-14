@@ -179,7 +179,7 @@ def load_cityscapes_gan_dataset_test(a_path, b_path):
     a_list, b_list = zip(*temp_list)
     img_length = len(a_list)
 
-    print("Loading Cityscapes test. Length of images: %d" % (img_length))
+    print("Loading Cityscapes test. Length of images: %d. Num workers: 1" % (img_length))
 
     dataset = segmentation_datasets.CityscapesGANDataset(a_list, b_list, 2)
     data_loader = torch.utils.data.DataLoader(
@@ -189,6 +189,33 @@ def load_cityscapes_gan_dataset_test(a_path, b_path):
         shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
+    return data_loader, img_length
+
+def load_cityscapes_dataset_train():
+    dataset = segmentation_datasets.CustomCityscapesDataset(1, "train")
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+    img_length = len(dataset)
+    print("Loading Cityscapes train. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
+    return data_loader, img_length
+
+
+
+def load_cityscapes_dataset_test():
+    dataset = segmentation_datasets.CustomCityscapesDataset(2, "val")
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=1,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+
+    img_length = len(dataset)
+    print("Loading Cityscapes test. Length of images: %d. Num workers: 1" % (img_length))
     return data_loader, img_length
 
 def load_voc_dataset():

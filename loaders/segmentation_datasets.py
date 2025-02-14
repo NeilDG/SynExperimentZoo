@@ -1,30 +1,85 @@
-import torch
 import cv2
+import torch
 import torchvision
-from torch.utils import data
 import torchvision.transforms as transforms
+from torch.utils import data
 
 import global_config
 from config.network_config import ConfigHolder
 
+
 class CustomCityscapesDataset(torchvision.datasets.Cityscapes):
-    def __init__(self, transform_config):
-        super().__init__(global_config.seg_path_root_train, split='train', mode='fine', target_type='semantic', download=True)
+    def __init__(self, transform_config, split):
+        super().__init__(global_config.seg_path_root_train, split=split, mode='fine', target_type='color')
         self.transform_config = transform_config
 
         config_holder = ConfigHolder.getInstance()
         self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
 
-        self.transform_op = transforms.Compose([
-                            transforms.ToTensor(),
-                            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # From ImageNet
-                            ])
+        if self.transform_config == 1:
+            patch_size = config_holder.get_network_attribute("patch_size", 32)
+            transform_list = [
+                # transforms.ToPILImage(),
+                transforms.RandomCrop(patch_size),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip()
+            ]
+            if "random_sharpness_contrast" in self.augment_mode:
+                transform_list.append(transforms.RandomAdjustSharpness(1.25))
+                transform_list.append(transforms.RandomAutocontrast())
+                print("Data augmentation: Added random sharpness and contrast")
+
+            if "random_invert" in self.augment_mode:
+                transform_list.append(transforms.RandomInvert())
+                print("Data augmentation: Added random invert")
+
+            if "augmix" in self.augment_mode:
+                transform_list.append(transforms.AugMix())
+                print("Data augmentation: Added augmix")
+
+            transform_list.append(transforms.ToTensor())
+            self.rgb_op = transforms.Compose(transform_list)
+        else:
+            self.rgb_op = transforms.Compose([
+                # transforms.ToPILImage(),
+                transforms.RandomCrop(128),
+                transforms.ToTensor()
+            ])
+
+        # self.norm_op = transforms.Normalize((0.5,), (0.5,))
+        self.norm_op = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) #From ImageNet
+
+        self.cache = []
+        self.cache_filled = False
+        self.cache_len = 5000
 
     def __getitem__(self, index):
-        image, target = super().__getitem__(index)
-        image = self.transform(image)
+        # image, target = super().__getitem__(index)
+        #
+        # state = torch.get_rng_state()
+        # image = self.rgb_op(image)
+        # torch.set_rng_state(state)
+        # target = self.rgb_op(target)[:3, :, :]
+        # image = self.norm_op(image)
 
-        return image, target
+        if not self.cache_filled:  # Fill the cache on the first pass
+            for i in range(self.cache_len):
+                image, target = super().__getitem__(index)
+
+                state = torch.get_rng_state()
+                image = self.rgb_op(image)
+                torch.set_rng_state(state)
+                target = self.rgb_op(target)[:3, :, :]
+                image = self.norm_op(image)
+
+                # print("Target type: ", type(target), "Image type: ", type(image), "Image shape: ", image.shape, " Target shape: ", target.shape)
+
+                self.cache.append([image, target])  # Load all data into the cache
+            self.cache_filled = True  # Set the flag after cache is filled
+
+        return self.cache[index]  # Return data from the cache
+        # return image, target
+
 
 class CityscapesGANDataset_Old(data.Dataset):
     def __init__(self, a_list, transform_config):
