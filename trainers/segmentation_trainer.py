@@ -30,6 +30,7 @@ class SegmentationTrainer:
 
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
+        hyperparam_config = config_holder.get_all_hyperparams()
 
         self.backbone = "mobilenet_v2"
         self.num_classes = 4
@@ -41,24 +42,25 @@ class SegmentationTrainer:
         # Loss function for multi-class segmentation
         self.dice_loss = smp.losses.DiceLoss(smp.losses.MULTICLASS_MODE, from_logits=True)
 
-        self.optimizerG = torch.optim.Adam(itertools.chain(self.model.parameters()), lr=network_config["g_lr"], weight_decay=network_config["weight_decay"])
+        self.optimizerG = torch.optim.Adam(itertools.chain(self.model.parameters()), lr=hyperparam_config["g_lr"], weight_decay=hyperparam_config["weight_decay"])
         self.model.to(self.gpu_device)
+        # self.preprocess_fn = get_preprocessing_fn(self.backbone, "imagenet")
 
     def initialize_dict(self):
         # what to store in visdom?
+        self.G_LOSS_KEY = "g_loss"
         self.losses_dict = {}
+        self.losses_dict[self.G_LOSS_KEY] = []
 
-    def update_penalties(self):
-        # what penalties to use for losses?
-        self.cycle_weight = 10.0
-
+        self.caption_dict = {}
+        self.caption_dict[self.G_LOSS_KEY] = "Dice loss per iteration"
 
     def train(self, epoch, iteration, train_map):
         train_img = train_map["train_img"]
         train_mask = train_map["train_mask"]
-        preprocess_fn = get_preprocessing_fn(self.backbone, "imagenet")
-        train_img = preprocess_fn(train_img)
-        train_mask = preprocess_fn(train_mask)
+
+        # train_img = self.preprocess_fn(train_img)
+        # train_mask = self.preprocess_fn(train_mask)
 
         accum_batch_size = self.load_size * iteration
 
@@ -66,26 +68,47 @@ class SegmentationTrainer:
         self.model.train()
         prediction = self.model(train_img)
 
+        # print("Shapes: ", train_img.shape, prediction.shape, train_mask.shape)
         dice_loss = self.dice_loss(prediction, train_mask)
         dice_loss.backward()
 
         if (accum_batch_size % self.batch_size == 0):
             self.optimizerG.step()
 
+            # what to put to losses dict for visdom reporting?
+            if (iteration > 10):
+                self.losses_dict[self.G_LOSS_KEY].append(dice_loss.item())
 
-        # what to put to losses dict for visdom reporting?
 
-    def visdom_report(self, train_a, train_b, test_a, test_b):
+    def test(self, input_map):
         with torch.no_grad():
-            # infer
-            print()
+            img = input_map["img"]
 
-        # report to visdom
+            self.model.eval()
+            prediction = self.model(img)
+            return prediction
 
-    def load_saved_state(self, iteration, checkpoint, model_key, optimizer_key):
-        self.iteration = iteration
+    def visdom_plot(self, iteration):
+        style_transfer_version = global_config.sr_network_version
+        self.visdom_reporter.plot_finegrain_loss("a2b_loss", iteration, self.losses_dict, self.caption_dict, style_transfer_version)
+
+    def visdom_visualize(self, input_map, label = "Train"):
+        with torch.no_grad():
+            # report to visdom
+            network_version = global_config.sr_network_version
+            img = input_map["img"]
+            mask = input_map["mask"]
+
+            prediction = self.test(input_map)
+
+            self.visdom_reporter.plot_image(img, str(label) + " RGB Images - " + network_version + str(self.iteration))
+            # self.visdom_reporter.plot_cmap(prediction, str(label) + " RGB->Mask Transfer " + network_version + str(self.iteration))
+            self.visdom_reporter.plot_cmap(mask, str(label) + " Mask Images - " + network_version + str(self.iteration))
+
+    def load_saved_state(self):
+        print("Loading model placeholder")
         # load model
 
-    def save_states(self, epoch, iteration, path, model_key, optimizer_key):
-        print()
+    def save_states(self, epoch, iteration, is_temp:bool):
+        print("Saving model placeholder")
         # save model

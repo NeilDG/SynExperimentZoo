@@ -49,6 +49,25 @@ class VisdomReporter:
         else:
             self.vis.images(img_group, win = self.image_windows[hash(caption)], opts = dict(caption = caption))
 
+    def plot_cmap(self, mask, caption):
+        if(global_config.plot_enabled == 0):
+            return
+
+        mask_img = mask[:16].cpu().numpy()
+        print("Mask img shape: ", mask_img.shape)
+
+        plt.figure(figsize=(12, 6))
+        plt.imshow(mask_img, cmap="tab20")  # Visualize ground truth mask
+        plt.title(caption)
+        plt.axis("off")
+
+        plt.show()
+
+        # if hash(caption) not in self.loss_windows:
+        #     self.loss_windows[hash(caption)] = self.vis.matplot(plt, opts = dict(caption = caption))
+        # else:
+        #     self.vis.matplot(plt, win = self.loss_windows[hash(caption)], opts = dict(caption = caption))
+
     def plot_text(self, text):
         if(hash(text) not in self.text_windows):
             self.text_windows[hash(text)] = self.vis.text(text, opts = dict(caption = text))

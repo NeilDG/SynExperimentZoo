@@ -25,7 +25,7 @@ def train_seg_main():
     #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"synseg_v00.00_cityscapes_gan.01.1\"")
 
     os.system("python \"train_seg_main_2.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"synseg_v00.00_cityscapes.01.1\"")
+              "--plot_enabled=1 --save_per_iter=10 --network_version=\"synseg_v00.00_cityscapes.01.1\"")
 
 def test_seg_main():
     os.system("python \"test_seg_main.py\" --server_config=0 --img_to_load=-1 "

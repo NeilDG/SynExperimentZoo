@@ -198,6 +198,38 @@ class CityscapesGANDataset(data.Dataset):
     def __len__(self):
         return len(self.a_list)
 
+
+def mask_to_labels(mask_img, color_to_class, other_class:int):
+    """Encodes the mask to [0, 1, 2, 3] labels."""
+
+    mask = mask_img.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
+    encoded_mask = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)  # (H, W)
+
+    for color, class_id in color_to_class.items():
+        color_mask = np.all(mask == np.array(color), axis=-1)
+        encoded_mask[color_mask] = class_id
+
+    # Handle "others" class
+    others_mask = np.ones((mask.shape[0], mask.shape[1]), dtype=bool)
+    for color, _ in color_to_class.items():
+        color_mask = np.all(mask == np.array(color), axis=-1)
+        others_mask = np.logical_and(others_mask, np.logical_not(color_mask))
+
+    encoded_mask[others_mask] = other_class
+    encoded_mask = torch.from_numpy(encoded_mask).long()  # To tensor and Long type
+    return encoded_mask
+
+def labels_to_mask(mask_labels, color_to_class, other_class:int):
+    H, W = mask_labels.shape
+
+    rgb_mask = np.zeros((H, W, 3), dtype=np.uint8)
+
+    for label, color in color_to_class.items():
+        rgb_mask[mask_labels == label] = color
+
+    return rgb_mask
+
+
 class CityscapesDataset(data.Dataset):
     def __init__(self, rgb_list, mask_list, transform_config):
         self.rgb_list = rgb_list
@@ -264,14 +296,15 @@ class CityscapesDataset(data.Dataset):
         torch.set_rng_state(state)
 
         mask_img = self.initial_op(mask_img)
-        mask_one_hot = self.mask_to_onehot(mask_img)
+        # mask = self.mask_to_onehot(mask_img)
+        mask = mask_to_labels(mask_img)
 
-        self.print_class_counts(mask_one_hot)
+        # self.print_class_counts(mask_one_hot)
 
         if self.use_tanh:
             rgb_img = self.norm_op(rgb_img)
 
-        return file_name, rgb_img, mask_one_hot
+        return file_name, rgb_img, mask
 
     def __len__(self):
         return len(self.rgb_list)

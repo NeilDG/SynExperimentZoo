@@ -164,30 +164,29 @@ def main(argv):
     pbar.update(current_progress)
 
     for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (train_img, train_mask) in enumerate(train_loader, 0):
+        for i, (_, train_img, train_mask) in enumerate(train_loader, 0):
             train_img = train_img.to(device)
             train_mask = train_mask.to(device)
 
             train_map = {"train_img" : train_img, "train_mask" : train_mask}
-            seg_t.train(epoch, iteration, train_map)
+            # seg_t.train(epoch, iteration, train_map)
 
             iteration = iteration + 1
             pbar.update(1)
 
-            # if (iteration % opts.save_per_iter == 0):
-            #     img2img_t.save_states(epoch, iteration, True)
-            #
-            #     # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
-            #     if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
-            #         img2img_t.visdom_plot(iteration)
-            #         img2img_t.visdom_visualize(input_map, "Train")
-            #
-            #         a_test_batch, b_test_batch = next(iter(test_loader))
-            #         a_test_batch = a_test_batch.to(device)
-            #         b_test_batch = b_test_batch.to(device)
-            #
-            #         input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-            #         img2img_t.visdom_visualize(input_map, "Test")
+            if (iteration % opts.save_per_iter == 0):
+                seg_t.save_states(epoch, iteration, True)
+
+                # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
+                if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
+                    seg_t.visdom_plot(iteration)
+                    seg_t.visdom_visualize({"img": train_img, "mask": train_mask}, "Train")
+
+                    _, val_img, val_mask = next(iter(test_loader))
+                    val_img = val_img.to(device)
+                    val_mask = val_mask.to(device)
+
+                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask}, "Test")
 
     pbar.close()
 
