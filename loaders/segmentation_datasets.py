@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -240,28 +241,67 @@ class CityscapesDataset(data.Dataset):
         self.norm_op = transforms.Compose([
             transforms.Normalize((0.5,), (0.5,))])
 
+        self.color_to_class = {
+            (0, 0, 0): 0, #background
+            (0, 0, 142): 1, #vehicle
+            (70, 70, 70): 2, #building
+            #the rest are "others"
+        }
+
+        self.other_class = 3 # "others"
+
     def __getitem__(self, idx):
         file_name = self.rgb_list[idx % len(self.rgb_list)].split("\\")[-1].split(".")[0]
 
         rgb_img = cv2.imread(self.rgb_list[idx])
         rgb_img = cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB)
 
-        mask_list = cv2.imread(self.mask_list[idx])
-        mask_list = cv2.cvtColor(mask_list, cv2.COLOR_BGR2RGB)
+        mask_img = cv2.imread(self.mask_list[idx])
+        mask_img = cv2.cvtColor(mask_img, cv2.COLOR_BGR2RGB)
 
         state = torch.get_rng_state()
         rgb_img = self.initial_op(rgb_img)
         torch.set_rng_state(state)
-        mask_list = self.initial_op(mask_list)
 
-        if (self.use_tanh):
+        mask_img = self.initial_op(mask_img)
+        mask_one_hot = self.mask_to_onehot(mask_img)
+
+        self.print_class_counts(mask_one_hot)
+
+        if self.use_tanh:
             rgb_img = self.norm_op(rgb_img)
-            mask_list = self.norm_op(mask_list)
 
-        return file_name, rgb_img, mask_list
+        return file_name, rgb_img, mask_one_hot
 
     def __len__(self):
         return len(self.rgb_list)
+
+    def mask_to_onehot(self, mask):
+        """Converts to one-hot, handling "others" class."""
+        mask = mask.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
+        one_hot = np.zeros((mask.shape[0], mask.shape[1], len(self.color_to_class) + 1), dtype=np.uint8)  # (H, W, C)
+
+        for color, class_id in self.color_to_class.items():
+            color_mask = np.all(mask == np.array(color), axis=-1)
+            one_hot[color_mask, class_id] = 1
+
+        # Handle "others" class: Find pixels NOT in any defined class
+        others_mask = np.ones((mask.shape[0], mask.shape[1]), dtype=bool)  # Start with all True
+        for color, _ in self.color_to_class.items():
+            color_mask = np.all(mask == np.array(color), axis=-1)
+            others_mask = np.logical_and(others_mask, np.logical_not(color_mask))  # False if color is found
+
+        one_hot[others_mask, self.other_class] = 1  # Assign "others" where needed
+        one_hot = torch.from_numpy(one_hot).permute(2, 0, 1).float()  # (C, H, W) and tensor
+        return one_hot
+
+    def print_class_counts(self, mask_one_hot):
+        """Prints the number of 1 values for each class in the one-hot mask."""
+
+        print("Mask one hot shape: ", mask_one_hot.shape)
+        for c in range(mask_one_hot.shape[0]):  # Iterate through classes
+            class_count = torch.sum(mask_one_hot[c]).item()  # Count 1s in each channel
+            print(f"Class {c}: {class_count} pixels")
 
 class CustomVOCSegmentationDataset(torchvision.datasets.VOCSegmentation):
     def __init__(self, transform_config):

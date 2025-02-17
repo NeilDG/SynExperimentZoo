@@ -1,3 +1,4 @@
+import itertools
 import sys
 from optparse import OptionParser
 import random
@@ -7,7 +8,7 @@ from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
-from trainers import paired_trainer
+from trainers import segmentation_trainer
 from tqdm import tqdm
 import yaml
 from yaml.loader import SafeLoader
@@ -30,16 +31,27 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
+    dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
+    dataset_version_test = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
+
+    img_path_train = network_config["img_path_train"]
+    mask_path_train = network_config["mask_path_train"]
+    img_path_test= network_config["img_path_test"]
+    mask_path_test = network_config["mask_path_test"]
 
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
+        global_config.seg_path_rgb_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
+        global_config.seg_path_rgb_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_test= "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
 
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
-        global_config.seg_path_root_train = "/home/jupyter-neil.delgallego/Segmentation Dataset/CityScapes/"
+        global_config.seg_path_root_train = "/home/jupyter-neil.delgallego/Segmentation Dataset/{dataset_version}/{img_path}/"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using CCS configuration.", global_config, network_config)
@@ -52,7 +64,8 @@ def update_config(opts):
 
     elif(global_config.server_config == 3): #RTX 3090 PC
         global_config.num_workers = 12
-        global_config.seg_path_root_train = "X:/Segmentation Dataset/CityScapes/"
+        global_config.seg_path_rgb_path_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. ", global_config, network_config)
@@ -86,6 +99,12 @@ def update_config(opts):
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
+
+    global_config.seg_path_rgb_path_train = global_config.seg_path_rgb_path_train.format(dataset_version=dataset_version_train, img_path=img_path_train)
+    global_config.seg_path_mask_path_train = global_config.seg_path_mask_path_train.format(dataset_version=dataset_version_train, mask_path=mask_path_train)
+
+    global_config.seg_path_rgb_path_test = global_config.seg_path_rgb_path_test.format(dataset_version=dataset_version_test, img_path=img_path_test)
+    global_config.seg_path_mask_path_test = global_config.seg_path_mask_path_test.format(dataset_version=dataset_version_test, mask_path=mask_path_test)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -122,9 +141,14 @@ def main(argv):
 
     plot_utils.VisdomReporter.initialize()
 
-    train_loader, train_count = dataset_loader.load_cityscapes_dataset_train()
-    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test()
-    img2img_t = paired_trainer.PairedTrainer(device)
+    print(global_config.seg_path_rgb_path_train)
+    print(global_config.seg_path_mask_path_train)
+    print(global_config.seg_path_rgb_path_test)
+    print(global_config.seg_path_mask_path_test)
+
+    train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train)
+    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
+    seg_t = segmentation_trainer.SegmentationTrainer(device)
 
     iteration = 0
     start_epoch = global_config.last_epoch_st
@@ -139,31 +163,31 @@ def main(argv):
     pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
     pbar.update(current_progress)
 
-
     for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (img_batch, target_batch) in enumerate(train_loader, 0):
-            img_batch = img_batch.to(device)
-            target_batch = target_batch.to(device)
-            input_map = {"img_a" : img_batch, "img_b" : target_batch}
-            img2img_t.train(epoch, iteration, input_map)
+        for i, (train_img, train_mask) in enumerate(train_loader, 0):
+            train_img = train_img.to(device)
+            train_mask = train_mask.to(device)
+
+            train_map = {"train_img" : train_img, "train_mask" : train_mask}
+            seg_t.train(epoch, iteration, train_map)
 
             iteration = iteration + 1
             pbar.update(1)
 
-            if (iteration % opts.save_per_iter == 0):
-                img2img_t.save_states(epoch, iteration, True)
-
-                # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
-                if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
-                    img2img_t.visdom_plot(iteration)
-                    img2img_t.visdom_visualize(input_map, "Train")
-
-                    a_test_batch, b_test_batch = next(iter(test_loader))
-                    a_test_batch = a_test_batch.to(device)
-                    b_test_batch = b_test_batch.to(device)
-
-                    input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
-                    img2img_t.visdom_visualize(input_map, "Test")
+            # if (iteration % opts.save_per_iter == 0):
+            #     img2img_t.save_states(epoch, iteration, True)
+            #
+            #     # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
+            #     if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
+            #         img2img_t.visdom_plot(iteration)
+            #         img2img_t.visdom_visualize(input_map, "Train")
+            #
+            #         a_test_batch, b_test_batch = next(iter(test_loader))
+            #         a_test_batch = a_test_batch.to(device)
+            #         b_test_batch = b_test_batch.to(device)
+            #
+            #         input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+            #         img2img_t.visdom_visualize(input_map, "Test")
 
     pbar.close()
 
