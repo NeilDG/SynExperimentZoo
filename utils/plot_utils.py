@@ -53,7 +53,7 @@ class VisdomReporter:
         if(global_config.plot_enabled == 0):
             return
 
-        mask_img = mask[:16].cpu().numpy()
+        mask_img = mask[:1].cpu().numpy()
         print("Mask img shape: ", mask_img.shape)
 
         plt.figure(figsize=(12, 6))
