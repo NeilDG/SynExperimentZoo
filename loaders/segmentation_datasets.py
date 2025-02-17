@@ -297,7 +297,7 @@ class CityscapesDataset(data.Dataset):
 
         mask_img = self.initial_op(mask_img)
         # mask = self.mask_to_onehot(mask_img)
-        mask = mask_to_labels(mask_img)
+        mask = mask_to_labels(mask_img, self.color_to_class, self.other_class)
 
         # self.print_class_counts(mask_one_hot)
 
