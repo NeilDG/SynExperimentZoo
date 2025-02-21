@@ -213,7 +213,10 @@ def mask_to_labels(mask_img, color_to_class, other_class:int):
     encoded_mask = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)  # (H, W)
 
     for color, class_id in color_to_class.items():
+        # print("Color values: ", np.mean(color), " Mask values: ", np.mean(mask))
         color_mask = np.all(mask == np.array(color), axis=-1)
+        # condition = (np.abs(np.mean(color) - np.mean(mask)) < 0.05)
+        # color_mask = np.all(mask == condition, axis=-1)
         encoded_mask[color_mask] = class_id
 
     # Handle "others" class
@@ -223,24 +226,25 @@ def mask_to_labels(mask_img, color_to_class, other_class:int):
         others_mask = np.logical_and(others_mask, np.logical_not(color_mask))
 
     encoded_mask[others_mask] = other_class
-    encoded_mask = torch.from_numpy(encoded_mask).long()  # To tensor and Long type
+    encoded_mask = torch.from_numpy(encoded_mask).to(torch.uint8)  # To tensor and Long type
     return encoded_mask
 
-def labels_to_mask(mask_labels:torch.int64, color_to_class):
+def labels_to_mask(mask_labels:torch.uint8, color_to_class):
     device = mask_labels.device
     # mask_labels = mask_labels.reshape(mask_labels.shape[0], mask_labels.shape[1]) #H, W, C
     rgb_mask = torch.zeros((mask_labels.shape[0], mask_labels.shape[1], 3), dtype=torch.uint8, device=device)  # (H, W, 3)
 
     for color, class_id in color_to_class.items():
         label_tensor = torch.tensor(class_id, device=device)
-        print("Label tensor: ", label_tensor)
+        # print("Label tensor: ", torch.sum(label_tensor), "Mask tensor: ", torch.sum(mask_labels))
         mask = torch.all(mask_labels == label_tensor, dim=-1)  # Create a boolean mask where all channels match
         color_tensor = torch.tensor(color, dtype=torch.uint8, device=device)  # Convert color to tensor with uint8 dtype
-        print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask.shape, "Color shape: ", color_tensor.shape)
+        # print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask.shape, "Color shape: ", color_tensor.shape)
 
-        rgb_mask[mask, 0] = color_tensor[0]
-        rgb_mask[mask, 1] = color_tensor[1]
-        rgb_mask[mask, 2] = color_tensor[2]
+        rgb_mask[mask] = color_tensor
+        # rgb_mask[mask, 0] = color_tensor[0]
+        # rgb_mask[mask, 1] = color_tensor[1]
+        # rgb_mask[mask, 2] = color_tensor[2]
 
     rgb_mask = rgb_mask.permute(2, 0, 1)
     return rgb_mask
@@ -305,6 +309,8 @@ class CityscapesDataset(data.Dataset):
         torch.set_rng_state(state)
 
         mask_img = self.initial_op(mask_img)
+        mask_img = (mask_img * 255.0).to(torch.uint8)
+        # mask_img = self.norm_op(mask_img)
         # mask = self.mask_to_onehot(mask_img)
         mask = mask_to_labels(mask_img, color_to_class, self.other_class)
 
