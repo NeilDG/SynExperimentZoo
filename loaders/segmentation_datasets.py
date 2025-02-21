@@ -199,10 +199,17 @@ class CityscapesGANDataset(data.Dataset):
         return len(self.a_list)
 
 
+color_to_class = {
+            (0, 0, 0): 0, #background
+            (0, 0, 142): 1, #vehicle
+            (70, 70, 70): 2, #building
+            (255, 255, 255): 3 #others
+            #the rest are "others"
+        }
+
 def mask_to_labels(mask_img, color_to_class, other_class:int):
     """Encodes the mask to [0, 1, 2, 3] labels."""
-
-    mask = mask_img.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
+    mask = mask_img.permute(1, 2, 0).numpy()  # (H, W, 1) and numpy
     encoded_mask = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)  # (H, W)
 
     for color, class_id in color_to_class.items():
@@ -219,14 +226,24 @@ def mask_to_labels(mask_img, color_to_class, other_class:int):
     encoded_mask = torch.from_numpy(encoded_mask).long()  # To tensor and Long type
     return encoded_mask
 
-def labels_to_mask(mask_labels, color_to_class, other_class:int):
-    H, W = mask_labels.shape
+def labels_to_mask(mask_labels:torch.int64, color_to_class):
+    device = mask_labels.device
+    mask_labels = mask_labels.reshape(mask_labels.shape[0], mask_labels.shape[1], 1) #H, W, C
 
-    rgb_mask = np.zeros((H, W, 3), dtype=np.uint8)
+    rgb_mask = torch.zeros((mask_labels.shape[0], mask_labels.shape[1], 3), dtype=mask_labels.dtype, device=device)  # (H, W, 3)
 
-    for label, color in color_to_class.items():
-        rgb_mask[mask_labels == label] = color
+    for color, class_id in color_to_class.items():
+        label_tensor = torch.tensor(class_id, device=device)
+        print("Label tensor: ", label_tensor)
+        mask = torch.all(mask_labels == label_tensor, dim=-1)  # Create a boolean mask where all channels match
+        color_tensor = torch.tensor(color, dtype=torch.uint8, device=device)  # Convert color to tensor with uint8 dtype
+        print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask.shape, "Color shape: ", color_tensor.shape)
 
+        rgb_mask[:, :, 0] = color_tensor[0]
+        rgb_mask[:, :, 1] = color_tensor[1]
+        rgb_mask[:, :, 2] = color_tensor[2]
+
+    rgb_mask = rgb_mask.permute(2, 0, 1)
     return rgb_mask
 
 
@@ -273,13 +290,6 @@ class CityscapesDataset(data.Dataset):
         self.norm_op = transforms.Compose([
             transforms.Normalize((0.5,), (0.5,))])
 
-        self.color_to_class = {
-            (0, 0, 0): 0, #background
-            (0, 0, 142): 1, #vehicle
-            (70, 70, 70): 2, #building
-            #the rest are "others"
-        }
-
         self.other_class = 3 # "others"
 
     def __getitem__(self, idx):
@@ -297,7 +307,7 @@ class CityscapesDataset(data.Dataset):
 
         mask_img = self.initial_op(mask_img)
         # mask = self.mask_to_onehot(mask_img)
-        mask = mask_to_labels(mask_img, self.color_to_class, self.other_class)
+        mask = mask_to_labels(mask_img, color_to_class, self.other_class)
 
         # self.print_class_counts(mask_one_hot)
 
@@ -309,24 +319,24 @@ class CityscapesDataset(data.Dataset):
     def __len__(self):
         return len(self.rgb_list)
 
-    def mask_to_onehot(self, mask):
-        """Converts to one-hot, handling "others" class."""
-        mask = mask.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
-        one_hot = np.zeros((mask.shape[0], mask.shape[1], len(self.color_to_class) + 1), dtype=np.uint8)  # (H, W, C)
-
-        for color, class_id in self.color_to_class.items():
-            color_mask = np.all(mask == np.array(color), axis=-1)
-            one_hot[color_mask, class_id] = 1
-
-        # Handle "others" class: Find pixels NOT in any defined class
-        others_mask = np.ones((mask.shape[0], mask.shape[1]), dtype=bool)  # Start with all True
-        for color, _ in self.color_to_class.items():
-            color_mask = np.all(mask == np.array(color), axis=-1)
-            others_mask = np.logical_and(others_mask, np.logical_not(color_mask))  # False if color is found
-
-        one_hot[others_mask, self.other_class] = 1  # Assign "others" where needed
-        one_hot = torch.from_numpy(one_hot).permute(2, 0, 1).float()  # (C, H, W) and tensor
-        return one_hot
+    # def mask_to_onehot(self, mask):
+    #     """Converts to one-hot, handling "others" class."""
+    #     mask = mask.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
+    #     one_hot = np.zeros((mask.shape[0], mask.shape[1], len(self.color_to_class) + 1), dtype=np.uint8)  # (H, W, C)
+    #
+    #     for color, class_id in self.color_to_class.items():
+    #         color_mask = np.all(mask == np.array(color), axis=-1)
+    #         one_hot[color_mask, class_id] = 1
+    #
+    #     # Handle "others" class: Find pixels NOT in any defined class
+    #     others_mask = np.ones((mask.shape[0], mask.shape[1]), dtype=bool)  # Start with all True
+    #     for color, _ in self.color_to_class.items():
+    #         color_mask = np.all(mask == np.array(color), axis=-1)
+    #         others_mask = np.logical_and(others_mask, np.logical_not(color_mask))  # False if color is found
+    #
+    #     one_hot[others_mask, self.other_class] = 1  # Assign "others" where needed
+    #     one_hot = torch.from_numpy(one_hot).permute(2, 0, 1).float()  # (C, H, W) and tensor
+    #     return one_hot
 
     def print_class_counts(self, mask_one_hot):
         """Prints the number of 1 values for each class in the one-hot mask."""

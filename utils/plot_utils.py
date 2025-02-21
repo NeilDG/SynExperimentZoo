@@ -4,6 +4,7 @@ Created on Thu Jun 25 17:02:01 2020
 
 @author: delgallegon
 """
+import torch
 from matplotlib.lines import Line2D
 
 import global_config
@@ -11,6 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.utils as vutils
 import visdom
+
+from loaders import segmentation_datasets
+from loaders.segmentation_datasets import CityscapesDataset, labels_to_mask
 
 SALIKSIK_SERVER = "192.168.134.223" #IMPORTmsANT: No HTTP
 
@@ -53,20 +57,25 @@ class VisdomReporter:
         if(global_config.plot_enabled == 0):
             return
 
-        mask_img = mask[:1].cpu().numpy()
-        print("Mask img shape: ", mask_img.shape)
+        mask_label = mask[:16]
+        all_mask_img = []
+        for mask in mask_label:
+            mask_img = labels_to_mask(mask, segmentation_datasets.color_to_class)
+            # print("Mask label shape: ", mask.shape, " Mask image shape: ", mask_img.shape)
 
-        plt.figure(figsize=(12, 6))
-        plt.imshow(mask_img, cmap="tab20")  # Visualize ground truth mask
-        plt.title(caption)
-        plt.axis("off")
+            all_mask_img.append(mask_img)
 
-        plt.show()
+        all_mask_img = torch.stack(all_mask_img).float()
+        print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
 
-        # if hash(caption) not in self.loss_windows:
-        #     self.loss_windows[hash(caption)] = self.vis.matplot(plt, opts = dict(caption = caption))
-        # else:
-        #     self.vis.matplot(plt, win = self.loss_windows[hash(caption)], opts = dict(caption = caption))
+        # plt.figure(figsize=(12, 6))
+        # plt.imshow(all_mask_img, cmap="tab20")  # Visualize ground truth mask
+        # plt.title(caption)
+        # plt.axis("off")
+        #
+        # plt.show()
+
+        self.plot_image(all_mask_img, caption, False)
 
     def plot_text(self, text):
         if(hash(text) not in self.text_windows):

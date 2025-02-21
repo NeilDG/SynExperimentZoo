@@ -66,6 +66,8 @@ def update_config(opts):
         global_config.num_workers = 12
         global_config.seg_path_rgb_path_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
         global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
+        global_config.seg_path_rgb_path_test = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
+        global_config.seg_path_mask_path_test = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. ", global_config, network_config)
