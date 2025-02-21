@@ -228,9 +228,8 @@ def mask_to_labels(mask_img, color_to_class, other_class:int):
 
 def labels_to_mask(mask_labels:torch.int64, color_to_class):
     device = mask_labels.device
-    mask_labels = mask_labels.reshape(mask_labels.shape[0], mask_labels.shape[1], 1) #H, W, C
-
-    rgb_mask = torch.zeros((mask_labels.shape[0], mask_labels.shape[1], 3), dtype=mask_labels.dtype, device=device)  # (H, W, 3)
+    # mask_labels = mask_labels.reshape(mask_labels.shape[0], mask_labels.shape[1]) #H, W, C
+    rgb_mask = torch.zeros((mask_labels.shape[0], mask_labels.shape[1], 3), dtype=torch.uint8, device=device)  # (H, W, 3)
 
     for color, class_id in color_to_class.items():
         label_tensor = torch.tensor(class_id, device=device)
@@ -239,9 +238,9 @@ def labels_to_mask(mask_labels:torch.int64, color_to_class):
         color_tensor = torch.tensor(color, dtype=torch.uint8, device=device)  # Convert color to tensor with uint8 dtype
         print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask.shape, "Color shape: ", color_tensor.shape)
 
-        rgb_mask[:, :, 0] = color_tensor[0]
-        rgb_mask[:, :, 1] = color_tensor[1]
-        rgb_mask[:, :, 2] = color_tensor[2]
+        rgb_mask[mask, 0] = color_tensor[0]
+        rgb_mask[mask, 1] = color_tensor[1]
+        rgb_mask[mask, 2] = color_tensor[2]
 
     rgb_mask = rgb_mask.permute(2, 0, 1)
     return rgb_mask
