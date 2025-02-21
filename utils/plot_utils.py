@@ -75,7 +75,7 @@ class VisdomReporter:
         #
         # plt.show()
 
-        self.plot_image(all_mask_img, caption, False)
+        self.plot_image(all_mask_img, caption)
 
     def plot_text(self, text):
         if(hash(text) not in self.text_windows):
