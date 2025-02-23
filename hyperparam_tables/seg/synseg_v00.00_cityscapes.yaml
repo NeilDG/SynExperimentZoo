@@ -1,7 +1,6 @@
 model_type: 1
 input_nc: 3
-#patch_size: 64
-patch_size: 256
+patch_size: 64
 num_blocks: 6
 
 #0 - 24GB, 1 - 16GB, 2 - 10 - 12GB, 3 - 8GB
@@ -15,7 +14,7 @@ max_epochs: 100
 
 dataset_version: "CityScapes"
 img_path_train: "/leftImg8bit/train/*/*.png"
-mask_path_train: "/gtFine/train/*/*_color.png"
+mask_path_train: "/gtFine/train/*/*_color_*.png"
 
 img_path_test: "/leftImg8bit/val/*/*.png"
 mask_path_test: "/gtFine/val/*/*_color.png"

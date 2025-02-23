@@ -129,36 +129,54 @@ class CityscapesGANDataset(data.Dataset):
         return len(self.a_list)
 
 
-# color_to_class = {
-#             (0, 0, 0): 0, #background
-#             (0, 0, 142): 1, #vehicle
-#             (70, 70, 70): 2, #building
-#             (255, 255, 255): 3 #others
-#             #the rest are "others"
-#         }
-
+# simplified classification. 0 = nature, 1 = vehicle, 2 = building, 3 = road, 4 = props, 5 = people
 color_to_class = {
-    (128, 64, 128): 0,  # road
-    (244, 35, 232): 1,  # sidewalk
-    (70, 70, 70): 2,    # building
-    (250, 170, 160): 3, # wall
-    (230, 150, 140): 4, # fence
-    (102, 102, 156): 5, # pole
-    (190, 153, 153): 6, # traffic light
-    (153, 153, 153): 7, # traffic sign
-    (107, 142, 35): 8,  # vegetation
-    (152, 251, 152): 9,  # terrain
-    (150, 251, 152): 10, # sky
-    (220, 20, 60): 11,  # person
-    (255, 0, 0): 12,    # rider
-    (0, 0, 142): 13,    # car
-    (0, 0, 70): 14,     # truck
-    (0, 60, 100): 15,    # bus
-    (0, 80, 100): 16,    # train
-    (0, 0, 230): 17,    # motorcycle
-    (119, 11, 32): 18,   # bicycle
-    (250, 170, 30): 19,  # rail track
+    (128, 64, 128): 3,  # road
+    (244, 35, 232): 3,  # sidewalk
+    (70, 70, 70): 2,  # building
+    (250, 170, 160): 2,  # wall
+    (230, 150, 140): 2,  # fence
+    (102, 102, 156): 4,  # pole
+    (190, 153, 153): 4,  # traffic light
+    (153, 153, 153): 4,  # traffic sign
+    (107, 142, 35): 0,  # vegetation
+    (152, 251, 152): 0,  # terrain
+    (150, 251, 152): 0,  # sky
+    (220, 20, 60): 5,  # person
+    (255, 0, 0): 5,  # rider
+    (0, 0, 142): 1,  # car
+    (0, 0, 70): 1,  # truck
+    (0, 60, 100): 1,  # bus
+    (0, 80, 100): 1,  # train
+    (0, 0, 230): 1,  # motorcycle
+    (119, 11, 32): 1,  # bicycle
+    (250, 170, 30): 3,  # rail track
 }
+color_to_class_len = len(color_to_class)
+
+#
+# color_to_class = {
+#     (128, 64, 128): 0,  # road
+#     (244, 35, 232): 1,  # sidewalk
+#     (70, 70, 70): 2,    # building
+#     (250, 170, 160): 3, # wall
+#     (230, 150, 140): 4, # fence
+#     (102, 102, 156): 5, # pole
+#     (190, 153, 153): 6, # traffic light
+#     (153, 153, 153): 7, # traffic sign
+#     (107, 142, 35): 8,  # vegetation
+#     (152, 251, 152): 9,  # terrain
+#     (150, 251, 152): 10, # sky
+#     (220, 20, 60): 11,  # person
+#     (255, 0, 0): 12,    # rider
+#     (0, 0, 142): 13,    # car
+#     (0, 0, 70): 14,     # truck
+#     (0, 60, 100): 15,    # bus
+#     (0, 80, 100): 16,    # train
+#     (0, 0, 230): 17,    # motorcycle
+#     (119, 11, 32): 18,   # bicycle
+#     (250, 170, 30): 19,  # rail track
+# }
 
 def mask_to_labels(mask_img, color_to_class, other_class:int):
     """Encodes the mask to [0, 1, 2, 3] labels."""

@@ -15,7 +15,8 @@ import torch.nn as nn
 import torchvision.utils as vutils
 from utils import plot_utils
 import segmentation_models_pytorch as smp
-from segmentation_models_pytorch.encoders import get_preprocessing_fn
+import loaders.segmentation_datasets as segmentation_datasets
+import torch.nn.functional as F
 
 class SegmentationTrainer:
 
@@ -33,14 +34,14 @@ class SegmentationTrainer:
         hyperparam_config = config_holder.get_all_hyperparams()
 
         self.backbone = "mobilenet_v2"
-        self.num_classes = 4
+        self.num_classes = segmentation_datasets.color_to_class_len
         if(network_config == 1):
             self.model = smp.Unet(encoder_name=self.backbone, encoder_weights='imagenet', classes=self.num_classes)
         else:
             self.model = smp.PSPNet(encoder_name=self.backbone, encoder_weights='imagenet', classes=self.num_classes)
 
         # Loss function for multi-class segmentation
-        self.dice_loss = smp.losses.DiceLoss(smp.losses.MULTICLASS_MODE, from_logits=True)
+        self.dice_loss = smp.losses.DiceLoss(smp.losses.MULTICLASS_MODE)
 
         self.optimizerG = torch.optim.Adam(itertools.chain(self.model.parameters()), lr=hyperparam_config["g_lr"], weight_decay=hyperparam_config["weight_decay"])
         self.model.to(self.gpu_device)
@@ -67,6 +68,8 @@ class SegmentationTrainer:
         self.optimizerG.zero_grad()
         self.model.train()
         prediction = self.model(train_img)
+        prediction = prediction.int()
+        train_mask = train_mask.int()
 
         # print("Shapes: ", train_img.shape, prediction.shape, train_mask.shape)
         dice_loss = self.dice_loss(prediction, train_mask)
@@ -101,11 +104,14 @@ class SegmentationTrainer:
             mask_rgb = input_map["mask_rgb"]
 
             prediction = self.test(input_map)
+            prediction = F.softmax(prediction, dim=1)
+            prediction = prediction.argmax(dim=1)
+            print("Prediction shape: ", prediction.shape, " Mask shape: ", mask.shape)
 
             self.visdom_reporter.plot_image(img, str(label) + " RGB Images - " + network_version + str(self.iteration))
-            # self.visdom_reporter.plot_cmap(prediction, str(label) + " RGB->Mask Transfer " + network_version + str(self.iteration))
+            self.visdom_reporter.plot_cmap(prediction, str(label) + " RGB->Mask Transfer " + network_version + str(self.iteration))
             self.visdom_reporter.plot_cmap(mask, str(label) + " Mask Images - " + network_version + str(self.iteration))
-            self.visdom_reporter.plot_image(mask_rgb, str(label) + " Mask RGB Images - " + network_version + str(self.iteration), normalize=False)
+            # self.visdom_reporter.plot_image(mask_rgb, str(label) + " Mask RGB Images - " + network_version + str(self.iteration), normalize=False)
 
     def load_saved_state(self):
         print("Loading model placeholder")

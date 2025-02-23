@@ -31,8 +31,8 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    # dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-    dataset_version_train = network_config["dataset_version"]
+    dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
+    # dataset_version_train = network_config["dataset_version"]
     dataset_version_test = network_config["dataset_version"]
 
     img_path_train = network_config["img_path_train"]
@@ -173,7 +173,7 @@ def main(argv):
             train_mask_img = train_mask_img.to(device)
 
             train_map = {"train_img" : train_img, "train_mask" : train_mask, "train_mask_img" : train_mask_img}
-            # seg_t.train(epoch, iteration, train_map)
+            seg_t.train(epoch, iteration, train_map)
 
             iteration = iteration + 1
             pbar.update(1)

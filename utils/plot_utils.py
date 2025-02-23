@@ -61,19 +61,10 @@ class VisdomReporter:
         all_mask_img = []
         for mask in mask_label:
             mask_img = labels_to_mask(mask, segmentation_datasets.color_to_class)
-            # print("Mask label shape: ", mask.shape, " Mask image shape: ", mask_img.shape)
-
             all_mask_img.append(mask_img)
 
         all_mask_img = torch.stack(all_mask_img).float()
         print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
-
-        # plt.figure(figsize=(12, 6))
-        # plt.imshow(all_mask_img, cmap="tab20")  # Visualize ground truth mask
-        # plt.title(caption)
-        # plt.axis("off")
-        #
-        # plt.show()
 
         self.plot_image(all_mask_img, caption)
 
