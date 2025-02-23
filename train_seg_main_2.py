@@ -31,8 +31,9 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-    dataset_version_test = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
+    # dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
+    dataset_version_train = network_config["dataset_version"]
+    dataset_version_test = network_config["dataset_version"]
 
     img_path_train = network_config["img_path_train"]
     mask_path_train = network_config["mask_path_train"]
@@ -166,11 +167,12 @@ def main(argv):
     pbar.update(current_progress)
 
     for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (_, train_img, train_mask) in enumerate(train_loader, 0):
+        for i, (_, train_img, train_mask, train_mask_img) in enumerate(train_loader, 0):
             train_img = train_img.to(device)
             train_mask = train_mask.to(device)
+            train_mask_img = train_mask_img.to(device)
 
-            train_map = {"train_img" : train_img, "train_mask" : train_mask}
+            train_map = {"train_img" : train_img, "train_mask" : train_mask, "train_mask_img" : train_mask_img}
             # seg_t.train(epoch, iteration, train_map)
 
             iteration = iteration + 1
@@ -182,13 +184,14 @@ def main(argv):
                 # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
                 if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
                     seg_t.visdom_plot(iteration)
-                    seg_t.visdom_visualize({"img": train_img, "mask": train_mask}, "Train")
+                    seg_t.visdom_visualize({"img": train_img, "mask": train_mask, "mask_rgb" : train_mask_img}, "Train")
 
-                    _, val_img, val_mask = next(iter(test_loader))
+                    _, val_img, val_mask, val_mask_img = next(iter(test_loader))
                     val_img = val_img.to(device)
                     val_mask = val_mask.to(device)
+                    val_mask_img = val_mask_img.to(device)
 
-                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask}, "Test")
+                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask, "mask_rgb" : val_mask_img}, "Test")
 
     pbar.close()
 

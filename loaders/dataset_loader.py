@@ -206,10 +206,9 @@ def load_cityscapes_dataset_train(rgb_path, mask_path):
     #     rgb_list.extend(rgb_list * (extend_length // len(rgb_list) + 1))
     #     mask_list.extend(mask_list * (extend_length // len(mask_list) + 1))
 
-    temp_list = list(zip(rgb_list, mask_list))
-    random.shuffle(temp_list)
-    rgb_list, mask_list = zip(*temp_list)
-    img_length = len(rgb_list)
+    # temp_list = list(zip(rgb_list, mask_list))
+    # random.shuffle(temp_list)
+    # rgb_list, mask_list = zip(*temp_list)
 
     dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, 1)
     data_loader = torch.utils.data.DataLoader(
@@ -219,8 +218,8 @@ def load_cityscapes_dataset_train(rgb_path, mask_path):
         shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
-    print("Loading Cityscapes train with one-hot. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
-    return data_loader, img_length
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: %d" % (len(rgb_list), len(mask_list), global_config.num_workers))
+    return data_loader, len(rgb_list)
 
 def load_cityscapes_dataset_test(rgb_path, mask_path):
     rgb_list = glob.glob(rgb_path)
@@ -230,11 +229,9 @@ def load_cityscapes_dataset_test(rgb_path, mask_path):
         rgb_list = rgb_list[0: global_config.img_to_load]
         mask_list = mask_list[0: global_config.img_to_load]
 
-    temp_list = list(zip(rgb_list, mask_list))
-    random.shuffle(temp_list)
-    rgb_list, mask_list = zip(*temp_list)
-    img_length = len(rgb_list)
-
+    # temp_list = list(zip(rgb_list, mask_list))
+    # random.shuffle(temp_list)
+    # rgb_list, mask_list = zip(*temp_list)
     dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, 2)
     data_loader = torch.utils.data.DataLoader(
         dataset,
@@ -243,8 +240,8 @@ def load_cityscapes_dataset_test(rgb_path, mask_path):
         shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
-    print("Loading Cityscapes test with one-hot. Length of images: %d. Num workers: 1" % img_length)
-    return data_loader, img_length
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: 1" % (len(rgb_list), len(mask_list)))
+    return data_loader, len(rgb_list)
 
 def load_voc_dataset():
     dataset = segmentation_datasets.CustomVOCSegmentationDataset(1)

@@ -62,76 +62,6 @@ from config.network_config import ConfigHolder
 #
 #         return image, target
 
-
-class CityscapesGANDataset_Old(data.Dataset):
-    def __init__(self, a_list, transform_config):
-        self.a_list = a_list
-        self.transform_config = transform_config
-
-        config_holder = ConfigHolder.getInstance()
-        self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
-        self.use_tanh = config_holder.get_network_attribute("use_tanh", True)
-
-        if self.transform_config == 1:
-            patch_size = config_holder.get_network_attribute("patch_size", 32)
-            transform_list = [
-                transforms.ToPILImage(),
-                transforms.RandomCrop(patch_size),
-                transforms.RandomHorizontalFlip(),
-                transforms.RandomVerticalFlip()
-            ]
-            if "random_sharpness_contrast" in self.augment_mode:
-                transform_list.append(transforms.RandomAdjustSharpness(1.25))
-                transform_list.append(transforms.RandomAutocontrast())
-                print("Data augmentation: Added random sharpness and contrast")
-
-            if "random_invert" in self.augment_mode:
-                transform_list.append(transforms.RandomInvert())
-                print("Data augmentation: Added random invert")
-
-            if "augmix" in self.augment_mode:
-                transform_list.append(transforms.AugMix())
-                print("Data augmentation: Added augmix")
-
-            transform_list.append(transforms.ToTensor())
-            self.initial_op = transforms.Compose(transform_list)
-        else:
-            self.initial_op = transforms.Compose([
-                transforms.ToPILImage(),
-                transforms.RandomCrop(128),
-                transforms.ToTensor()
-            ])
-
-        self.norm_op = transforms.Compose([
-            transforms.Normalize((0.5,), (0.5,))])
-
-    def __getitem__(self, idx):
-        file_name = self.a_list[idx % len(self.a_list)].split("\\")[-1].split(".")[0]
-
-        a_img = cv2.imread(self.a_list[idx])
-        a_img = cv2.cvtColor(a_img, cv2.COLOR_BGR2RGB)
-
-        # Split image into two parts
-        height, width, _ = a_img.shape
-        mid_point = width // 2  # Assuming vertical split
-
-        left_image = a_img[:, :mid_point, :]
-        right_image = a_img[:, mid_point:, :]
-
-        state = torch.get_rng_state()
-        left_image = self.initial_op(left_image)
-        torch.set_rng_state(state)
-        right_image = self.initial_op(right_image)
-
-        if (self.use_tanh):
-            left_image = self.norm_op(left_image)
-            right_image = self.norm_op(right_image)
-
-        return file_name, left_image, right_image
-
-    def __len__(self):
-        return len(self.a_list)
-
 class CityscapesGANDataset(data.Dataset):
     def __init__(self, a_list, b_list, transform_config):
         self.a_list = a_list
@@ -208,46 +138,37 @@ class CityscapesGANDataset(data.Dataset):
 #         }
 
 color_to_class = {
-    (0, 0, 0): 0,  # background
-    (0, 0, 142): 1,  # car
-    (70, 70, 70): 2,  # building
-    (255, 0, 0): 3,  # road
-    (153, 153, 153): 4,  # sidewalk
-    (107, 142, 35): 5,  # vegetation
-    (190, 153, 153): 6,  # terrain
-    (250, 170, 30): 7,  # pole
-    (220, 220, 0): 8,  # traffic light
-    (152, 251, 152): 9,  # traffic sign
-    (0, 0, 230): 10,  # sky
-    (119, 11, 32): 11,  # rail track
-    (244, 35, 232): 12,  # person
-    (250, 170, 160): 13,  # fence
-    (230, 150, 140): 14,  # wall
-    (0, 0, 70): 15,  # motorcycle
-    (0, 0, 90): 16,  # bicycle
-    (0, 60, 100): 17,  # bus
-    (0, 80, 100): 18,  # train
-    (70, 130, 180): 19, #truck
+    (128, 64, 128): 0,  # road
+    (244, 35, 232): 1,  # sidewalk
+    (70, 70, 70): 2,    # building
+    (250, 170, 160): 3, # wall
+    (230, 150, 140): 4, # fence
+    (102, 102, 156): 5, # pole
+    (190, 153, 153): 6, # traffic light
+    (153, 153, 153): 7, # traffic sign
+    (107, 142, 35): 8,  # vegetation
+    (152, 251, 152): 9,  # terrain
+    (150, 251, 152): 10, # sky
+    (220, 20, 60): 11,  # person
+    (255, 0, 0): 12,    # rider
+    (0, 0, 142): 13,    # car
+    (0, 0, 70): 14,     # truck
+    (0, 60, 100): 15,    # bus
+    (0, 80, 100): 16,    # train
+    (0, 0, 230): 17,    # motorcycle
+    (119, 11, 32): 18,   # bicycle
+    (250, 170, 30): 19,  # rail track
 }
 
 def mask_to_labels(mask_img, color_to_class, other_class:int):
     """Encodes the mask to [0, 1, 2, 3] labels."""
     mask_img = mask_img.permute(1, 2, 0).numpy()  # (H, W, 3) and numpy
     encoded_mask = np.zeros((mask_img.shape[0], mask_img.shape[1]), dtype=np.uint8)  # (H, W)
-    tolerance = 5
 
     for color, class_id in color_to_class.items():
-        # print("Color values: ", np.mean(color), " Mask values: ", np.mean(mask))
-
-        # color_mask = np.all(mask_img == np.array(color))
-        # nonzeros = np.count_nonzero(color_mask)
-        # print("Class id: ", class_id, " Non-zeros: ", nonzeros)
-        # condition = (np.abs(np.mean(color) - np.mean(mask)) < 0.05)
-        # color_mask = np.all(mask == condition, axis=-1)
-
-        distance = np.linalg.norm(mask_img - color, axis=-1)
-        color_mask = distance <= tolerance
-
+        color = np.full(mask_img.shape, color)
+        # print("Color values: ", np.mean(color), " Mask values: ", np.mean(mask_img))
+        color_mask = np.all(mask_img == color, axis=-1)
         encoded_mask[color_mask] = class_id
 
     # Handle "others" class
@@ -266,9 +187,9 @@ def labels_to_mask(mask_labels:torch.uint8, color_to_class):
     rgb_mask = torch.zeros((mask_labels.shape[0], mask_labels.shape[1], 3), dtype=torch.uint8, device=device)  # (H, W, 3)
 
     for color, class_id in color_to_class.items():
-        label_tensor = torch.tensor(class_id, device=device, dtype=torch.float16)
+        label_tensor = torch.tensor(class_id, device=device, dtype=torch.uint8)
         color_tensor = torch.tensor(color, dtype=torch.uint8, device=device)  # Convert color to tensor with uint8 dtype
-        print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask_labels.shape, "Color shape: ", color_tensor.shape, " Non-zeros in mask:", torch.count_nonzero(mask_labels))
+        # print("RGB mask shape: ", rgb_mask.shape, "Mask shape: ", mask_labels.shape, "Color shape: ", color_tensor.shape, " Non-zeros in mask:", torch.count_nonzero(mask_labels))
 
         rgb_mask[mask_labels == label_tensor] = color_tensor
 
@@ -327,7 +248,11 @@ class CityscapesDataset(data.Dataset):
         rgb_img = cv2.imread(self.rgb_list[idx])
         rgb_img = cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB)
 
+
         mask_img = cv2.imread(self.mask_list[idx])
+        # mask_file_name = file_name + "_color.png"
+        # print("Mask file name: ", mask_file_name)
+        # mask_img = cv2.imread(mask_file_name)
         mask_img = cv2.cvtColor(mask_img, cv2.COLOR_BGR2RGB)
 
         state = torch.get_rng_state()
@@ -345,7 +270,7 @@ class CityscapesDataset(data.Dataset):
         if self.use_tanh:
             rgb_img = self.norm_op(rgb_img)
 
-        return file_name, rgb_img, mask
+        return file_name, rgb_img, mask, mask_img
 
     def __len__(self):
         return len(self.rgb_list)

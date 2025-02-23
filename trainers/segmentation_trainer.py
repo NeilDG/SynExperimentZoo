@@ -98,12 +98,14 @@ class SegmentationTrainer:
             network_version = global_config.sr_network_version
             img = input_map["img"]
             mask = input_map["mask"]
+            mask_rgb = input_map["mask_rgb"]
 
             prediction = self.test(input_map)
 
             self.visdom_reporter.plot_image(img, str(label) + " RGB Images - " + network_version + str(self.iteration))
             # self.visdom_reporter.plot_cmap(prediction, str(label) + " RGB->Mask Transfer " + network_version + str(self.iteration))
             self.visdom_reporter.plot_cmap(mask, str(label) + " Mask Images - " + network_version + str(self.iteration))
+            self.visdom_reporter.plot_image(mask_rgb, str(label) + " Mask RGB Images - " + network_version + str(self.iteration), normalize=False)
 
     def load_saved_state(self):
         print("Loading model placeholder")
