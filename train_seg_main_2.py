@@ -32,13 +32,15 @@ def update_config(opts):
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-    # dataset_version_train = network_config["dataset_version"]
     dataset_version_test = network_config["dataset_version"]
 
     img_path_train = network_config["img_path_train"]
     mask_path_train = network_config["mask_path_train"]
+    label_path_train = network_config["label_path_train"]
+
     img_path_test= network_config["img_path_test"]
     mask_path_test = network_config["mask_path_test"]
+    label_path_test = network_config["label_path_test"]
 
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
@@ -46,6 +48,8 @@ def update_config(opts):
         global_config.seg_path_mask_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.seg_path_rgb_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
         global_config.seg_path_mask_path_test= "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
+        global_config.seg_path_label_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{label_path}"
+        global_config.seg_path_label_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{label_path}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
@@ -69,6 +73,9 @@ def update_config(opts):
         global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
         global_config.seg_path_rgb_path_test = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
         global_config.seg_path_mask_path_test = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
+        global_config.seg_path_label_path_train = "X:/Segmentation Dataset/{dataset_version}/{label_path}"
+        global_config.seg_path_label_path_test = "X:/Segmentation Dataset/{dataset_version}/{label_path}"
+
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. ", global_config, network_config)
@@ -105,9 +112,11 @@ def update_config(opts):
 
     global_config.seg_path_rgb_path_train = global_config.seg_path_rgb_path_train.format(dataset_version=dataset_version_train, img_path=img_path_train)
     global_config.seg_path_mask_path_train = global_config.seg_path_mask_path_train.format(dataset_version=dataset_version_train, mask_path=mask_path_train)
+    global_config.seg_path_label_path_train = global_config.seg_path_label_path_train.format(dataset_version=dataset_version_train, label_path=label_path_train)
 
     global_config.seg_path_rgb_path_test = global_config.seg_path_rgb_path_test.format(dataset_version=dataset_version_test, img_path=img_path_test)
     global_config.seg_path_mask_path_test = global_config.seg_path_mask_path_test.format(dataset_version=dataset_version_test, mask_path=mask_path_test)
+    global_config.seg_path_label_path_test = global_config.seg_path_label_path_test.format(dataset_version=dataset_version_test, label_path=label_path_test)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -149,8 +158,8 @@ def main(argv):
     print(global_config.seg_path_rgb_path_test)
     print(global_config.seg_path_mask_path_test)
 
-    train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train)
-    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
+    train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train, global_config.seg_path_label_path_train)
+    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test, global_config.seg_path_label_path_test)
     seg_t = segmentation_trainer.SegmentationTrainer(device)
 
     iteration = 0

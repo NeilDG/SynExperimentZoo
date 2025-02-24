@@ -30,6 +30,8 @@ seg_path_rgb_path_train = ""
 seg_path_mask_path_train = ""
 seg_path_rgb_path_test = ""
 seg_path_mask_path_test = ""
+seg_path_label_path_train = ""
+seg_path_label_path_test = ""
 
 burst_sr_lr_path = ""
 burst_sr_hr_path = ""

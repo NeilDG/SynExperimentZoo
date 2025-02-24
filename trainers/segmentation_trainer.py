@@ -68,10 +68,8 @@ class SegmentationTrainer:
         self.optimizerG.zero_grad()
         self.model.train()
         prediction = self.model(train_img)
-        prediction = prediction.int()
-        train_mask = train_mask.int()
 
-        # print("Shapes: ", train_img.shape, prediction.shape, train_mask.shape)
+        # print("Shapes: ", train_img.shape, prediction.shape, train_mask.shape, " Type: ", prediction.dtype, train_mask.dtype)
         dice_loss = self.dice_loss(prediction, train_mask)
         dice_loss.backward()
 

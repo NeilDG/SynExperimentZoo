@@ -60,11 +60,11 @@ class VisdomReporter:
         mask_label = mask[:16]
         all_mask_img = []
         for mask in mask_label:
-            mask_img = labels_to_mask(mask, segmentation_datasets.color_to_class)
+            mask_img = labels_to_mask(mask)
             all_mask_img.append(mask_img)
 
         all_mask_img = torch.stack(all_mask_img).float()
-        print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
+        # print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
 
         self.plot_image(all_mask_img, caption)
 

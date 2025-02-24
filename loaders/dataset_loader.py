@@ -191,13 +191,15 @@ def load_cityscapes_gan_dataset_test(a_path, b_path):
 
     return data_loader, img_length
 
-def load_cityscapes_dataset_train(rgb_path, mask_path):
+def load_cityscapes_dataset_train(rgb_path, mask_path, label_path):
     rgb_list = glob.glob(rgb_path)
     mask_list = glob.glob(mask_path)
+    label_list = glob.glob(label_path)
 
     if (global_config.img_to_load > 0):
         rgb_list = rgb_list[0: global_config.img_to_load]
         mask_list = mask_list[0: global_config.img_to_load]
+        label_list = label_list[0: global_config.img_to_load]
 
     # Ensure rgb_list and b_list have at least X00,000 elements
     # ideal_sample_size = len(rgb_list) * 10
@@ -206,11 +208,11 @@ def load_cityscapes_dataset_train(rgb_path, mask_path):
     #     rgb_list.extend(rgb_list * (extend_length // len(rgb_list) + 1))
     #     mask_list.extend(mask_list * (extend_length // len(mask_list) + 1))
 
-    # temp_list = list(zip(rgb_list, mask_list))
-    # random.shuffle(temp_list)
-    # rgb_list, mask_list = zip(*temp_list)
+    temp_list = list(zip(rgb_list, mask_list))
+    random.shuffle(temp_list)
+    rgb_list, mask_list = zip(*temp_list)
 
-    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, 1)
+    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, label_list, 1)
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=global_config.load_size,
@@ -218,21 +220,23 @@ def load_cityscapes_dataset_train(rgb_path, mask_path):
         shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
-    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: %d" % (len(rgb_list), len(mask_list), global_config.num_workers))
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: %d" % (len(rgb_list), len(mask_list), len(label_list), global_config.num_workers))
     return data_loader, len(rgb_list)
 
-def load_cityscapes_dataset_test(rgb_path, mask_path):
+def load_cityscapes_dataset_test(rgb_path, mask_path, label_path):
     rgb_list = glob.glob(rgb_path)
     mask_list = glob.glob(mask_path)
+    label_list = glob.glob(label_path)
 
     if (global_config.img_to_load > 0):
         rgb_list = rgb_list[0: global_config.img_to_load]
         mask_list = mask_list[0: global_config.img_to_load]
+        label_list = label_list[0: global_config.img_to_load]
 
     # temp_list = list(zip(rgb_list, mask_list))
     # random.shuffle(temp_list)
     # rgb_list, mask_list = zip(*temp_list)
-    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, 2)
+    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, label_list, 2)
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=global_config.load_size,
@@ -240,7 +244,7 @@ def load_cityscapes_dataset_test(rgb_path, mask_path):
         shuffle=False, pin_memory=True, prefetch_factor=4
     )
 
-    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: 1" % (len(rgb_list), len(mask_list)))
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: 1" % (len(rgb_list), len(mask_list), len(label_list)))
     return data_loader, len(rgb_list)
 
 def load_voc_dataset():
