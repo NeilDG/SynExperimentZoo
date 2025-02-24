@@ -4,6 +4,7 @@ Created on Thu Jun 25 17:02:01 2020
 
 @author: delgallegon
 """
+import torch
 from matplotlib.lines import Line2D
 
 import global_config
@@ -11,6 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.utils as vutils
 import visdom
+
+from loaders import segmentation_datasets
+from loaders.segmentation_datasets import CityscapesDataset, labels_to_mask
 
 SALIKSIK_SERVER = "192.168.134.223" #IMPORTmsANT: No HTTP
 
@@ -48,6 +52,21 @@ class VisdomReporter:
             self.image_windows[hash(caption)] = self.vis.images(img_group, opts = dict(caption = caption))
         else:
             self.vis.images(img_group, win = self.image_windows[hash(caption)], opts = dict(caption = caption))
+
+    def plot_cmap(self, mask, caption):
+        if(global_config.plot_enabled == 0):
+            return
+
+        mask_label = mask[:16]
+        all_mask_img = []
+        for mask in mask_label:
+            mask_img = labels_to_mask(mask)
+            all_mask_img.append(mask_img)
+
+        all_mask_img = torch.stack(all_mask_img).float()
+        # print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
+
+        self.plot_image(all_mask_img, caption)
 
     def plot_text(self, text):
         if(hash(text) not in self.text_windows):

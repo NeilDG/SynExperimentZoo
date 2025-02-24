@@ -9,6 +9,7 @@ import os
 import numpy as np
 import global_config
 import cv2
+import loaders.segmentation_datasets as segmentation_datasets
 
 def parse_string(input_string):
     """
@@ -45,13 +46,9 @@ def parse_string(input_string):
 
     return parsed_string, int_cc, int_dd
 
-def patchify():
+def patchify(input_dir, reference_dir, output_dir):
     patch_size = (64, 64)  # Size of the patches
     stride = (64, 64)  # Stride for patching
-
-    input_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/*/"  # Path to the image dataset
-    reference_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k/bicubic_x4/"  # Reference size of the HR image
-    output_dir = "/scratch3/neil.delgallego/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
 
     # Get all image paths
     image_paths = glob.glob(os.path.join(input_dir, "*.png"))
@@ -91,9 +88,97 @@ def patchify():
 
         print("Saved patches to ", image_path, " Input image size: ", np.shape(img), " Ref image size: ", np.shape(ref_img))
 
+def patchify_without_ref(input_dir, output_dir):
+    patch_size = (64, 64)  # Size of the patches
+    stride = (64, 64)  # Stride for patching
+
+    # Get all image paths
+    # image_paths = glob.glob(os.path.join(input_dir, "*.png"))
+    image_paths = glob.glob(input_dir)
+    for image_path in image_paths:
+        # Read image
+        img_name = os.path.basename(image_path).split('.')[0]
+        img = cv2.imread(image_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
+
+        # Convert to tensor
+        img_tensor = torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+
+        # Patchify
+        patches = kornia.contrib.extract_tensor_patches(img_tensor, patch_size, stride, allow_auto_padding=True)
+
+        # Get image name and subdirectory
+        subdirectory = os.path.basename(os.path.dirname(image_path))
+
+        # Create subdirectory in the output directory
+        subdirectory_path = os.path.join(output_dir, subdirectory)
+        os.makedirs(subdirectory_path, exist_ok=True)
+
+        # Save patches
+        for j in range(patches.shape[1]):
+            patch = patches[0, j].squeeze().permute(1, 2, 0).numpy() * 255.0
+            # patch = patch.astype(np.uint8)
+            patch_name = f"{img_name}_patched_{j}.png"
+            patch_path = os.path.join(subdirectory_path, patch_name)
+            cv2.imwrite(patch_path, cv2.cvtColor(patch, cv2.COLOR_RGB2BGR))
+
+        print("Saved patches to ", image_path, " Input image size: ", np.shape(img))
+
+def patchify_segmentation(input_dir, output_dir):
+    patch_size = (64, 64)  # Size of the patches
+    stride = (64, 64)  # Stride for patching
+
+    # Get all image paths
+    # image_paths = glob.glob(os.path.join(input_dir, "*.png"))
+    image_paths = glob.glob(input_dir)
+    for image_path in image_paths:
+        # Read image
+        img_name = os.path.basename(image_path).split('.')[0]
+        img = cv2.imread(image_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
+
+        # Convert to tensor
+        img_tensor = torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+
+        # Patchify
+        patches = kornia.contrib.extract_tensor_patches(img_tensor, patch_size, stride, allow_auto_padding=True)
+
+        # Get image name and subdirectory
+        subdirectory = os.path.basename(os.path.dirname(image_path))
+
+        # Create subdirectory in the output directory
+        subdirectory_path = os.path.join(output_dir, subdirectory)
+        os.makedirs(subdirectory_path, exist_ok=True)
+
+        # Save patches
+        for j in range(patches.shape[1]):
+            patch_tensor = patches[0, j].squeeze().permute(1, 2, 0) * 255.0
+            patch = patch_tensor.numpy()
+            # patch = patch.astype(np.uint8)
+            patch_name = f"{img_name}_patched_{j}.png"
+            patch_path = os.path.join(subdirectory_path, patch_name)
+            cv2.imwrite(patch_path, cv2.cvtColor(patch, cv2.COLOR_RGB2BGR))
+
+            #also save the class labels
+            mask_label = segmentation_datasets.mask_to_labels(patch_tensor).numpy()
+            mask_name = f"{img_name}_patched_label_{j}.txt"
+            np.savetxt(os.path.join(subdirectory_path, mask_name), mask_label, fmt='%d')
+
+        print("Saved patches to ", image_path, " Input image size: ", np.shape(img))
+
 
 def main():
-    patchify()
+    input_dir = "X:/Segmentation Dataset/CityScapes/gtFine/train/*/*_color.png"  # Path to the input dataset
+    output_dir = "X:/Segmentation Dataset/CityScapes_patched/gtFine/train/"  # Directory to save the patches
+    patchify_segmentation(input_dir, output_dir)
+
+    input_dir = "X:/Segmentation Dataset/CityScapes/gtFine/val/*/*_color.png"  # Path to the input dataset
+    output_dir = "X:/Segmentation Dataset/CityScapes_patched/gtFine/val/"  # Directory to save the patches
+    patchify_segmentation(input_dir, output_dir)
+
+    # input_dir = "X:/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
+    # output_dir = "X:/Segmentation Dataset/CityScapes_patched/leftImg8bit/train/"  # Directory to save the patches
+    # patchify_without_ref(input_dir, output_dir)
 
 if __name__=="__main__":
     main()

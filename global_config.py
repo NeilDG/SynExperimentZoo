@@ -26,6 +26,13 @@ b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
 a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
 b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
 
+seg_path_rgb_path_train = ""
+seg_path_mask_path_train = ""
+seg_path_rgb_path_test = ""
+seg_path_mask_path_test = ""
+seg_path_label_path_train = ""
+seg_path_label_path_test = ""
+
 burst_sr_lr_path = ""
 burst_sr_hr_path = ""
 div2k_lr_path = ""
@@ -52,6 +59,7 @@ dataset_target = ""
 cuda_device = ""
 save_images = 0
 save_every_epoch = 5
+save_per_iter = 50
 epoch_to_load = 0
 load_per_epoch = False
 load_per_sample = False

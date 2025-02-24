@@ -1,31 +1,9 @@
 import glob
 import random
 import torch
-# from super_image.data import EvalDataset
 import global_config
 from config.network_config import ConfigHolder
-from loaders import superres_datasets
-import os
-
-def load_single_test_dataset(path_a, opts):
-    print("Dataset path: ", path_a)
-    a_list = glob.glob(path_a)
-    random.shuffle(a_list)
-    if (opts.img_to_load > 0):
-        a_list = a_list[0: opts.img_to_load]
-
-    # a_list = a_list[100000:328497] #TODO: Temp only
-
-    print("Length of images: %d" % len(a_list))
-
-    data_loader = torch.utils.data.DataLoader(
-        image_datasets.SingleImageDataset(a_list, 2),
-        batch_size=128,
-        num_workers=1,
-        shuffle=True
-    )
-
-    return data_loader
+from loaders import superres_datasets, segmentation_datasets
 
 def load_train_img2img_dataset(a_path, b_path):
     network_config = ConfigHolder.getInstance().get_network_config()
@@ -36,7 +14,7 @@ def load_train_img2img_dataset(a_path, b_path):
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
 
-    # Ensure a_list and b_list have at least 200,000 elements
+    # Ensure a_list and b_list have at least X00,000 elements
     ideal_sample_size = 300000
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
@@ -133,4 +111,154 @@ def load_singleimg_dataset(a_path):
 #     )
 #
 #     return data_loader
+
+def load_cityscapes_dataset():
+    dataset = segmentation_datasets.CustomCityscapesDataset(1)
+
+    num_workers = global_config.num_workers
+    print("Loading Cityscapes. Num workers: %d" % (num_workers))
+
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, len(dataset)
+
+def load_cityscapes_gan_dataset_train(a_path, b_path):
+    a_list = glob.glob(a_path)
+    b_list = glob.glob(b_path)
+
+    if (global_config.img_to_load > 0):
+        a_list = a_list[0: global_config.img_to_load]
+        b_list = b_list[0: global_config.img_to_load]
+
+    # Ensure a_list and b_list have at least X00,000 elements
+    ideal_sample_size = len(a_list) * 10
+    if len(a_list) < ideal_sample_size:
+        extend_length = ideal_sample_size - len(a_list)
+        a_list.extend(a_list * (extend_length // len(a_list) + 1))
+        b_list.extend(b_list * (extend_length // len(b_list) + 1))
+
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
+    img_length = len(a_list)
+
+    print("Loading Cityscapes train. Length of images: %d. Num workers: %d" % (img_length, global_config.num_workers))
+
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, b_list, 1)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, img_length
+
+def load_cityscapes_gan_dataset_test(a_path, b_path):
+    a_list = glob.glob(a_path)
+    b_list = glob.glob(b_path)
+
+    if (global_config.img_to_load > 0):
+        a_list = a_list[0: global_config.img_to_load]
+        b_list = b_list[0: global_config.img_to_load]
+
+    # Ensure a_list and b_list have at least X00,000 elements
+    # ideal_sample_size = 300000
+    # if len(a_list) < ideal_sample_size:
+    #     extend_length = ideal_sample_size - len(a_list)
+    #     a_list.extend(a_list * (extend_length // len(a_list) + 1))
+    #     b_list.extend(b_list * (extend_length // len(b_list) + 1))
+
+    temp_list = list(zip(a_list, b_list))
+    random.shuffle(temp_list)
+    a_list, b_list = zip(*temp_list)
+    img_length = len(a_list)
+
+    print("Loading Cityscapes test. Length of images: %d. Num workers: 1" % (img_length))
+
+    dataset = segmentation_datasets.CityscapesGANDataset(a_list, b_list, 2)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=1,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, img_length
+
+def load_cityscapes_dataset_train(rgb_path, mask_path, label_path):
+    rgb_list = glob.glob(rgb_path)
+    mask_list = glob.glob(mask_path)
+    label_list = glob.glob(label_path)
+
+    if (global_config.img_to_load > 0):
+        rgb_list = rgb_list[0: global_config.img_to_load]
+        mask_list = mask_list[0: global_config.img_to_load]
+        label_list = label_list[0: global_config.img_to_load]
+
+    # Ensure rgb_list and b_list have at least X00,000 elements
+    # ideal_sample_size = len(rgb_list) * 10
+    # if len(rgb_list) < ideal_sample_size:
+    #     extend_length = ideal_sample_size - len(rgb_list)
+    #     rgb_list.extend(rgb_list * (extend_length // len(rgb_list) + 1))
+    #     mask_list.extend(mask_list * (extend_length // len(mask_list) + 1))
+
+    temp_list = list(zip(rgb_list, mask_list))
+    random.shuffle(temp_list)
+    rgb_list, mask_list = zip(*temp_list)
+
+    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, label_list, 1)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: %d" % (len(rgb_list), len(mask_list), len(label_list), global_config.num_workers))
+    return data_loader, len(rgb_list)
+
+def load_cityscapes_dataset_test(rgb_path, mask_path, label_path):
+    rgb_list = glob.glob(rgb_path)
+    mask_list = glob.glob(mask_path)
+    label_list = glob.glob(label_path)
+
+    if (global_config.img_to_load > 0):
+        rgb_list = rgb_list[0: global_config.img_to_load]
+        mask_list = mask_list[0: global_config.img_to_load]
+        label_list = label_list[0: global_config.img_to_load]
+
+    # temp_list = list(zip(rgb_list, mask_list))
+    # random.shuffle(temp_list)
+    # rgb_list, mask_list = zip(*temp_list)
+    dataset = segmentation_datasets.CityscapesDataset(rgb_list, mask_list, label_list, 2)
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=1,
+        shuffle=False, pin_memory=True, prefetch_factor=4
+    )
+
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: 1" % (len(rgb_list), len(mask_list), len(label_list)))
+    return data_loader, len(rgb_list)
+
+def load_voc_dataset():
+    dataset = segmentation_datasets.CustomVOCSegmentationDataset(1)
+
+    num_workers = global_config.num_workers
+    print("Loading VOC segmentation Dataset. Samples: %d Num workers: %d" % (len(dataset), num_workers))
+
+    data_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=global_config.load_size,
+        num_workers=global_config.num_workers,
+        shuffle=True, pin_memory=True, prefetch_factor=4
+    )
+
+    return data_loader, len(dataset)
 

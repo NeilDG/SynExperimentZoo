@@ -3,13 +3,13 @@ input_nc: 3
 patch_size: 64
 
 #0 - 24GB, 1 - 16GB, 2 - 10 - 12GB, 3 - 8GB
-batch_size: [1536, 1024, 1024, 256] #amount of images to accumulate before backprop
-load_size: [768, 512, 512, 128] #amount of images to load in GPU. load_size <= batch_size
+batch_size: [1536, 256, 1024, 256] #amount of images to accumulate before backprop
+load_size: [768, 128, 512, 128] #amount of images to load in GPU. load_size <= batch_size
 
 num_blocks: 6
 
-min_epochs: 400
-max_epochs: 400
+min_epochs: 200
+max_epochs: 200
 
 dataset_version: "div2k"
 low_path: "/lr/*.png"
