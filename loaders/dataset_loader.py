@@ -217,7 +217,7 @@ def load_cityscapes_dataset_train(rgb_path, mask_path, label_path):
         dataset,
         batch_size=global_config.load_size,
         num_workers=global_config.num_workers,
-        shuffle=False, pin_memory=True, prefetch_factor=4
+        shuffle=False, pin_memory=True, prefetch_factor=2
     )
 
     print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: %d" % (len(rgb_list), len(mask_list), len(label_list), global_config.num_workers))
@@ -241,7 +241,7 @@ def load_cityscapes_dataset_test(rgb_path, mask_path, label_path):
         dataset,
         batch_size=global_config.load_size,
         num_workers=1,
-        shuffle=False, pin_memory=True, prefetch_factor=4
+        shuffle=False, pin_memory=True, prefetch_factor=2
     )
 
     print("Loading Cityscapes train with one-hot. Length of images: %d %d %d. Num workers: 1" % (len(rgb_list), len(mask_list), len(label_list)))

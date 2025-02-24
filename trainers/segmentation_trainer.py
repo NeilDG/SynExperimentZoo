@@ -31,11 +31,12 @@ class SegmentationTrainer:
 
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
+        model_type = network_config["model_type"]
         hyperparam_config = config_holder.get_all_hyperparams()
 
         self.backbone = "mobilenet_v2"
         self.num_classes = segmentation_datasets.color_to_class_len
-        if(network_config == 1):
+        if model_type == 1:
             self.model = smp.Unet(encoder_name=self.backbone, encoder_weights='imagenet', classes=self.num_classes)
         else:
             self.model = smp.PSPNet(encoder_name=self.backbone, encoder_weights='imagenet', classes=self.num_classes)
@@ -104,7 +105,7 @@ class SegmentationTrainer:
             prediction = self.test(input_map)
             prediction = F.softmax(prediction, dim=1)
             prediction = prediction.argmax(dim=1)
-            print("Prediction shape: ", prediction.shape, " Mask shape: ", mask.shape)
+            # print("Prediction shape: ", prediction.shape, " Mask shape: ", mask.shape)
 
             self.visdom_reporter.plot_image(img, str(label) + " RGB Images - " + network_version + str(self.iteration))
             self.visdom_reporter.plot_cmap(prediction, str(label) + " RGB->Mask Transfer " + network_version + str(self.iteration))

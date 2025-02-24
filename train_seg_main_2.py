@@ -157,9 +157,11 @@ def main(argv):
     print(global_config.seg_path_mask_path_train)
     print(global_config.seg_path_rgb_path_test)
     print(global_config.seg_path_mask_path_test)
+    print(global_config.seg_path_label_path_train)
+    print(global_config.seg_path_label_path_test)
 
     train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_mask_path_train, global_config.seg_path_label_path_train)
-    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test, global_config.seg_path_label_path_test)
+    # test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test, global_config.seg_path_label_path_test)
     seg_t = segmentation_trainer.SegmentationTrainer(device)
 
     iteration = 0
@@ -195,12 +197,12 @@ def main(argv):
                     seg_t.visdom_plot(iteration)
                     seg_t.visdom_visualize({"img": train_img, "mask": train_mask, "mask_rgb" : train_mask_img}, "Train")
 
-                    _, val_img, val_mask, val_mask_img = next(iter(test_loader))
-                    val_img = val_img.to(device)
-                    val_mask = val_mask.to(device)
-                    val_mask_img = val_mask_img.to(device)
-
-                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask, "mask_rgb" : val_mask_img}, "Test")
+                    # _, val_img, val_mask, val_mask_img = next(iter(test_loader))
+                    # val_img = val_img.to(device)
+                    # val_mask = val_mask.to(device)
+                    # val_mask_img = val_mask_img.to(device)
+                    #
+                    # seg_t.visdom_visualize({"img": val_img, "mask": val_mask, "mask_rgb" : val_mask_img}, "Test")
 
     pbar.close()
 

@@ -289,7 +289,7 @@ class CityscapesDataset(data.Dataset):
         # mask = self.mask_to_onehot(mask_img)
         # mask = mask_to_labels(mask_img)
         mask = np.loadtxt(self.label_list[idx])
-        mask = torch.from_numpy(mask)
+        mask = torch.from_numpy(mask).long()
 
         # self.print_class_counts(mask_one_hot)
 
