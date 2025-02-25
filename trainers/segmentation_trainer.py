@@ -48,6 +48,10 @@ class SegmentationTrainer:
         self.model.to(self.gpu_device)
         # self.preprocess_fn = get_preprocessing_fn(self.backbone, "imagenet")
 
+        self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
+        self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
+        self.load_saved_state()
+
     def initialize_dict(self):
         # what to store in visdom?
         self.G_LOSS_KEY = "g_loss"
@@ -100,7 +104,7 @@ class SegmentationTrainer:
             network_version = global_config.sr_network_version
             img = input_map["img"]
             mask = input_map["mask"]
-            mask_rgb = input_map["mask_rgb"]
+            # mask_rgb = input_map["mask_rgb"]
 
             prediction = self.test(input_map)
             prediction = F.softmax(prediction, dim=1)
@@ -112,10 +116,33 @@ class SegmentationTrainer:
             self.visdom_reporter.plot_cmap(mask, str(label) + " Mask Images - " + network_version + str(self.iteration))
             # self.visdom_reporter.plot_image(mask_rgb, str(label) + " Mask RGB Images - " + network_version + str(self.iteration), normalize=False)
 
-    def load_saved_state(self):
-        print("Loading model placeholder")
-        # load model
+    def save_states(self, epoch, iteration, is_temp: bool):
+        save_dict = {'epoch': epoch, 'iteration': iteration}
+        model_state_dict = self.model.state_dict()
 
-    def save_states(self, epoch, iteration, is_temp:bool):
-        print("Saving model placeholder")
-        # save model
+        save_dict[global_config.GENERATOR_KEY + "A2B"] = model_state_dict
+
+        if (is_temp):
+            torch.save(save_dict, self.NETWORK_CHECKPATH + ".checkpt")
+            print("Saved checkpoint state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
+        else:
+            torch.save(save_dict, self.NETWORK_CHECKPATH)
+            print("Saved stable model state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
+
+    def load_saved_state(self):
+        try:
+            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device, weights_only=True)
+        except:
+            # check if a .checkpt is available, load it
+            try:
+                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
+                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device, weights_only=True)
+            except:
+                checkpoint = None
+                print("No existing checkpoint file found. Creating new seg network: ", self.NETWORK_CHECKPATH)
+
+        if (checkpoint != None):
+            global_config.last_epoch_st = checkpoint["epoch"]
+
+            self.model.load_state_dict(checkpoint[global_config.GENERATOR_KEY + "A2B"])
+            print("Loaded seg network: ", self.NETWORK_CHECKPATH, "Epoch: ", global_config.last_epoch_st)

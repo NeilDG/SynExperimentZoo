@@ -4,6 +4,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils import data
+from torchvision import io
 
 import global_config
 from config.network_config import ConfigHolder
@@ -227,9 +228,9 @@ def labels_to_mask(mask_labels:torch.uint8):
 
 
 class CityscapesDataset(data.Dataset):
-    def __init__(self, rgb_list, mask_list, label_list, transform_config):
+    def __init__(self, rgb_list, label_list, transform_config):
         self.rgb_list = rgb_list
-        self.mask_list = mask_list
+        # self.mask_list = mask_list
         self.label_list = label_list
         self.transform_config = transform_config
 
@@ -241,9 +242,9 @@ class CityscapesDataset(data.Dataset):
         if self.transform_config == 1:
             transform_list = [
                 transforms.ToPILImage(),
-                transforms.RandomCrop(patch_size),
-                transforms.RandomHorizontalFlip(),
-                transforms.RandomVerticalFlip()
+                transforms.RandomCrop(patch_size)
+                # transforms.RandomHorizontalFlip(),
+                # transforms.RandomVerticalFlip()
             ]
             if "random_sharpness_contrast" in self.augment_mode:
                 transform_list.append(transforms.RandomAdjustSharpness(1.25))
@@ -273,30 +274,20 @@ class CityscapesDataset(data.Dataset):
     def __getitem__(self, idx):
         file_name = self.rgb_list[idx % len(self.rgb_list)].split("\\")[-1].split(".")[0]
 
-        rgb_img = cv2.imread(self.rgb_list[idx])
-        rgb_img = cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB)
-
-        mask_img = cv2.imread(self.mask_list[idx])
-        mask_img = cv2.cvtColor(mask_img, cv2.COLOR_BGR2RGB)
+        rgb_img = io.read_image(self.rgb_list[idx])  # Use torchvision io read image.
 
         state = torch.get_rng_state()
         rgb_img = self.initial_op(rgb_img)
 
         torch.set_rng_state(state)
-        mask_img = self.initial_op(mask_img)
-        mask_img = (mask_img * 255.0).to(torch.uint8)
 
-        # mask = self.mask_to_onehot(mask_img)
-        # mask = mask_to_labels(mask_img)
         mask = np.loadtxt(self.label_list[idx])
         mask = torch.from_numpy(mask).long()
-
-        # self.print_class_counts(mask_one_hot)
 
         if self.use_tanh:
             rgb_img = self.norm_op(rgb_img)
 
-        return file_name, rgb_img, mask, mask_img
+        return file_name, rgb_img, mask
 
     def __len__(self):
         return len(self.rgb_list)
