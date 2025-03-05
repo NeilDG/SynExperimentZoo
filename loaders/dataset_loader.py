@@ -245,7 +245,7 @@ def load_cityscapes_dataset_test(rgb_path, label_path):
         shuffle=False, pin_memory=True
     )
 
-    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: 1" % (len(rgb_list), len(label_list)))
+    print("Loading Cityscapes test with one-hot. Length of images: %d %d. Num workers: 1" % (len(rgb_list), len(label_list)))
     return data_loader, len(rgb_list)
 
 def load_voc_dataset():

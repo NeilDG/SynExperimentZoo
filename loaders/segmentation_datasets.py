@@ -131,27 +131,28 @@ class CityscapesGANDataset(data.Dataset):
 
 
 # simplified classification. 0 = nature, 1 = vehicle, 2 = building, 3 = road, 4 = props, 5 = people
+# simplified classification. 0 others, 1 = vehicle, 2 = road, 3 = building
 color_to_class = {
-    (128, 64, 128): 3,  # road
-    (244, 35, 232): 3,  # sidewalk
-    (70, 70, 70): 2,  # building
-    (250, 170, 160): 2,  # wall
-    (230, 150, 140): 2,  # fence
-    (102, 102, 156): 4,  # pole
-    (190, 153, 153): 4,  # traffic light
-    (153, 153, 153): 4,  # traffic sign
+    (128, 64, 128): 2,  # road
+    (244, 35, 232): 2,  # sidewalk
+    (70, 70, 70): 3,  # building
+    (250, 170, 160): 3,  # wall
+    (230, 150, 140): 3,  # fence
+    (102, 102, 156): 0,  # pole
+    (190, 153, 153): 0,  # traffic light
+    (153, 153, 153): 0,  # traffic sign
     (107, 142, 35): 0,  # vegetation
     (152, 251, 152): 0,  # terrain
     (150, 251, 152): 0,  # sky
-    (220, 20, 60): 5,  # person
-    (255, 0, 0): 5,  # rider
+    (220, 20, 60): 0,  # person
+    (255, 0, 0): 0,  # rider
     (0, 0, 142): 1,  # car
     (0, 0, 70): 1,  # truck
     (0, 60, 100): 1,  # bus
     (0, 80, 100): 1,  # train
     (0, 0, 230): 1,  # motorcycle
     (119, 11, 32): 1,  # bicycle
-    (250, 170, 30): 3,  # rail track
+    (250, 170, 30): 2,  # rail track
 }
 color_to_class_len = len(color_to_class)
 

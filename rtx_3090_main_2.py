@@ -11,11 +11,11 @@ def test_sr_main():
               "--plot_enabled=1 --network_version=\"mobisr_v02.06_div2k.02.1")
 
 def train_seg_main():
-    # os.system("python \"train_seg_main.py\" --server_config=3 --img_to_load=-1 "
+    # os.system("python \"train_seg_main_2.py\" --server_config=3 --img_to_load=-1 "
     #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"synseg_v00.00_cityscapes.01.1\"")
 
     os.system("python \"train_seg_main_2.py\" --server_config=3 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"synseg_v00.00_cityscapes.01.1\"")
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"synseg_v00.00_fcg.01.1\"")
 
 
 def download_ml_hypersim():

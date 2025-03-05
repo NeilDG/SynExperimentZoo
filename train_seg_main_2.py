@@ -31,8 +31,8 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-    dataset_version_test = network_config["dataset_version"]
+    dataset_version_train = network_config["dataset_version_train"]
+    dataset_version_test = network_config["dataset_version_test"]
 
     img_path_train = network_config["img_path_train"]
     mask_path_train = network_config["mask_path_train"]
@@ -161,7 +161,7 @@ def main(argv):
     print(global_config.seg_path_label_path_test)
 
     train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_label_path_train)
-    # test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test, global_config.seg_path_label_path_test)
+    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_label_path_test)
     seg_t = segmentation_trainer.SegmentationTrainer(device)
 
     iteration = 0
@@ -196,12 +196,11 @@ def main(argv):
                     seg_t.visdom_plot(iteration)
                     seg_t.visdom_visualize({"img": train_img, "mask": train_mask}, "Train")
 
-                    # _, val_img, val_mask, val_mask_img = next(iter(test_loader))
-                    # val_img = val_img.to(device)
-                    # val_mask = val_mask.to(device)
-                    # val_mask_img = val_mask_img.to(device)
-                    #
-                    # seg_t.visdom_visualize({"img": val_img, "mask": val_mask, "mask_rgb" : val_mask_img}, "Test")
+                    _, val_img, val_mask = next(iter(test_loader))
+                    val_img = val_img.to(device)
+                    val_mask = val_mask.to(device)
+
+                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask}, "Test")
 
     pbar.close()
 
