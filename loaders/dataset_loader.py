@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 import glob
 import random
 import torch
@@ -28,12 +31,12 @@ def load_train_img2img_dataset(a_path, b_path):
 
     img_length = len(a_list)
     num_workers = global_config.num_workers
-    print("Length of images: %d %d. Num workers: %d" % (img_length, len(b_list), num_workers))
+    print("Length of train images: %d %d. Num workers: %d" % (img_length, len(b_list), num_workers))
 
     data_loader = torch.utils.data.DataLoader(
         superres_datasets.PairedImageDataset(a_list, b_list, 1),
         batch_size=global_config.load_size,
-        num_workers=num_workers, pin_memory=True, prefetch_factor=4
+        num_workers=num_workers, pin_memory=True, prefetch_factor=2
     )
 
     return data_loader, img_length
@@ -51,7 +54,7 @@ def load_test_img2img_dataset(a_path, b_path):
     a_list, b_list = zip(*temp_list)
 
     img_length = len(a_list)
-    print("Length of images: %d %d" % (img_length, len(b_list)))
+    print("Length of test images: %d %d" % (img_length, len(b_list)))
 
     data_loader = torch.utils.data.DataLoader(
         superres_datasets.PairedImageDataset(a_list, b_list, 2),
@@ -245,7 +248,7 @@ def load_cityscapes_dataset_test(rgb_path, label_path):
         shuffle=False, pin_memory=True
     )
 
-    print("Loading Cityscapes test with one-hot. Length of images: %d %d. Num workers: 1" % (len(rgb_list), len(label_list)))
+    print("Loading Cityscapes test with one-hot. Length of n    images: %d %d. Num workers: 1" % (len(rgb_list), len(label_list)))
     return data_loader, len(rgb_list)
 
 def load_voc_dataset():

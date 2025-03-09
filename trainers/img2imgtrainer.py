@@ -22,8 +22,10 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
     def initialize_train_config(self):
         config_holder = ConfigHolder.getInstance()
         network_config = config_holder.get_network_config()
-        self.iteration = global_config.sr_iteration
-        self.common_losses = common_losses.LossRepository(self.gpu_device, self.iteration)
+        hyperparam_config = config_holder.get_all_hyperparams()
+
+        self.iteration = global_config.loss_iteration
+        self.common_losses = common_losses.LossRepository(self.gpu_device)
         self.l1_loss = nn.L1Loss()
 
         self.D_A_pool = image_pool.ImagePool(50)
@@ -46,11 +48,11 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
         patch_size = config_holder.get_network_attribute("patch_size", 32)
         self.transform_op = transform_operations.Img2ImgBasicTransform(patch_size).to(self.gpu_device)
 
-        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters(), self.G_B2A.parameters()), lr=network_config["g_lr"], weight_decay=network_config["weight_decay"])
-        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_A.parameters(), self.D_B.parameters()), lr=network_config["d_lr"], weight_decay=network_config["weight_decay"])
+        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters(), self.G_B2A.parameters()), lr=hyperparam_config["g_lr"], weight_decay=hyperparam_config["weight_decay"])
+        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_A.parameters(), self.D_B.parameters()), lr=hyperparam_config["d_lr"], weight_decay=hyperparam_config["weight_decay"])
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
-        self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pt'
+        self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
         self.load_saved_state()
 
     def initialize_dict(self):
@@ -106,7 +108,7 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
     def compute_identity_loss(self, pred, target):
         config_holder = ConfigHolder.getInstance()
-        weight = config_holder.get_loss_weight_by_key(self.iteration, "id_weight")
+        weight = config_holder.get_loss_weight_by_key("id_weight")
         if (weight > 0.0):
             return self.l1_loss(pred, target) * weight
         else:
@@ -114,7 +116,7 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
     def compute_cycle_loss(self, pred, target):
         config_holder = ConfigHolder.getInstance()
-        weight = config_holder.get_loss_weight_by_key(self.iteration, "cycle_weight")
+        weight = config_holder.get_loss_weight_by_key("cycle_weight")
         if (weight > 0.0):
             return self.l1_loss(pred, target) * weight
         else:
