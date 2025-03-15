@@ -166,15 +166,15 @@ def patchify_segmentation(input_dir, output_dir, patch_size, stride):
 
 
 def main():
-    patch_size = (64, 64)  # Size of the patches
-    stride = (64, 64)  # Stride for patching
+    patch_size = (256, 256)  # Size of the patches
+    stride = (256, 256)  # Stride for patching
 
-    input_dir = "C:/Datasets/Segmentation Dataset/FCG-Synth-01/sequence.0/*.camera.png"  # Path to the input dataset
-    output_dir = "C:/Datasets/Segmentation Dataset/FCG-Synth-01-patched/train-rgb/"  # Directory to save the patches
+    input_dir = "D:/Datasets/Segmentation Dataset/FCG-Synth-01/sequence.0/*.camera.png"  # Path to the input dataset
+    output_dir = "D:/Datasets/Segmentation Dataset/FCG-Synth-01-patched/train-rgb/"  # Directory to save the patches
     patchify_without_ref(input_dir, output_dir, patch_size, stride)
 
-    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
-    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes-01-patched/train-rgb/"  # Directory to save the patches
+    input_dir = "D:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
+    output_dir = "D:/Datasets/Segmentation Dataset/CityScapes-01-patched/train-rgb/"  # Directory to save the patches
     patchify_without_ref(input_dir, output_dir, patch_size, stride)
 
     # input_dir = "X:/GithubProjects/NeuralNets-SynthWorkplace_V3/Dataset/solo_1/sequence.0/*.camera.png"  # Path to the input dataset
