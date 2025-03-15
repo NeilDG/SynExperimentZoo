@@ -205,7 +205,7 @@ def main(argv):
             if(iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 128 == 0:
+                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 128) == 0:
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 
