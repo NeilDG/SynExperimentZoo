@@ -22,16 +22,13 @@ def load_train_img2img_dataset(a_path, b_path):
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
         a_list.extend(a_list * (extend_length // len(a_list) + 1))
+
+    if len(b_list) < len(a_list):
+        extend_length = len(a_list) - len(b_list)
         b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
-    # # Repeat the dataset for multiple passes (optional)
-    # for i in range(0, network_config["dataset_repeats"]):
-    #     a_list.extend(a_list)  # Extend with original list for repeats
-    #     b_list.extend(b_list)
-
-    img_length = len(a_list)
     num_workers = global_config.num_workers
-    print("Length of train images: %d %d. Num workers: %d" % (img_length, len(b_list), num_workers))
+    print("Length of train images: %d %d. Num workers: %d" % (len(a_list), len(b_list), num_workers))
 
     data_loader = torch.utils.data.DataLoader(
         superres_datasets.PairedImageDataset(a_list, b_list, 1),
@@ -39,7 +36,7 @@ def load_train_img2img_dataset(a_path, b_path):
         num_workers=num_workers, pin_memory=True, prefetch_factor=2
     )
 
-    return data_loader, img_length
+    return data_loader, len(a_list)
 
 def load_test_img2img_dataset(a_path, b_path):
     a_list = glob.glob(a_path)

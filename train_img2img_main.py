@@ -37,10 +37,10 @@ def update_config(opts):
 
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
-        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_train = "C:/Datasets/{dataset_version}"
+        global_config.b_path_train = "C:/Datasets/{dataset_version}"
+        global_config.a_path_test = "C:/Datasets/{dataset_version}"
+        global_config.b_path_test = "C:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
@@ -107,10 +107,10 @@ def update_config(opts):
 
     elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
         global_config.num_workers = 6
-        global_config.a_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "D:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "D:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_train = "D:/Datasets/{dataset_version}"
+        global_config.b_path_train = "D:/Datasets/{dataset_version}"
+        global_config.a_path_test = "D:/Datasets/{dataset_version}"
+        global_config.b_path_test = "D:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
@@ -210,8 +210,8 @@ def main(argv):
                     img2img_t.visdom_visualize(input_map, "Train")
 
                     _, a_test_batch, b_test_batch = next(iter(test_loader))
-                    a_test_batch = a_test_batch.to(device, non_blocking = True)
-                    b_test_batch = b_test_batch.to(device, non_blocking = True)
+                    a_test_batch = a_test_batch.to(device)
+                    b_test_batch = b_test_batch.to(device)
 
                     input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
                     img2img_t.visdom_visualize(input_map, "Test")
