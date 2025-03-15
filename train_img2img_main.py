@@ -113,7 +113,7 @@ def update_config(opts):
         global_config.b_path_test = "D:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
+        print("Using RL202-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 8): #COARE
         global_config.num_workers = 6
