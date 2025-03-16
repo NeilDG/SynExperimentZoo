@@ -19,6 +19,7 @@ def train_img2img_main():
 
 def run_util_script_main():
     os.system("python \"util_script_main.py\"")
+
 def download_ml_hypersim():
     os.system("python \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
 

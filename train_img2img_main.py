@@ -97,10 +97,10 @@ def update_config(opts):
 
     elif (global_config.server_config == 6): #G411 RTX 3060
         global_config.num_workers = 8
-        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_train = "C:/Datasets/{dataset_version}"
+        global_config.b_path_train = "C:/Datasets/{dataset_version}"
+        global_config.a_path_test = "C:/Datasets/{dataset_version}"
+        global_config.b_path_test = "C:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)

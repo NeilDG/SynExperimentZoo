@@ -11,4 +11,12 @@ loss_weights:
     l1_weight: 1.0
     adv_weight: 1.0
     cycle_weight: 10.0
+  4:
+    l1_weight: 10.0
+    adv_weight: 1.0
+    cycle_weight: 10.0
+  5:
+    l1_weight: 1.0
+    adv_weight: 1.0
+    cycle_weight: 1.0
   
