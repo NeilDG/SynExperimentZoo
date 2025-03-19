@@ -279,7 +279,7 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
         except:
             # check if a .checkpt is available, load it
             try:
-                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pt.checkpt"
+                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
                 checkpoint = torch.load(checkpt_name, map_location=self.gpu_device)
             except:
                 checkpoint = None
