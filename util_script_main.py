@@ -88,13 +88,13 @@ def patchify(input_dir, reference_dir, output_dir):
 
         print("Saved patches to ", image_path, " Input image size: ", np.shape(img), " Ref image size: ", np.shape(ref_img))
 
-def patchify_without_ref(input_dir, output_dir):
-    patch_size = (64, 64)  # Size of the patches
-    stride = (64, 64)  # Stride for patching
-
+def patchify_without_ref(input_dir, output_dir, patch_size, stride, start_index=0):
     # Get all image paths
     # image_paths = glob.glob(os.path.join(input_dir, "*.png"))
     image_paths = glob.glob(input_dir)
+    image_paths = image_paths[start_index:]
+    print("Image paths length: ", len(image_paths))
+
     for image_path in image_paths:
         # Read image
         img_name = os.path.basename(image_path).split('.')[0]
@@ -124,9 +124,7 @@ def patchify_without_ref(input_dir, output_dir):
 
         print("Saved patches to ", image_path, " Input image size: ", np.shape(img))
 
-def patchify_segmentation(input_dir, output_dir):
-    patch_size = (64, 64)  # Size of the patches
-    stride = (64, 64)  # Stride for patching
+def patchify_segmentation(input_dir, output_dir, patch_size, stride):
 
     # Get all image paths
     # image_paths = glob.glob(os.path.join(input_dir, "*.png"))
@@ -168,17 +166,24 @@ def patchify_segmentation(input_dir, output_dir):
 
 
 def main():
-    input_dir = "X:/Segmentation Dataset/CityScapes/gtFine/train/*/*_color.png"  # Path to the input dataset
-    output_dir = "X:/Segmentation Dataset/CityScapes_patched/gtFine/train/"  # Directory to save the patches
-    patchify_segmentation(input_dir, output_dir)
+    patch_size = (256, 256)  # Size of the patches
+    stride = (256, 256)  # Stride for patching
 
-    input_dir = "X:/Segmentation Dataset/CityScapes/gtFine/val/*/*_color.png"  # Path to the input dataset
-    output_dir = "X:/Segmentation Dataset/CityScapes_patched/gtFine/val/"  # Directory to save the patches
-    patchify_segmentation(input_dir, output_dir)
+    input_dir = "C:/Datasets/Segmentation Dataset/FCG-Synth-01/sequence.0/*.camera.png"  # Path to the input dataset
+    output_dir = "C:/Datasets/Segmentation Dataset/FCG-Synth-01-patched/train-rgb/"  # Directory to save the patches
+    patchify_without_ref(input_dir, output_dir, patch_size, stride)
 
-    # input_dir = "X:/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
-    # output_dir = "X:/Segmentation Dataset/CityScapes_patched/leftImg8bit/train/"  # Directory to save the patches
-    # patchify_without_ref(input_dir, output_dir)
+    input_dir = "C:/Datasets/Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"  # Path to the input dataset
+    output_dir = "C:/Datasets/Segmentation Dataset/CityScapes-01-patched/train-rgb/"  # Directory to save the patches
+    patchify_without_ref(input_dir, output_dir, patch_size, stride)
+
+    # input_dir = "X:/GithubProjects/NeuralNets-SynthWorkplace_V3/Dataset/solo_1/sequence.0/*.camera.png"  # Path to the input dataset
+    # output_dir = "X:/Segmentation Dataset/FCG-Synth/train-rgb/"  # Directory to save the patches
+    # patchify_without_ref(input_dir, output_dir, patch_size, stride)
+    #
+    # input_dir = "X:/GithubProjects/NeuralNets-SynthWorkplace_V3/Dataset/solo_1/sequence.0/*.segmentation.png"  # Path to the input dataset
+    # output_dir = "X:/Segmentation Dataset/FCG-Synth/train-seg/"  # Directory to save the patches
+    # patchify_segmentation(input_dir, output_dir, patch_size, stride)
 
 if __name__=="__main__":
     main()

@@ -66,7 +66,7 @@ class VisdomReporter:
         all_mask_img = torch.stack(all_mask_img).float()
         # print("All mask image shape: ", all_mask_img.shape, "Min: ", all_mask_img.min(), " Max: ", all_mask_img.max())
 
-        self.plot_image(all_mask_img, caption)
+        self.plot_image(all_mask_img, caption, normalize=False)
 
     def plot_text(self, text):
         if(hash(text) not in self.text_windows):

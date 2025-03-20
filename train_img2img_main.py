@@ -1,4 +1,3 @@
-import itertools
 import sys
 from optparse import OptionParser
 import random
@@ -8,7 +7,7 @@ from config.network_config import ConfigHolder
 from loaders import dataset_loader
 import global_config
 from utils import plot_utils
-from trainers import segmentation_trainer
+from trainers import img2imgtrainer
 from tqdm import tqdm
 import yaml
 from yaml.loader import SafeLoader
@@ -31,92 +30,107 @@ def update_config(opts):
     global_config.test_size = 2
 
     network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version_train = network_config["dataset_version_train"]
-    dataset_version_test = network_config["dataset_version_test"]
-
-    img_path_train = network_config["img_path_train"]
-    mask_path_train = network_config["mask_path_train"]
-    label_path_train = network_config["label_path_train"]
-
-    img_path_test= network_config["img_path_test"]
-    mask_path_test = network_config["mask_path_test"]
-    label_path_test = network_config["label_path_test"]
+    dataset_a_train = network_config["dataset_a_train"]
+    dataset_b_train = network_config["dataset_b_train"]
+    dataset_a_test = network_config["dataset_a_test"]
+    dataset_b_test = network_config["dataset_b_test"]
 
     if(global_config.server_config == 0): #RTX 4060Ti PC
         global_config.num_workers = 8
-        global_config.seg_path_rgb_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.seg_path_rgb_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_test= "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.seg_path_label_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{label_path}"
-        global_config.seg_path_label_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{label_path}"
+        global_config.a_path_train = "C:/Datasets/{dataset_version}"
+        global_config.b_path_train = "C:/Datasets/{dataset_version}"
+        global_config.a_path_test = "C:/Datasets/{dataset_version}"
+        global_config.b_path_test = "C:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
 
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
-        global_config.seg_path_root_train = "/home/jupyter-neil.delgallego/Segmentation Dataset/{dataset_version}/{img_path}/"
+        global_config.a_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][1]
         global_config.load_size = network_config["load_size"][1]
         print("Using CCS configuration.", global_config, network_config)
 
     elif(global_config.server_config == 2): #RTX 2080Ti
         global_config.num_workers = 6
+        global_config.a_path_train = "X:/{dataset_version}/low/train_patches/*.jpg"
+        global_config.b_path_train = "X:/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
+        global_config.a_path_test = "X:/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
+        global_config.b_path_test = "X:/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using RTX 2080Ti configuration.", global_config, network_config)
 
     elif(global_config.server_config == 3): #RTX 3090 PC
         global_config.num_workers = 12
-        global_config.seg_path_rgb_path_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.seg_path_rgb_path_test = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_test = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.seg_path_label_path_train = "X:/Segmentation Dataset/{dataset_version}/{label_path}"
-        global_config.seg_path_label_path_test = "X:/Segmentation Dataset/{dataset_version}/{label_path}"
-
+        global_config.a_path_train = "X:/{dataset_version}"
+        global_config.b_path_train = "X:/{dataset_version}"
+        global_config.a_path_test = "X:/{dataset_version}"
+        global_config.b_path_test = "X:/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using RTX 3090 configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 4):  #Titan RTX 3060
-        global_config.num_workers = 6
+        global_config.num_workers = 4
+        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 5): #Titan RTX 2070
-        global_config.num_workers = 6
+        global_config.num_workers = 4
+        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][3]
         global_config.load_size = network_config["load_size"][3]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 6): #G411 RTX 3060
         global_config.num_workers = 8
+        global_config.a_path_train = "C:/Datasets/{dataset_version}"
+        global_config.b_path_train = "C:/Datasets/{dataset_version}"
+        global_config.a_path_test = "C:/Datasets/{dataset_version}"
+        global_config.b_path_test = "C:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
         print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
         global_config.num_workers = 6
+        global_config.a_path_train = "D:/Datasets/{dataset_version}"
+        global_config.b_path_train = "D:/Datasets/{dataset_version}"
+        global_config.a_path_test = "D:/Datasets/{dataset_version}"
+        global_config.b_path_test = "D:/Datasets/{dataset_version}"
         global_config.batch_size = network_config["batch_size"][2]
         global_config.load_size = network_config["load_size"][2]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
+        print("Using RL202-RTX3060 Workstation configuration. ", global_config, network_config)
 
     elif (global_config.server_config == 8): #COARE
         global_config.num_workers = 6
+        global_config.disable_progress_bar = True
+        global_config.a_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/scratch3/neil.delgallego/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.batch_size = network_config["batch_size"][0]
         global_config.load_size = network_config["load_size"][0]
         print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
 
-    global_config.seg_path_rgb_path_train = global_config.seg_path_rgb_path_train.format(dataset_version=dataset_version_train, img_path=img_path_train)
-    global_config.seg_path_mask_path_train = global_config.seg_path_mask_path_train.format(dataset_version=dataset_version_train, mask_path=mask_path_train)
-    global_config.seg_path_label_path_train = global_config.seg_path_label_path_train.format(dataset_version=dataset_version_train, label_path=label_path_train)
+    global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_a_train)
+    global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_a_test)
 
-    global_config.seg_path_rgb_path_test = global_config.seg_path_rgb_path_test.format(dataset_version=dataset_version_test, img_path=img_path_test)
-    global_config.seg_path_mask_path_test = global_config.seg_path_mask_path_test.format(dataset_version=dataset_version_test, mask_path=mask_path_test)
-    global_config.seg_path_label_path_test = global_config.seg_path_label_path_test.format(dataset_version=dataset_version_test, label_path=label_path_test)
+    global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_b_train)
+    global_config.b_path_test = global_config.b_path_test.format(dataset_version=dataset_b_test)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -130,10 +144,10 @@ def main(argv):
 
     global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = utils_script.parse_string(opts.network_version)
 
-    yaml_config = "./hyperparam_tables/seg/{network_version}.yaml"
+    yaml_config = "./hyperparam_tables/img2img/{network_version}.yaml"
     yaml_config = yaml_config.format(network_version=global_config.sr_network_version)
-    hyperparam_path = "./hyperparam_tables/seg/common_hyper.yaml"
-    loss_weights_path = "./hyperparam_tables/seg/common_weights.yaml"
+    hyperparam_path = "./hyperparam_tables/img2img/common_hyper.yaml"
+    loss_weights_path = "./hyperparam_tables/img2img/common_weights.yaml"
     with open(yaml_config) as f, open(hyperparam_path) as h, open(loss_weights_path) as l:
         ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader), yaml.load(l, SafeLoader))
 
@@ -151,23 +165,24 @@ def main(argv):
     loss_config_table = loss_config["loss_weights"][loss_iteration]
     print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " Learning rates: ", hyperparams_table["g_lr"], hyperparams_table["d_lr"])
 
+    a_path_train = global_config.a_path_train
+    b_path_train = global_config.b_path_train
+    a_path_test = global_config.a_path_test
+    b_path_test = global_config.b_path_test
+
+    print("Dataset path A: ", a_path_train, a_path_test)
+    print("Dataset path B: ", b_path_train, b_path_test)
+
     plot_utils.VisdomReporter.initialize()
 
-    print(global_config.seg_path_rgb_path_train)
-    print(global_config.seg_path_mask_path_train)
-    print(global_config.seg_path_rgb_path_test)
-    print(global_config.seg_path_mask_path_test)
-    print(global_config.seg_path_label_path_train)
-    print(global_config.seg_path_label_path_test)
-
-    train_loader, train_count = dataset_loader.load_cityscapes_dataset_train(global_config.seg_path_rgb_path_train, global_config.seg_path_label_path_train)
-    test_loader, test_count = dataset_loader.load_cityscapes_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_label_path_test)
-    seg_t = segmentation_trainer.SegmentationTrainer(device)
+    train_loader, train_count = dataset_loader.load_train_img2img_dataset(a_path_train, b_path_train)
+    test_loader, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
+    img2img_t = img2imgtrainer.Img2ImgTrainer(device)
 
     iteration = 0
     start_epoch = global_config.last_epoch_st
     print("---------------------------------------------------------------------------")
-    print("Started Training loop for mode: synthseg", " Set start epoch: ", start_epoch)
+    print("Started Training loop for mode: synth2real", " Set start epoch: ", start_epoch)
     print("---------------------------------------------------------------------------")
 
     # compute total progress
@@ -178,29 +193,28 @@ def main(argv):
     pbar.update(current_progress)
 
     for epoch in range(start_epoch, network_config["max_epochs"]):
-        for i, (_, train_img, train_mask) in enumerate(train_loader, 0):
-            train_img = train_img.to(device)
-            train_mask = train_mask.to(device)
-
-            train_map = {"train_img" : train_img, "train_mask" : train_mask}
-            seg_t.train(epoch, iteration, train_map)
+        for i, (_, a_batch, b_batch) in enumerate(train_loader, 0):
+            a_batch = a_batch.to(device)
+            b_batch = b_batch.to(device)
+            input_map = {"img_a" : a_batch, "img_b" : b_batch}
+            img2img_t.train(epoch, iteration, input_map)
 
             iteration = iteration + 1
             pbar.update(1)
 
-            if (iteration % opts.save_per_iter == 0):
-                seg_t.save_states(epoch, iteration, True)
+            if(iteration % opts.save_per_iter == 0):
+                img2img_t.save_states(epoch, iteration, True)
 
-                # if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 64) == 0:
-                if global_config.plot_enabled == 1 and iteration % opts.save_per_iter == 0:
-                    seg_t.visdom_plot(iteration)
-                    seg_t.visdom_visualize({"img": train_img, "mask": train_mask}, "Train")
+                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 128) == 0:
+                    img2img_t.visdom_plot(iteration)
+                    img2img_t.visdom_visualize(input_map, "Train")
 
-                    _, val_img, val_mask = next(iter(test_loader))
-                    val_img = val_img.to(device)
-                    val_mask = val_mask.to(device)
+                    _, a_test_batch, b_test_batch = next(iter(test_loader))
+                    a_test_batch = a_test_batch.to(device)
+                    b_test_batch = b_test_batch.to(device)
 
-                    seg_t.visdom_visualize({"img": val_img, "mask": val_mask}, "Test")
+                    input_map = {"img_a": a_test_batch, "img_b": b_test_batch}
+                    img2img_t.visdom_visualize(input_map, "Test")
 
     pbar.close()
 
