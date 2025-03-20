@@ -48,8 +48,8 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
         patch_size = config_holder.get_network_attribute("patch_size", 32)
         self.transform_op = transform_operations.Img2ImgBasicTransform(patch_size).to(self.gpu_device)
 
-        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters(), self.G_B2A.parameters()), lr=hyperparam_config["g_lr"], weight_decay=hyperparam_config["weight_decay"])
-        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_A.parameters(), self.D_B.parameters()), lr=hyperparam_config["d_lr"], weight_decay=hyperparam_config["weight_decay"])
+        self.optimizerG = torch.optim.Adam(itertools.chain(self.G_A2B.parameters(), self.G_B2A.parameters()), lr=hyperparam_config["g_lr"], weight_decay=config_holder.get_hyperparameter("weight_decay", 0.0))
+        self.optimizerD = torch.optim.Adam(itertools.chain(self.D_A.parameters(), self.D_B.parameters()), lr=hyperparam_config["d_lr"], weight_decay=config_holder.get_hyperparameter("weight_decay", 0.0))
 
         self.NETWORK_VERSION = ConfigHolder.getInstance().get_sr_version_name()
         self.NETWORK_CHECKPATH = 'checkpoint/' + self.NETWORK_VERSION + '.pth'
