@@ -36,7 +36,7 @@ def download_ml_hypersim():
 def main():
     # train_sr_main()
     # test_sr_main()
-    run_util_script_main()
+    # run_util_script_main()
     train_img2img_main()
     # download_ml_hypersim()
     # os.system("shutdown /s /t 1")
