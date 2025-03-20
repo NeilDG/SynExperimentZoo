@@ -4,8 +4,8 @@ patch_size: 64
 num_blocks: 6
 
 #0 - 24GB, 1 - 16GB, 2 - 10 - 12GB, 3 - 8GB
-batch_size: [384, 256, 128, 128] #amount of images to accumulate before backprop
-load_size: [192, 128, 64, 64] #amount of images to load in GPU. load_size <= batch_size
+batch_size: [384, 256, 192, 128] #amount of images to accumulate before backprop
+load_size: [192, 128, 96, 64] #amount of images to load in GPU. load_size <= batch_size
 
 min_epochs: 100
 max_epochs: 100
