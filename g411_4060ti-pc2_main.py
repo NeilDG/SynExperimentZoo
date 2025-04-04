@@ -32,7 +32,16 @@ def test_seg_main():
 
 def train_img2img_main():
     os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.1\"")
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.3\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.4\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.5\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.6\"")
 
 def run_util_script_main():
     os.system("python \"util_script_main.py\"")
