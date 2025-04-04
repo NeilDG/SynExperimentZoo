@@ -27,7 +27,7 @@ def update_config(opts):
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
     global_config.save_per_iter = opts.save_per_iter
-    global_config.test_size = 2
+    global_config.test_size = 16
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_a_train = network_config["dataset_a_train"]
