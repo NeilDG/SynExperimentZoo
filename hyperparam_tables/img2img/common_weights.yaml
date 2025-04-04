@@ -19,4 +19,8 @@ loss_weights:
     l1_weight: 1.0
     adv_weight: 1.0
     cycle_weight: 1.0
+  6:
+    l1_weight: 0.0
+    adv_weight: 1.0
+    cycle_weight: 1.0
   
