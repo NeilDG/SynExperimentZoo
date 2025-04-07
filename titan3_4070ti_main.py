@@ -70,7 +70,7 @@ def main():
     # test_sr_main()
     # download_ml_hypersim()
     run_util_script_main()
-    train_img2img_main()
+    # train_img2img_main()
     # os.system("shutdown /s /t 1")
 
 
