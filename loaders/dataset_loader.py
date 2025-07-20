@@ -42,7 +42,7 @@ def load_test_img2img_dataset(a_path, b_path):
     a_list = glob.glob(a_path)
     b_list = glob.glob(b_path)
 
-    if (global_config.img_to_load > 0):
+    if global_config.img_to_load > 0:
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
 
