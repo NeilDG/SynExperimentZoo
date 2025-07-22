@@ -8,7 +8,13 @@ def train_sr_main():
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
-              "--plot_enabled=1 --network_version=\"mobisr_v02.06_div2k.1.1")
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_div2k.10.1")
+
+    os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_div2k.10.2")
+
+    os.system("python \"test_sr_main.py\" --server_config=3 --img_to_load=-1 "
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_div2k.10.3")
 
 def train_seg_main():
     # os.system("python \"train_seg_main_2.py\" --server_config=3 --img_to_load=-1 "
