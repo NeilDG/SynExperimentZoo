@@ -7,7 +7,7 @@ def train_sr_main():
               "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.3\"")
 
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.43\"")
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.4\"")
 
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
               "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.5\"")
