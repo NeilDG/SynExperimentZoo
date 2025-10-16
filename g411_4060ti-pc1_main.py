@@ -31,15 +31,15 @@ def test_seg_main():
 
 
 def train_img2img_main():
-    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.1\"")
-
-    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.2\"")
-
-    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.3\"")
-
+    # os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.1\"")
+    #
+    # os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.2\"")
+    #
+    # os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.3\"")
+    #
     os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
               "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.05.4\"")
 
