@@ -31,7 +31,7 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.test_size = 8
+    global_config.test_size = 16
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_version = network_config["dataset_version"]
@@ -174,7 +174,8 @@ def main(argv):
 
     test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
     test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
-    test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
+    # test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
+    test_loader_div2k, test_count = dataset_loader.load_test_img2img_dataset(div2k_lr_path, div2k_hr_path)
 
     img2img_t = paired_tester.PairedTester(device)
     start_epoch = global_config.last_epoch_st
