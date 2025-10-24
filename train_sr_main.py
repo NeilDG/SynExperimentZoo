@@ -85,15 +85,19 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. ", global_config, network_config)
 
-    elif (global_config.server_config == 5): #Titan RTX 2070
-        global_config.num_workers = 4
-        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.batch_size = network_config["batch_size"][3]
-        global_config.load_size = network_config["load_size"][3]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
+    elif (global_config.server_config == 5): #G411-5090-X
+        global_config.num_workers = 12
+        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.burst_sr_lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+        global_config.burst_sr_hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+        global_config.div2k_lr_path = "C:/Datasets/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "C:/Datasets/SuperRes Dataset/div2k/bicubic_x4/*.png"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
+        print("Using RTX 5090 configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 6): #G411 RTX 3060
         global_config.num_workers = 8
@@ -204,7 +208,7 @@ def main(argv):
             if(iteration % opts.save_per_iter == 0):
                 img2img_t.save_states(epoch, iteration, True)
 
-                if global_config.plot_enabled == 1 and iteration % opts.save_per_iter * 128 == 0:
+                if global_config.plot_enabled == 1 and iteration % (opts.save_per_iter * 128) == 0:
                     img2img_t.visdom_plot(iteration)
                     img2img_t.visdom_visualize(input_map, "Train")
 
