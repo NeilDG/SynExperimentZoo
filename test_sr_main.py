@@ -3,12 +3,10 @@ import sys
 from optparse import OptionParser
 import random
 
-import datasets
 import torch
 import torch.nn.parallel
 import torch.utils.data
 import numpy as np
-from super_image import ImageLoader
 
 from config.network_config import ConfigHolder
 from loaders import dataset_loader
@@ -33,7 +31,7 @@ def update_config(opts):
     global_config.plot_enabled = opts.plot_enabled
     global_config.img_to_load = opts.img_to_load
     global_config.cuda_device = opts.cuda_device
-    global_config.test_size = 8
+    global_config.test_size = 16
 
     network_config = ConfigHolder.getInstance().get_network_config()
     dataset_version = network_config["dataset_version"]
@@ -98,15 +96,19 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][2]
         print("Using TITAN Workstation configuration. Workers: ", global_config.num_workers)
 
-    elif (global_config.server_config == 5): #Titan RTX 2070
-        global_config.num_workers = 4
-        global_config.a_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_train = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.a_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{low_path}"
-        global_config.b_path_test = "/home/gamelab/Documents/SuperRes Dataset/{dataset_version}{high_path}"
-        global_config.batch_size = network_config["batch_size"][3]
-        global_config.load_size = network_config["load_size"][3]
-        print("Using G411-RTX3060 Workstation configuration. Workers: ", global_config.num_workers)
+    elif (global_config.server_config == 5): #G411-5090-X
+        global_config.num_workers = 12
+        global_config.a_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "C:/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.burst_sr_lr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/samsung_00/im_rgb_*.png"
+        global_config.burst_sr_hr_path = "C:/Datasets/SuperRes Dataset/v02_burstsr/val/*/canon/im_rgb_*.png"
+        global_config.div2k_lr_path = "C:/Datasets/SuperRes Dataset/div2k/lr/*.png"
+        global_config.div2k_hr_path = "C:/Datasets/SuperRes Dataset/div2k/bicubic_x4/*.png"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
+        print("Using RTX 5090 configuration. Workers: ", global_config.num_workers)
 
     elif (global_config.server_config == 6): #G411 RTX 3060
         global_config.num_workers = 6
@@ -175,8 +177,9 @@ def main(argv):
     plot_utils.VisdomReporter.initialize()
 
     test_loader_a, test_count = dataset_loader.load_test_img2img_dataset(a_path_test, b_path_test)
-    test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
-    test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
+    # test_loader_b, test_count = dataset_loader.load_test_img2img_dataset(burst_sr_lr_path, burst_sr_hr_path)
+    # test_loader_div2k, test_count = dataset_loader.load_base_img2img_dataset(div2k_lr_path, div2k_hr_path)
+    test_loader_div2k, test_count = dataset_loader.load_test_img2img_dataset(div2k_lr_path, div2k_hr_path)
 
     img2img_t = paired_tester.PairedTester(device)
     start_epoch = global_config.last_epoch_st
@@ -208,23 +211,23 @@ def main(argv):
             img2img_t.visualize_results(input_map, "Train Dataset")
         img2img_t.report_metrics("Train Dataset")
 
-        for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
-            a_batch = a_batch.to(device)
-            b_batch = b_batch.to(device)
-
-            input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
-            img2img_t.measure_and_store(input_map)
-            img2img_t.save_images(input_map)
-            pbar.update(1)
-
-            if ((i + 1) % 4 == 0):
-                break
-
-        if (global_config.plot_enabled == 1):
-            img2img_t.visualize_results(input_map, "Test - BurstSR")
-        img2img_t.report_metrics("Test - BurstSR")
-
-        pbar.close()
+        # for i, (file_name, a_batch, b_batch) in enumerate(test_loader_b, 0):
+        #     a_batch = a_batch.to(device)
+        #     b_batch = b_batch.to(device)
+        #
+        #     input_map = {"file_name": file_name, "img_a": a_batch, "img_b": b_batch}
+        #     img2img_t.measure_and_store(input_map)
+        #     img2img_t.save_images(input_map)
+        #     pbar.update(1)
+        #
+        #     if ((i + 1) % 4 == 0):
+        #         break
+        #
+        # if (global_config.plot_enabled == 1):
+        #     img2img_t.visualize_results(input_map, "Test - BurstSR")
+        # img2img_t.report_metrics("Test - BurstSR")
+        #
+        # pbar.close()
 
         for i, (file_name, a_batch, b_batch) in enumerate(test_loader_div2k, 0):
             a_batch = a_batch.to(device)

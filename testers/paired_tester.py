@@ -99,5 +99,5 @@ class PairedTester():
                                         + "Dataset: " + str(dataset_title) + "<br>"
                                        + "PSNR: " +str(psnr_mean) + "<br>" 
                                        "Abs Rel: " + str(l1_mean) + "<br>"
-                                        "Sqr Rel: " + str(mse_mean) + "<br>"
+                                        # "Sqr Rel: " + str(mse_mean) + "<br>"
                                        "SSIM: " + str(ssim_mean) + "<br>")

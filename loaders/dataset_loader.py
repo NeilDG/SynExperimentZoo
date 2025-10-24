@@ -18,14 +18,18 @@ def load_train_img2img_dataset(a_path, b_path):
         b_list = b_list[0: global_config.img_to_load]
 
     # Ensure a_list and b_list have at least X00,000 elements
-    ideal_sample_size = 300000
+    ideal_sample_size = 1000000
     if len(a_list) < ideal_sample_size:
         extend_length = ideal_sample_size - len(a_list)
         a_list.extend(a_list * (extend_length // len(a_list) + 1))
 
-    if len(b_list) < len(a_list):
-        extend_length = len(a_list) - len(b_list)
+    if len(b_list) < ideal_sample_size:
+        extend_length = ideal_sample_size - len(b_list)
         b_list.extend(b_list * (extend_length // len(b_list) + 1))
+
+    # if len(b_list) < len(a_list):
+    #     extend_length = len(a_list) - len(b_list)
+    #     b_list.extend(b_list * (extend_length // len(b_list) + 1))
 
     num_workers = global_config.num_workers
     print("Length of train images: %d %d. Num workers: %d" % (len(a_list), len(b_list), num_workers))
@@ -42,7 +46,7 @@ def load_test_img2img_dataset(a_path, b_path):
     a_list = glob.glob(a_path)
     b_list = glob.glob(b_path)
 
-    if (global_config.img_to_load > 0):
+    if global_config.img_to_load > 0:
         a_list = a_list[0: global_config.img_to_load]
         b_list = b_list[0: global_config.img_to_load]
 

@@ -3,14 +3,20 @@
 import os
 
 def train_sr_main():
-    # os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.08.1\"")
-    #
-    # os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.08.2\"")
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.3\"")
 
     os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.08.3\"")
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.4\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.10.5\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.08.4\"")
+
+    os.system("python \"train_sr_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"mobisr_v02.05_div2k.08.5\"")
 
 def test_sr_main():
     os.system("python \"test_sr_main.py\" --server_config=0 --img_to_load=-1 "
@@ -32,7 +38,16 @@ def test_seg_main():
 
 def train_img2img_main():
     os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.1\"")
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.3\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.4\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.5\"")
+
+    os.system("python \"train_img2img_main.py\" --server_config=0 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.02.6\"")
 
 def run_util_script_main():
     os.system("python \"util_script_main.py\"")
@@ -42,7 +57,7 @@ def download_ml_hypersim():
 
 def main():
     # train_sr_main()
-    # test_sr_main()
+    test_sr_main()
     # train_seg_main()
     # test_seg_main()
     # run_util_script_main()
