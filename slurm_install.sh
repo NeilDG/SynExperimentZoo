@@ -39,3 +39,6 @@ pip install ITTR_pytorch
 pip install super_image
 pip install timm
 pip install datasets
+
+python "util_script_main.py"
+python "g411_5090-pc3_main.py"
