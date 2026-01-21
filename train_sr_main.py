@@ -47,12 +47,12 @@ def update_config(opts):
 
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
-        global_config.a_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/train_patches/*.jpg"
-        global_config.b_path_train = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/train_patches/*.jpg"
-        global_config.a_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/low/test_images/*.jpg"
-        global_config.b_path_test = "/home/jupyter-neil.delgallego/SuperRes Dataset/{dataset_version}/high/test_images/*.jpg"
-        global_config.batch_size = network_config["batch_size"][1]
-        global_config.load_size = network_config["load_size"][1]
+        global_config.a_path_train = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_train = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.a_path_test = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
+        global_config.b_path_test = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
+        global_config.batch_size = network_config["batch_size"][0]
+        global_config.load_size = network_config["load_size"][0]
         print("Using CCS configuration.", global_config, network_config)
 
     elif(global_config.server_config == 2): #RTX 2080Ti

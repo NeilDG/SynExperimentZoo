@@ -176,10 +176,10 @@ def main():
     # output_dir = "C:/Datasets/SuperRes Dataset/div2k_patched/"  # Directory to save the patches
     # patchify_without_ref(input_dir, output_dir, patch_size, stride)
 
-    low_dir = "C:/Datasets/SuperRes Dataset/sr-hypersim/classic_x4/*.png"
-    hr_dir_ref = "C:/Datasets/SuperRes Dataset/sr-hypersim/high/"
-    hr_dir = "C:/Datasets/SuperRes Dataset/sr-hypersim/high/*.png"
-    output_dir = "C:/Datasets/SuperRes Dataset/sr-hypersim_patched/"  # Directory to save the patches
+    low_dir = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/sr-hypersim/classic_x4/*.png"
+    hr_dir_ref = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/sr-hypersim/high/"
+    hr_dir = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/sr-hypersim/high/*.png"
+    output_dir = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/sr-hypersim_patched/"  # Directory to save the patches
     patchify(low_dir, hr_dir_ref, output_dir, patch_size, stride)
     patchify_without_ref(hr_dir, output_dir, patch_size, stride)
 
