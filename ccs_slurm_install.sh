@@ -8,14 +8,14 @@
 #About this script:
 
 # Remove previous conda environment and install a new one
-module load anaconda
-conda remove -y --name NeilZoo --all
-conda create -n NeilZoo python=3.14
-conda deactivate
-
-# Installation of necessary libraries
-module load anaconda
-conda activate NeilZoo
+#module load anaconda
+#conda remove -y --name NeilZoo --all
+#conda create -n NeilZoo python=3.14
+#conda deactivate
+#
+## Installation of necessary libraries
+#module load anaconda
+#conda activate NeilZoo
 
 #do fresh install
 python3 -m pip install --upgrade pip
