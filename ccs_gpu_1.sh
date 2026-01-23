@@ -7,5 +7,5 @@
 
 #About this script:
 
-python3 "util_script_main.py"
+#python3 "util_script_main.py"
 python3 "ccs1_main.py"
