@@ -17,6 +17,8 @@ rm -rf "/scratch3/neil.delgallego/SynthWeather Dataset 10"
 
 gdown https://drive.google.com/uc?id=1B6erEfeB2_n_KYP5GtCQU-DHGE1bKEVE --o "scratch2/SynthWeather Dataset 10/"
 mv "/scratch1/scratch2/neil.delgallego/NeuralNets-GenerativeExperiment-V58.XX.XX/v26" "/scratch1/scratch2/neil.delgallego/SynthWeather Dataset 10/v26"
+mkdir "/scratch3/Datasets/"
+mv "sr-hypersim/" "scratch3/Datasets/SuperRes Dataset/"
 
 //Execute job
 sbatch --dependency=afterany:361283 slurm_download.slurm

@@ -4,7 +4,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils import data
-from torchvision import io
+# from torchvision import io
 
 import global_config
 from config.network_config import ConfigHolder
@@ -228,70 +228,70 @@ def labels_to_mask(mask_labels:torch.uint8):
     return rgb_mask
 
 
-class CityscapesDataset(data.Dataset):
-    def __init__(self, rgb_list, label_list, transform_config):
-        self.rgb_list = rgb_list
-        # self.mask_list = mask_list
-        self.label_list = label_list
-        self.transform_config = transform_config
-
-        config_holder = ConfigHolder.getInstance()
-        self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
-        self.use_tanh = config_holder.get_network_attribute("use_tanh", True)
-        patch_size = config_holder.get_network_attribute("patch_size", 32)
-
-        if self.transform_config == 1:
-            transform_list = [
-                transforms.ToPILImage(),
-                transforms.RandomCrop(patch_size)
-                # transforms.RandomHorizontalFlip(),
-                # transforms.RandomVerticalFlip()
-            ]
-            if "random_sharpness_contrast" in self.augment_mode:
-                transform_list.append(transforms.RandomAdjustSharpness(1.25))
-                transform_list.append(transforms.RandomAutocontrast())
-                print("Data augmentation: Added random sharpness and contrast")
-
-            if "random_invert" in self.augment_mode:
-                transform_list.append(transforms.RandomInvert())
-                print("Data augmentation: Added random invert")
-
-            if "augmix" in self.augment_mode:
-                transform_list.append(transforms.AugMix())
-                print("Data augmentation: Added augmix")
-
-            transform_list.append(transforms.ToTensor())
-            self.initial_op = transforms.Compose(transform_list)
-        else:
-            self.initial_op = transforms.Compose([
-                transforms.ToPILImage(),
-                transforms.RandomCrop(512),
-                transforms.ToTensor()
-            ])
-
-        self.norm_op = transforms.Compose([
-            transforms.Normalize((0.5,), (0.5,))])
-
-    def __getitem__(self, idx):
-        file_name = self.rgb_list[idx % len(self.rgb_list)].split("\\")[-1].split(".")[0]
-
-        rgb_img = io.read_image(self.rgb_list[idx])  # Use torchvision io read image.
-
-        state = torch.get_rng_state()
-        rgb_img = self.initial_op(rgb_img)
-
-        torch.set_rng_state(state)
-
-        mask = np.loadtxt(self.label_list[idx])
-        mask = torch.from_numpy(mask).long()
-
-        if self.use_tanh:
-            rgb_img = self.norm_op(rgb_img)
-
-        return file_name, rgb_img, mask
-
-    def __len__(self):
-        return len(self.rgb_list)
+# class CityscapesDataset(data.Dataset):
+#     def __init__(self, rgb_list, label_list, transform_config):
+#         self.rgb_list = rgb_list
+#         # self.mask_list = mask_list
+#         self.label_list = label_list
+#         self.transform_config = transform_config
+#
+#         config_holder = ConfigHolder.getInstance()
+#         self.augment_mode = config_holder.get_network_attribute("augment_key", "none")
+#         self.use_tanh = config_holder.get_network_attribute("use_tanh", True)
+#         patch_size = config_holder.get_network_attribute("patch_size", 32)
+#
+#         if self.transform_config == 1:
+#             transform_list = [
+#                 transforms.ToPILImage(),
+#                 transforms.RandomCrop(patch_size)
+#                 # transforms.RandomHorizontalFlip(),
+#                 # transforms.RandomVerticalFlip()
+#             ]
+#             if "random_sharpness_contrast" in self.augment_mode:
+#                 transform_list.append(transforms.RandomAdjustSharpness(1.25))
+#                 transform_list.append(transforms.RandomAutocontrast())
+#                 print("Data augmentation: Added random sharpness and contrast")
+#
+#             if "random_invert" in self.augment_mode:
+#                 transform_list.append(transforms.RandomInvert())
+#                 print("Data augmentation: Added random invert")
+#
+#             if "augmix" in self.augment_mode:
+#                 transform_list.append(transforms.AugMix())
+#                 print("Data augmentation: Added augmix")
+#
+#             transform_list.append(transforms.ToTensor())
+#             self.initial_op = transforms.Compose(transform_list)
+#         else:
+#             self.initial_op = transforms.Compose([
+#                 transforms.ToPILImage(),
+#                 transforms.RandomCrop(512),
+#                 transforms.ToTensor()
+#             ])
+#
+#         self.norm_op = transforms.Compose([
+#             transforms.Normalize((0.5,), (0.5,))])
+#
+#     def __getitem__(self, idx):
+#         file_name = self.rgb_list[idx % len(self.rgb_list)].split("\\")[-1].split(".")[0]
+#
+#         rgb_img = io.read_image(self.rgb_list[idx])  # Use torchvision io read image.
+#
+#         state = torch.get_rng_state()
+#         rgb_img = self.initial_op(rgb_img)
+#
+#         torch.set_rng_state(state)
+#
+#         mask = np.loadtxt(self.label_list[idx])
+#         mask = torch.from_numpy(mask).long()
+#
+#         if self.use_tanh:
+#             rgb_img = self.norm_op(rgb_img)
+#
+#         return file_name, rgb_img, mask
+#
+#     def __len__(self):
+#         return len(self.rgb_list)
 
     # def mask_to_onehot(self, mask):
     #     """Converts to one-hot, handling "others" class."""
