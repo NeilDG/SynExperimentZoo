@@ -14,7 +14,7 @@ import torchvision.utils as vutils
 import visdom
 
 from loaders import segmentation_datasets
-from loaders.segmentation_datasets import CityscapesDataset, labels_to_mask
+from loaders.segmentation_datasets import labels_to_mask
 
 SALIKSIK_SERVER = "192.168.134.223" #IMPORTmsANT: No HTTP
 
