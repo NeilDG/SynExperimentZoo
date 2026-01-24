@@ -1,5 +1,6 @@
 #!/bin/bash
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=12
+#SBATCH -G 1
 #SBATCH --ntasks=1
 #SBATCH --output=script_install.out
 #SBATCH --mail-user=neil.delgallego@dlsu.edu.ph
