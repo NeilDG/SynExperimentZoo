@@ -1,34 +1,74 @@
-import os
-import GPUtil
-import multiprocessing
-import time
+#Script to use for running heavy training.
 
-def train_proper(gpu_device):
-    os.system("python \"shadow_train_main.py\" --server_config=1 --cuda_device=" +gpu_device+ " --img_to_load=-1 --train_mode=\"train_shadow_matte\" "
-              "--plot_enabled=0 --save_per_iter=500 --network_version=\"rgb2sm_v61.54_places\" --iteration=1")
+import os
+
+def train_sr_main():
+    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.1\"")
+    #
+    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.2\"")
+    #
+    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.3\"")
+    #
+    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.4\"")
+    #
+    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.5\"")
+    #
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.1\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.2\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.3\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.4\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.5\"")
+
+def test_sr_main():
+    os.system("python3 \"test_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_hypersim.10.1")
+
+    os.system("python3 \"test_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_hypersim.10.2")
+
+    os.system("python3 \"test_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=0 --network_version=\"mobisr_v02.05_hypersim.10.3")
+
+def train_seg_main():
+    # os.system("python \"train_seg_main_2.py\" --server_config=3 --img_to_load=-1 "
+    #           "--plot_enabled=1 --save_per_iter=500 --network_version=\"synseg_v00.00_cityscapes.01.1\"")
+
+    os.system("python3 \"train_seg_main_2.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"synseg_v00.00_fcg.01.1\"")
+
+def train_img2img_main():
+    os.system("python3 \"train_img2img_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.01.1\"")
+
+def test_img2img_main():
+    os.system("python3 \"test_img2img_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=500 --network_version=\"fcg2cityscapes_v00.00.01.1\"")
+
+
+def download_ml_hypersim():
+    os.system("python3 \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
 
 def main():
-    EXECUTION_TIME_IN_HOURS = 48
-    execution_seconds = 3600 * EXECUTION_TIME_IN_HOURS
-
-    GPUtil.showUtilization()
-    device_id = GPUtil.getFirstAvailable(maxMemory=0.1, maxLoad=0.1, attempts=2500, interval=30, verbose=True)
-    gpu_device = "cuda:" + str(device_id[0])
-    print("Available GPU device found: ", gpu_device)
-
-    p = multiprocessing.Process(target=train_proper, name="train_proper", args=(gpu_device,))
-    p.start()
-
-    time.sleep(execution_seconds) #causes p to execute code for X seconds. 3600 = 1 hour
-
-    #terminate
-    print("--------------------------------------------------")
-    print("--------------------------------------------------")
-    print("\n Process " +p.name+ " has finished execution.")
-    print("--------------------------------------------------")
-    print("--------------------------------------------------")
-    p.terminate()
-    p.join()
+    train_sr_main()
+    # test_sr_main()
+    # train_img2img_main()
+    # test_img2img_main()
+    # download_ml_hypersim()
+    # os.system("shutdown /s /t 1")
 
 
 if __name__ == "__main__":
