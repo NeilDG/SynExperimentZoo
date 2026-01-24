@@ -6,17 +6,17 @@ def train_sr_main():
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
               "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.1\"")
 
-    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.2\"")
-    #
-    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.3\"")
-    #
-    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.4\"")
-    #
-    # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-    #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.5\"")
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.2\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.3\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.4\"")
+
+    os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
+              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.5\"")
     #
     # os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
     #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.1\"")
