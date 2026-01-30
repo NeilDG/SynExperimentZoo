@@ -19,19 +19,19 @@ def train_sr_main():
     #           "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.10.5\"")
     #
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.1\" --cuda_device=\"cuda:3\"")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.1\" --cuda_device=\"cuda:3\"")
 
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.2\" --cuda_device=\"cuda:3\"")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.2\" --cuda_device=\"cuda:3\"")
 
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.3\" --cuda_device=\"cuda:3\"")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.3\" --cuda_device=\"cuda:3\"")
 
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.4\" --cuda_device=\"cuda:3\"")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.4\" --cuda_device=\"cuda:3\"")
 
     os.system("python3 \"train_sr_main.py\" --server_config=1 --img_to_load=-1 "
-              "--plot_enabled=1 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.5\" --cuda_device=\"cuda:3\"")
+              "--plot_enabled=0 --save_per_iter=250 --network_version=\"mobisr_v02.05_hypersim.11.5\" --cuda_device=\"cuda:3\"")
 
 def test_sr_main():
     os.system("python3 \"test_sr_main.py\" --server_config=1 --img_to_load=-1 "
