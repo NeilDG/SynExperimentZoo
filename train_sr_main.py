@@ -48,6 +48,7 @@ def update_config(opts):
     elif(global_config.server_config == 1): #CCS Cloud
         global_config.num_workers = 12
         global_config.disable_progress_bar = True
+        global_config.plot_enabled = False
         global_config.a_path_train = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
         global_config.b_path_train = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{high_path}"
         global_config.a_path_test = "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/{dataset_version}{low_path}"
