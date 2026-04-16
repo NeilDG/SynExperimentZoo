@@ -199,6 +199,7 @@ def load_cityscapes_dataset_train(rgb_path, label_path):
     rgb_list = glob.glob(rgb_path)
     # mask_list = glob.glob(mask_path)
     label_list = glob.glob(label_path)
+    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: %d" % (len(rgb_list), len(label_list), global_config.num_workers))
 
     if (global_config.img_to_load > 0):
         rgb_list = rgb_list[0: global_config.img_to_load]
@@ -224,7 +225,6 @@ def load_cityscapes_dataset_train(rgb_path, label_path):
         shuffle=False, pin_memory=True
     )
 
-    print("Loading Cityscapes train with one-hot. Length of images: %d %d. Num workers: %d" % (len(rgb_list), len(label_list), global_config.num_workers))
     return data_loader, len(rgb_list)
 
 def load_cityscapes_dataset_test(rgb_path, label_path):

@@ -36,8 +36,9 @@ def download_ml_hypersim():
     os.system("python \"utils/ml_hypersim_dl.py\" --contains scene_cam_00_final_preview --contains .color.jpg")
 
 def main():
-    # train_sr_main()
-    test_sr_main()
+    train_sr_main()
+    # test_sr_main()
+    # train_seg_main()
     # train_img2img_main()
     # test_img2img_main()
     # download_ml_hypersim()

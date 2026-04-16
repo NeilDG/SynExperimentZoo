@@ -1,0 +1,10 @@
+dataset:
+  modality: "video"
+  train:
+    path: "C:/Datasets/VideoData/train/*.mp4"
+    frames_per_batch: 8
+  test:
+    path: "C:/Datasets/VideoData/test/*.mp4"
+  preprocessing:
+    resize: [256, 256]
+    normalize: true
