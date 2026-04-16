@@ -1,0 +1,8 @@
+dataset:
+  modality: "image"
+  train:
+    a_path: "C:/Datasets/SuperRes Dataset/div2k_patched/lr/*.png"
+    b_path: "C:/Datasets/SuperRes Dataset/div2k_patched/bicubic_x4/*.png"
+  test:
+    a_path: "C:/Datasets/SuperRes Dataset/div2k/lr/*.png"
+    b_path: "C:/Datasets/SuperRes Dataset/div2k/bicubic_x4/*.png"
