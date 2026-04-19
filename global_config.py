@@ -66,3 +66,14 @@ load_per_sample = False
 load_best = False
 
 
+def get_vram_index(server_config):
+    # [Index 0: High (>24GB), Index 1: Mid (16GB), Index 2: Low (11-12GB), Index 3: Safety (8GB)]
+    if server_config in [1, 3, 4, 5, 8]: # 32GB, 24GB, 24GB, 32GB, 40/80GB
+        return 0
+    if server_config in [0]: # 16GB
+        return 1
+    if server_config in [2, 6, 7]: # 11GB, 12GB, 12GB
+        return 2
+    return 3 # Safety
+
+

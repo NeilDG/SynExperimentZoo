@@ -42,6 +42,7 @@ def main(argv):
     global_config.test_size = 16
     global_config.server_config = opts.server_config
     
+    vram_index = global_config.get_vram_index(opts.server_config)
     old_network_config = {
         "model_type": config.get('model_type'),
         "input_nc": config.get('input_nc'),
@@ -55,6 +56,9 @@ def main(argv):
         "batch_size": config.get('batch_size', [256]*4),
         "load_size": config.get('load_size', [128]*4)
     }
+    
+    global_config.batch_size = old_network_config["batch_size"][vram_index]
+    global_config.load_size = old_network_config["load_size"][vram_index]
     old_hyperparam_data = {"hyperparams": {cp.hyper_id: config.get('hyperparams', {})}}
     old_weight_data = {"loss_weights": {cp.loss_id: config.get('losses', {})}}
     

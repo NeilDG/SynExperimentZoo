@@ -109,8 +109,8 @@ versions:
   v02.04_hypersim:
     model_type: 4
     num_blocks: 3
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [256, 256, 128, 64]
+    load_size: [128, 128, 64, 32]
     min_epochs: 400
     max_epochs: 400
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"

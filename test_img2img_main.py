@@ -70,8 +70,9 @@ def main(argv):
     
     global_config.a_path_test = old_network_config["dataset_a_test"]
     global_config.b_path_test = old_network_config["dataset_b_test"]
-    global_config.batch_size = old_network_config["batch_size"][0]
-    global_config.load_size = old_network_config["load_size"][0]
+    vram_index = global_config.get_vram_index(opts.server_config)
+    global_config.batch_size = old_network_config["batch_size"][vram_index]
+    global_config.load_size = old_network_config["load_size"][vram_index]
     global_config.num_workers = 8
 
     plot_utils.VisdomReporter.initialize()
