@@ -57,4 +57,5 @@ class ConfigHolder():
         hyper_iteration = global_config.hyper_iteration
         loss_iteration = global_config.loss_iteration
 
-        return str(network_version) + "." + str(hyper_iteration) + "_" + str(loss_iteration)
+        # Use dot notation for consistency and future-proofing
+        return str(network_version) + "." + str(hyper_iteration) + "." + str(loss_iteration)

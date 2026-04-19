@@ -213,15 +213,17 @@ class PairedTrainer:
             print("Saved stable model state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
 
     def load_saved_state(self):
-        try:
+        import os
+        checkpoint = None
+        if os.path.exists(self.NETWORK_CHECKPATH):
             checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device, weights_only=True)
-        except:
-            # check if a .checkpt is available, load it
-            try:
-                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
+            print("Loaded SR network (Stable): ", self.NETWORK_CHECKPATH, "Epoch: ", checkpoint["epoch"])
+        else:
+            checkpt_name = self.NETWORK_CHECKPATH + ".checkpt"
+            if os.path.exists(checkpt_name):
                 checkpoint = torch.load(checkpt_name, map_location=self.gpu_device, weights_only=True)
-            except:
-                checkpoint = None
+                print("Loaded SR network (Checkpoint): ", checkpt_name, "Epoch: ", checkpoint["epoch"])
+            else:
                 print("No existing checkpoint file found. Creating new SR network: ", self.NETWORK_CHECKPATH)
 
         if (checkpoint != None):
@@ -230,5 +232,3 @@ class PairedTrainer:
 
             self.G_A2B.load_state_dict(checkpoint[global_config.GENERATOR_KEY + "A2B"])
             self.D_B.load_state_dict(checkpoint[global_config.DISCRIMINATOR_KEY + "B"])
-
-            print("Loaded SR network: ", self.NETWORK_CHECKPATH, "Epoch: ", global_config.last_epoch_st)

@@ -268,21 +268,23 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
 
         if (is_temp):
             torch.save(save_dict, self.NETWORK_CHECKPATH + ".checkpt")
-            print("Saved checkpoint state: %s Epoch: %d" % (len(save_dict), (epoch + 1)))
+            print("Saved checkpoint state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
         else:
             torch.save(save_dict, self.NETWORK_CHECKPATH)
-            print("Saved stable model state: %s Epoch: %d" % (len(save_dict), (epoch + 1)))
+            print("Saved stable model state: %s Epoch: %d" % (self.NETWORK_VERSION, (epoch + 1)))
 
     def load_saved_state(self):
-        try:
-            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device)
-        except:
-            # check if a .checkpt is available, load it
-            try:
-                checkpt_name = 'checkpoint/' + self.NETWORK_VERSION + ".pth.checkpt"
-                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device)
-            except:
-                checkpoint = None
+        import os
+        checkpoint = None
+        if os.path.exists(self.NETWORK_CHECKPATH):
+            checkpoint = torch.load(self.NETWORK_CHECKPATH, map_location=self.gpu_device, weights_only=True)
+            print("Loaded img2img network (Stable): ", self.NETWORK_CHECKPATH, "Epoch: ", checkpoint["epoch"])
+        else:
+            checkpt_name = self.NETWORK_CHECKPATH + ".checkpt"
+            if os.path.exists(checkpt_name):
+                checkpoint = torch.load(checkpt_name, map_location=self.gpu_device, weights_only=True)
+                print("Loaded img2img network (Checkpoint): ", checkpt_name, "Epoch: ", checkpoint["epoch"])
+            else:
                 print("No existing checkpoint file found. Creating new img2img network: ", self.NETWORK_CHECKPATH)
 
         if(checkpoint != None):
@@ -293,8 +295,6 @@ class Img2ImgTrainer(abstract_iid_trainer.AbstractIIDTrainer):
             self.G_B2A.load_state_dict(checkpoint[global_config.GENERATOR_KEY + "B2A"])
             self.D_A.load_state_dict(checkpoint[global_config.DISCRIMINATOR_KEY + "A"])
             self.D_B.load_state_dict(checkpoint[global_config.DISCRIMINATOR_KEY + "B"])
-
-            print("Loaded style transfer network: ", self.NETWORK_CHECKPATH, "Epoch: ", global_config.last_epoch_st)
 
 
 

@@ -26,7 +26,10 @@ def main(argv):
     config = cp.load_config(opts.server)
     
     # Setup global_config for backward compatibility
-    global_config.sr_network_version = opts.vcc
+    global_config.sr_network_version = f"{cp.problem}_{cp.version}"
+    global_config.hyper_iteration = cp.hyper_id
+    global_config.loss_iteration = cp.loss_id
+    
     global_config.load_size = config.get('training.load_size', 1)
     global_config.batch_size = config.get('training.batch_size', 1)
     global_config.num_workers = config.get('training.num_workers', 4)
@@ -39,17 +42,15 @@ def main(argv):
     from config.network_config import ConfigHolder
     # Mock the old structures for ConfigHolder
     old_network_config = {
-        "model_type": config.get('model.type'),
-        "input_nc": config.get('model.input_nc'),
-        "num_blocks": config.get('model.num_blocks'),
-        "max_epochs": config.get('experiment.training.epochs', 200),
+        "model_type": config.get('model_type'),
+        "input_nc": config.get('input_nc'),
+        "num_blocks": config.get('num_blocks'),
+        "max_epochs": config.get('max_epochs', 200),
         "min_epochs": 10
     }
     # For backward compat, we keep iterations at 0 since YAML merges them
-    old_hyperparam_data = {"hyperparams": {0: config.get('experiment.hyperparams', {})}}
-    old_weight_data = {"loss_weights": {0: config.get('experiment.losses', {})}}
-    global_config.hyper_iteration = 0
-    global_config.loss_iteration = 0
+    old_hyperparam_data = {"hyperparams": {cp.hyper_id: config.get('hyperparams', {})}}
+    old_weight_data = {"loss_weights": {cp.loss_id: config.get('losses', {})}}
     
     ConfigHolder.initialize(old_network_config, old_hyperparam_data, old_weight_data)
     

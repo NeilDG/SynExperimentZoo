@@ -1,0 +1,44 @@
+# img2img.yaml
+common:
+  input_nc: 3
+  patch_size: 64
+
+server_paths:
+  0: "C:/Datasets/"
+  1: "/home/npdelgallego/scratch3/Datasets/"
+  2: "X:/"
+  3: "X:/"
+  4: "/home/gamelab/Documents/"
+  5: "C:/Datasets/"
+  6: "C:/Datasets/"
+  7: "D:/Datasets/"
+  8: "/scratch3/neil.delgallego/"
+
+versions:
+  v00.00_fcg2cityscapes:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [384, 256, 192, 128]
+    load_size: [192, 128, 96, 64]
+    min_epochs: 100
+    max_epochs: 100
+    dataset_a_train: "{server_path}Segmentation Dataset/FCG-Synth-01-patched/train-rgb/sequence.0/*.png"
+    dataset_b_train: "{server_path}Segmentation Dataset/CityScapes-01-patched/train-rgb/*/*.png"
+    dataset_a_test: "{server_path}Segmentation Dataset/FCG-Synth-01/sequence.0/*.camera.png"
+    dataset_b_test: "{server_path}Segmentation Dataset/CityScapes/leftImg8bit/train/*/*.png"
+
+hyperparams:
+  1: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0002}
+  2: {norm_mode: "instance", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0002}
+  3: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0001}
+  4: {norm_mode: "instance", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0001}
+  5: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0004, d_lr: 0.0001}
+  6: {norm_mode: "batch", weights_init: "zero_one", g_lr: 0.0004, d_lr: 0.0001}
+
+loss_weights:
+  1: {l1_weight: 0.0, adv_weight: 1.0, cycle_weight: 10.0}
+  2: {l1_weight: 0.01, adv_weight: 1.0, cycle_weight: 10.0}
+  3: {l1_weight: 1.0, adv_weight: 1.0, cycle_weight: 10.0}
+  4: {l1_weight: 10.0, adv_weight: 1.0, cycle_weight: 10.0}
+  5: {l1_weight: 1.0, adv_weight: 1.0, cycle_weight: 1.0}
+  6: {l1_weight: 0.0, adv_weight: 1.0, cycle_weight: 1.0}

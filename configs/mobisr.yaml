@@ -38,25 +38,45 @@ versions:
     low_path: "{server_path}div2k/lr/*.png"
     high_path: "{server_path}div2k/bicubic_x4/*.png"
 
+  v02.05_hypersim:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [1536, 256, 1024, 256]
+    load_size: [768, 128, 512, 128]
+    min_epochs: 200
+    max_epochs: 200
+    low_path: "{server_path}sr-hypersim/classic_x4/*.png"
+    high_path: "{server_path}sr-hypersim/high/*.png"
+
+  v02.06_hypersim:
+    model_type: 4
+    num_blocks: 3
+    batch_size: [256, 256, 128, 64]
+    load_size: [128, 128, 64, 32]
+    min_epochs: 400
+    max_epochs: 400
+    low_path: "{server_path}sr-hypersim/classic_x4/*.png"
+    high_path: "{server_path}sr-hypersim/high/*.png"
+
 # Hyperparameter table (maps to the .12 part of the code)
 hyperparams:
-  12:
-    norm_mode: "batch"
-    weights_init: "zero_one"
-    g_lr: 0.0004
-    d_lr: 0.0001
-  10:
-    norm_mode: "batch"
-    weights_init: "dc_gan"
-    g_lr: 0.0002
-    d_lr: 0.0001
+  1: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0002}
+  2: {norm_mode: "instance", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0002}
+  3: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0001}
+  4: {norm_mode: "instance", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0001}
+  5: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0004, d_lr: 0.0001}
+  6: {norm_mode: "batch", weights_init: "zero_one", g_lr: 0.0004, d_lr: 0.0001}
+  7: {norm_mode: "batch", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0002}
+  8: {norm_mode: "batch", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0002}
+  9: {norm_mode: "batch", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0001}
+  10: {norm_mode: "batch", weights_init: "zero_one", g_lr: 0.0002, d_lr: 0.0001}
+  11: {norm_mode: "batch", weights_init: "dc_gan", g_lr: 0.0004, d_lr: 0.0001}
+  12: {norm_mode: "batch", weights_init: "zero_one", g_lr: 0.0004, d_lr: 0.0001}
 
 # Loss weight table (maps to the .3 part of the code)
 loss_weights:
-  3:
-    l1_weight: 0.0
-    perceptual_weight: 1.0
-    adv_weight: 1.0
-  1:
-    l1_weight: 1.0
-    adv_weight: 1.0
+  1: {l1_weight: 1.0, adv_weight: 1.0}
+  2: {l1_weight: 0.01, adv_weight: 1.0}
+  3: {l1_weight: 0.0, perceptual_weight: 1.0, adv_weight: 1.0}
+  4: {l1_weight: 0.01, perceptual_weight: 1.0, adv_weight: 1.0}
+  5: {l1_weight: 1.0, perceptual_weight: 0.0, adv_weight: 0.0000001}

@@ -1,0 +1,30 @@
+# rgb2sm.yaml
+common:
+  input_nc: 3
+  patch_size: 64
+
+server_paths:
+  0: "C:/Datasets/ShadowMatte Dataset/"
+  1: "/home/npdelgallego/scratch3/Datasets/ShadowMatte Dataset/"
+  2: "X:/ShadowMatte Dataset/"
+  3: "X:/ShadowMatte Dataset/"
+  4: "/home/gamelab/Documents/ShadowMatte Dataset/"
+  5: "C:/Datasets/ShadowMatte Dataset/"
+  8: "/scratch3/neil.delgallego/ShadowMatte Dataset/"
+
+versions:
+  v62.00_istd:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [128, 128, 128, 128]
+    load_size: [64, 64, 64, 64]
+    min_epochs: 200
+    max_epochs: 200
+    dataset_a_train: "{server_path}istd/train/train_A/*.png"
+    dataset_b_train: "{server_path}istd/train/train_B/*.png"
+
+hyperparams:
+  1: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0002}
+
+loss_weights:
+  1: {l1_weight: 1.0, adv_weight: 1.0}

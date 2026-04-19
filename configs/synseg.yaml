@@ -1,0 +1,51 @@
+# synseg.yaml
+common:
+  input_nc: 3
+  patch_size: 512
+
+server_paths:
+  0: "C:/Datasets/Segmentation Dataset/"
+  1: "/home/npdelgallego/scratch3/Datasets/Segmentation Dataset/"
+  2: "X:/Segmentation Dataset/"
+  3: "X:/Segmentation Dataset/"
+  4: "/home/gamelab/Documents/Segmentation Dataset/"
+  5: "C:/Datasets/Segmentation Dataset/"
+  6: "C:/Datasets/Segmentation Dataset/"
+  7: "D:/Datasets/Segmentation Dataset/"
+  8: "/scratch3/neil.delgallego/Segmentation Dataset/"
+
+versions:
+  v00.00_cityscapes:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [48, 2048, 2048, 256]
+    load_size: [24, 1024, 1024, 128]
+    min_epochs: 100
+    max_epochs: 100
+    dataset_version: "CityScapes"
+    img_path_train: "{server_path}CityScapes/leftImg8bit/train/*/*.png"
+    mask_path_train: "{server_path}CityScapes/gtFine/train/*/*_color_*.png"
+    label_path_train: "{server_path}CityScapes/gtFine/train/*/*_label_*.txt"
+    img_path_test: "{server_path}CityScapes/leftImg8bit/val/*/*.png"
+    mask_path_test: "{server_path}CityScapes/gtFine/val/*/*_color.png"
+    label_path_test: "{server_path}CityScapes/gtFine/val/*/*_label_*.txt"
+
+  v00.00_fcg:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [256, 256, 256, 256]
+    load_size: [128, 128, 128, 128]
+    min_epochs: 100
+    max_epochs: 100
+    dataset_version: "FCG"
+    img_path_train: "{server_path}FCG-Synth/train-rgb/*/*.png"
+    label_path_train: "{server_path}FCG-Synth/train-seg/*/*.txt"
+    img_path_test: "{server_path}FCG-Synth/test-rgb/*/*.png"
+    label_path_test: "{server_path}FCG-Synth/test-seg/*/*.txt"
+
+hyperparams:
+  1: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0002, d_lr: 0.0002}
+  5: {norm_mode: "instance", weights_init: "dc_gan", g_lr: 0.0004, d_lr: 0.0001}
+
+loss_weights:
+  1: {l1_weight: 1.0, adv_weight: 1.0}
