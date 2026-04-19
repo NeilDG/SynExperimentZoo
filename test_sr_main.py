@@ -50,8 +50,8 @@ def main(argv):
         "max_epochs": config.get('max_epochs', 200),
         "min_epochs": config.get('min_epochs', 10),
         "dataset_version": config.get('dataset_version', "div2k"),
-        "low_path": config.get('low_path'), 
-        "high_path": config.get('high_path'),
+        "low_path": config.get('low_path_test'), 
+        "high_path": config.get('high_path_test'),
         "batch_size": config.get('batch_size', [256]*4),
         "load_size": config.get('load_size', [128]*4)
     }
@@ -60,8 +60,8 @@ def main(argv):
     
     ConfigHolder.initialize(old_network_config, old_hyperparam_data, old_weight_data)
     
-    global_config.a_path_test = old_network_config["low_path"]
-    global_config.b_path_test = old_network_config["high_path"]
+    global_config.a_path_test = config.get('low_path_test')
+    global_config.b_path_test = config.get('high_path_test')
     global_config.num_workers = 8
     
     # BurstSR/Div2K paths from consolidated YAML if available, else fallback
