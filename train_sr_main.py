@@ -132,6 +132,8 @@ def update_config(opts):
         global_config.load_size = network_config["load_size"][0]
         print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
 
+    # Note: For new VCC scheme, paths are already resolved by ConfigParser. 
+    # This format() call will be a no-op if placeholders aren't present.
     global_config.a_path_train = global_config.a_path_train.format(dataset_version=dataset_version_train, low_path=low_path)
     global_config.b_path_train = global_config.b_path_train.format(dataset_version=dataset_version_train, high_path=high_path)
     global_config.a_path_test = global_config.a_path_test.format(dataset_version=dataset_version_test, low_path=low_path)
@@ -147,10 +149,13 @@ def main(argv):
     torch.manual_seed(manualSeed)
     np.random.seed(manualSeed)
 
-    if opts.network_version.startswith("V."):
+    # Smart detection: Use new VCC if it starts with V. OR if it follows the problem_vXX format (contains underscores and 2 dots)
+    is_new_vcc = opts.network_version.startswith("V.") or (opts.network_version.count('.') == 2 and "_" in opts.network_version)
+
+    if is_new_vcc:
         from utils.config_parser import ConfigParser
         cp = ConfigParser(opts.network_version)
-        config = cp.load_config() # Default server
+        config = cp.load_config(opts.server_config) 
         
         global_config.sr_network_version = opts.network_version
         global_config.hyper_iteration = 0
@@ -158,21 +163,31 @@ def main(argv):
         
         # Mock the old structures for ConfigHolder
         old_network_config = {
-            "model_type": config.get('model.type'),
-            "input_nc": config.get('model.input_nc'),
-            "num_blocks": config.get('model.num_blocks'),
-            "max_epochs": config.get('experiment.training.epochs', 200),
-            "min_epochs": 10,
-            "dataset_version": config.get('dataset.version', "div2k"), # Fallback for old dataset logic
-            "low_path": config.get('dataset.train.low_path', "/lr/*.png"),
-            "high_path": config.get('dataset.train.high_path', "/bicubic_x4/*.png"),
-            "batch_size": [config.get('training.batch_size', 256)] * 4,
-            "load_size": [config.get('training.load_size', 128)] * 4
+            "model_type": config.get('model_type'),
+            "input_nc": config.get('input_nc'),
+            "patch_size": config.get('patch_size', 64),
+            "num_blocks": config.get('num_blocks'),
+            "max_epochs": config.get('max_epochs', 200),
+            "min_epochs": config.get('min_epochs', 10),
+            "dataset_version": config.get('dataset_version', "div2k"),
+            "low_path": config.get('low_path'), 
+            "high_path": config.get('high_path'),
+            "batch_size": config.get('batch_size', [256]*4),
+            "load_size": config.get('load_size', [128]*4)
         }
-        old_hyperparam_data = {"hyperparams": {0: config.get('experiment.hyperparams', {})}}
-        old_weight_data = {"loss_weights": {0: config.get('experiment.losses', {})}}
+        old_hyperparam_data = {"hyperparams": {0: config.get('hyperparams', {})}}
+        old_weight_data = {"loss_weights": {0: config.get('losses', {})}}
         
         ConfigHolder.initialize(old_network_config, old_hyperparam_data, old_weight_data)
+        
+        # Override global_config paths directly since they are resolved by new parser
+        global_config.a_path_train = old_network_config["low_path"]
+        global_config.b_path_train = old_network_config["high_path"]
+        global_config.a_path_test = old_network_config["low_path"]
+        global_config.b_path_test = old_network_config["high_path"]
+        global_config.batch_size = old_network_config["batch_size"][0]
+        global_config.load_size = old_network_config["load_size"][0]
+
     else:
         global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = utils_script.parse_string(opts.network_version)
 
@@ -182,8 +197,8 @@ def main(argv):
         loss_weights_path = "./hyperparam_tables/common_weights.yaml"
         with open(yaml_config) as f, open(hyperparam_path) as h, open(loss_weights_path) as l:
             ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader), yaml.load(l, SafeLoader))
+        update_config(opts)
 
-    update_config(opts)
     print(opts)
     print("=====================BEGIN============================")
     print("Server config? %d GPU Count: %d" % (global_config.server_config, torch.cuda.device_count()))

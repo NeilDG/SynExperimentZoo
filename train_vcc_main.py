@@ -12,7 +12,7 @@ from tqdm import tqdm
 import global_config
 
 parser = OptionParser()
-parser.add_option('--vcc', type=str, help="VCC version (V.XX.YY.ZZ)", default="V.02.05div2k.10")
+parser.add_option('--vcc', type=str, help="VCC version (V.XX.YY.ZZ.WW)", default="V.02.06div2k.12.3")
 parser.add_option('--server', type=str, help="Server config name", default="default")
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--save_per_iter', type=int, default=500)
@@ -25,7 +25,7 @@ def main(argv):
     cp = ConfigParser(opts.vcc)
     config = cp.load_config(opts.server)
     
-    # Setup global_config for backward compatibility (some trainers still use it)
+    # Setup global_config for backward compatibility
     global_config.sr_network_version = opts.vcc
     global_config.load_size = config.get('training.load_size', 1)
     global_config.batch_size = config.get('training.batch_size', 1)
@@ -33,22 +33,11 @@ def main(argv):
     global_config.save_per_iter = opts.save_per_iter
     
     # 2. Triple-Factory Pattern
-    # Note: Currently PairedTrainer handles its own instantiation of models via NetworkCreator
-    # To keep it simple for now, we inject the config and let it use it.
-    # In a full refactor, we would pass the instantiated objects.
+    train_loader, test_loader, train_count = DatasetFactory.get_dataloaders(cp)
     
-    # For now, let's use the factories to show the design
-    train_loader, test_loader, train_count = DatasetFactory.get_dataloaders(config)
-    
-    # 3. Model & Loss Factory (Demonstration of Triple-Factory)
-    # netG, netD = ModelFactory.create_model(config, device)
-    # loss_repo, weights = LossFactory.get_losses(config, device)
-    
-    # Initialize the trainer (we still use PairedTrainer for now but it will read from ConfigHolder)
-    # We need to initialize ConfigHolder for backward compatibility with existing trainers
+    # Initialize the trainer
     from config.network_config import ConfigHolder
     # Mock the old structures for ConfigHolder
-    # This is a bridge between the new VCC and old code
     old_network_config = {
         "model_type": config.get('model.type'),
         "input_nc": config.get('model.input_nc'),
@@ -56,6 +45,7 @@ def main(argv):
         "max_epochs": config.get('experiment.training.epochs', 200),
         "min_epochs": 10
     }
+    # For backward compat, we keep iterations at 0 since YAML merges them
     old_hyperparam_data = {"hyperparams": {0: config.get('experiment.hyperparams', {})}}
     old_weight_data = {"loss_weights": {0: config.get('experiment.losses', {})}}
     global_config.hyper_iteration = 0
@@ -71,10 +61,13 @@ def main(argv):
     
     print(f"Starting training for {opts.vcc} on {opts.server}")
     
-    pbar = tqdm(total=max_epochs * (train_count // global_config.load_size))
+    # Handle possible 0 division if data not found
+    iter_per_epoch = (train_count // global_config.load_size) if global_config.load_size > 0 else 1
+    pbar = tqdm(total=max_epochs * iter_per_epoch)
     iteration = 0
     
     for epoch in range(start_epoch, max_epochs):
+        if train_loader is None: break
         for i, (_, a_batch, b_batch) in enumerate(train_loader):
             a_batch = a_batch.to(device)
             b_batch = b_batch.to(device)

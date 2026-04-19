@@ -1,0 +1,62 @@
+# mobisr.yaml - Consolidated configuration for Mobile SuperRes problem
+# Common parameters for this problem
+common:
+  input_nc: 3
+  patch_size: 64
+
+# Server paths corresponding to server_config index (0 to 8)
+server_paths:
+  0: "C:/Datasets/SuperRes Dataset/"             # RTX 4060Ti PC
+  1: "/home/npdelgallego/scratch3/Datasets/SuperRes Dataset/" # CCS Cloud
+  2: "X:/SuperRes Dataset/"                      # RTX 2080Ti
+  3: "X:/SuperRes Dataset/"                      # RTX 3090 PC
+  4: "/home/gamelab/Documents/SuperRes Dataset/" # Titan RTX 3060
+  5: "C:/Datasets/SuperRes Dataset/"             # G411-5090-X
+  6: "C:/Datasets/SuperRes Dataset/"             # G411 RTX 3060
+  7: "D:/Datasets/SuperRes Dataset/"             # RTX 3060 Laguna
+  8: "/scratch3/neil.delgallego/SuperRes Dataset/" # DOST-COARE
+
+# Specific versions/architectures
+versions:
+  v02.06_div2k:
+    model_type: 4
+    num_blocks: 3
+    batch_size: [256, 256, 128, 64]
+    load_size: [128, 128, 64, 32]
+    min_epochs: 400
+    max_epochs: 400
+    low_path: "{server_path}div2k/lr/*.png"
+    high_path: "{server_path}div2k/bicubic_x4/*.png"
+  
+  v02.05_div2k:
+    model_type: 1
+    num_blocks: 6
+    batch_size: [1536, 256, 1024, 256]
+    load_size: [768, 128, 512, 128]
+    min_epochs: 200
+    max_epochs: 200
+    low_path: "{server_path}div2k/lr/*.png"
+    high_path: "{server_path}div2k/bicubic_x4/*.png"
+
+# Hyperparameter table (maps to the .12 part of the code)
+hyperparams:
+  12:
+    norm_mode: "batch"
+    weights_init: "zero_one"
+    g_lr: 0.0004
+    d_lr: 0.0001
+  10:
+    norm_mode: "batch"
+    weights_init: "dc_gan"
+    g_lr: 0.0002
+    d_lr: 0.0001
+
+# Loss weight table (maps to the .3 part of the code)
+loss_weights:
+  3:
+    l1_weight: 0.0
+    perceptual_weight: 1.0
+    adv_weight: 1.0
+  1:
+    l1_weight: 1.0
+    adv_weight: 1.0

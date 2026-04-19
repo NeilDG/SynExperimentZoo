@@ -1,5 +1,6 @@
 import torch
 from model import vanilla_cycle_gan as cycle_gan, unet_gan, usi3d_gan, ffa_gan, rrdbnet, network_swinir, network_srmd
+from model import attention_resunet_gan, densenet_gan, nafssr_gan, restormer_unet_gan, psp_net, translator_gan, new_style_transfer_gan, embedding_network
 
 class ModelFactory:
     @staticmethod
@@ -34,6 +35,25 @@ class ModelFactory:
             netG = network_swinir.SwinIR(upscale=1, window_size=8, img_range=1., depths=[6, 6, 6, 6],
                                         embed_dim=60, num_heads=[6, 6, 6, 6], mlp_ratio=2, 
                                         upsampler='pixelshuffledirect').to(device)
+        elif model_type == 7:
+            netG = attention_resunet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks,
+                                                  dropout_rate=dropout_rate, norm=norm_mode).to(device)
+        elif model_type == 8:
+            netG = densenet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(device)
+        elif model_type == 9:
+            netG = nafssr_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks,
+                                       dropout_rate=dropout_rate, norm=norm_mode).to(device)
+        elif model_type == 10:
+            netG = restormer_unet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks,
+                                               dropout_rate=dropout_rate).to(device)
+        elif model_type == 11:
+            netG = psp_net.PSPNet(n_classes=3).to(device)
+        elif model_type == 12:
+            netG = translator_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(device)
+        elif model_type == 13:
+            netG = new_style_transfer_gan.Generator(nblocks=num_blocks).to(device)
+        elif model_type == 14:
+            netG = embedding_network.EmbeddingNetwork(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(device)
         else:
             netG = network_srmd.SRMD(in_nc=input_nc, out_nc=3, nc=64, nb=num_blocks, upscale=1, 
                                     act_mode='R', upsample_mode='pixelshuffle').to(device)
