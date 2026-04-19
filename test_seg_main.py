@@ -9,101 +9,15 @@ import global_config
 from utils import plot_utils
 from testers import paired_tester
 from tqdm import tqdm
-import yaml
-from yaml.loader import SafeLoader
-import util_script_main as utils_script
+from utils.config_parser import ConfigParser
 
 parser = OptionParser()
-parser.add_option('--server_config', type=int, help="Is running on COARE?", default=0)
+parser.add_option('--server_config', type=int, help="Server config index", default=0)
 parser.add_option('--cuda_device', type=str, help="CUDA Device?", default="cuda:0")
 parser.add_option('--img_to_load', type=int, help="Image to load?", default=-1)
-parser.add_option('--network_version', type=str, default="vXX.XX")
+parser.add_option('--network_version', type=str, default="synseg_v00.01_cityscapes.1.1")
 parser.add_option('--plot_enabled', type=int, default=1)
 parser.add_option('--save_per_iter', type=int, default=500)
-
-def update_config(opts):
-    global_config.server_config = opts.server_config
-    global_config.plot_enabled = opts.plot_enabled
-    global_config.img_to_load = opts.img_to_load
-    global_config.cuda_device = opts.cuda_device
-    global_config.save_per_iter = opts.save_per_iter
-    global_config.test_size = 2
-
-    network_config = ConfigHolder.getInstance().get_network_config()
-    dataset_version_train = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-    dataset_version_test = network_config["dataset_version"] + "_patched"  # TODO: hardcoded _patched suffix. To fix
-
-    img_path_train = network_config["img_path_train"]
-    mask_path_train = network_config["mask_path_train"]
-    img_path_test= network_config["img_path_test"]
-    mask_path_test = network_config["mask_path_test"]
-
-    if(global_config.server_config == 0): #RTX 4060Ti PC
-        global_config.num_workers = 8
-        global_config.seg_path_rgb_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_train = "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.seg_path_rgb_path_test = "C:/Datasets/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_test= "C:/Datasets/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.batch_size = network_config["batch_size"][1]
-        global_config.load_size = network_config["load_size"][1]
-        print("Using G411-RTX4060Ti configuration. ", global_config, network_config)
-
-    elif(global_config.server_config == 1): #CCS Cloud
-        global_config.num_workers = 12
-        global_config.seg_path_root_train = "/home/jupyter-neil.delgallego/Segmentation Dataset/{dataset_version}/{img_path}/"
-        global_config.batch_size = network_config["batch_size"][1]
-        global_config.load_size = network_config["load_size"][1]
-        print("Using CCS configuration.", global_config, network_config)
-
-    elif(global_config.server_config == 2): #RTX 2080Ti
-        global_config.num_workers = 6
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
-        print("Using RTX 2080Ti configuration.", global_config, network_config)
-
-    elif(global_config.server_config == 3): #RTX 3090 PC
-        global_config.num_workers = 12
-        global_config.seg_path_rgb_path_train = "X:/Segmentation Dataset/{dataset_version}/{img_path}"
-        global_config.seg_path_mask_path_train = "X:/Segmentation Dataset/{dataset_version}/{mask_path}"
-        global_config.batch_size = network_config["batch_size"][0]
-        global_config.load_size = network_config["load_size"][0]
-        print("Using RTX 3090 configuration. ", global_config, network_config)
-
-    elif (global_config.server_config == 4):  #Titan RTX 3060
-        global_config.num_workers = 6
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
-        print("Using TITAN Workstation configuration. ", global_config, network_config)
-
-    elif (global_config.server_config == 5): #Titan RTX 2070
-        global_config.num_workers = 6
-        global_config.batch_size = network_config["batch_size"][3]
-        global_config.load_size = network_config["load_size"][3]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
-
-    elif (global_config.server_config == 6): #G411 RTX 3060
-        global_config.num_workers = 8
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
-
-    elif (global_config.server_config == 7): #RTX 3060 Laguna PCs
-        global_config.num_workers = 6
-        global_config.batch_size = network_config["batch_size"][2]
-        global_config.load_size = network_config["load_size"][2]
-        print("Using G411-RTX3060 Workstation configuration. ", global_config, network_config)
-
-    elif (global_config.server_config == 8): #COARE
-        global_config.num_workers = 6
-        global_config.batch_size = network_config["batch_size"][0]
-        global_config.load_size = network_config["load_size"][0]
-        print("Using DOST-COARE Workstation configuration. ", global_config, network_config)
-
-    global_config.seg_path_rgb_path_train = global_config.seg_path_rgb_path_train.format(dataset_version=dataset_version_train, img_path=img_path_train)
-    global_config.seg_path_mask_path_train = global_config.seg_path_mask_path_train.format(dataset_version=dataset_version_train, mask_path=mask_path_train)
-
-    global_config.seg_path_rgb_path_test = global_config.seg_path_rgb_path_test.format(dataset_version=dataset_version_test, img_path=img_path_test)
-    global_config.seg_path_mask_path_test = global_config.seg_path_mask_path_test.format(dataset_version=dataset_version_test, mask_path=mask_path_test)
 
 def main(argv):
     (opts, args) = parser.parse_args(argv)
@@ -115,49 +29,50 @@ def main(argv):
     torch.manual_seed(manualSeed)
     np.random.seed(manualSeed)
 
-    global_config.sr_network_version, global_config.hyper_iteration, global_config.loss_iteration = utils_script.parse_string(opts.network_version)
-
-    yaml_config = "./hyperparam_tables/seg/{network_version}.yaml"
-    yaml_config = yaml_config.format(network_version=global_config.sr_network_version)
-    hyperparam_path = "./hyperparam_tables/seg/common_hyper.yaml"
-    loss_weights_path = "./hyperparam_tables/seg/common_weights.yaml"
-    with open(yaml_config) as f, open(hyperparam_path) as h, open(loss_weights_path) as l:
-        ConfigHolder.initialize(yaml.load(f, SafeLoader), yaml.load(h, SafeLoader), yaml.load(l, SafeLoader))
-
-    update_config(opts)
-    print(opts)
-    print("=====================BEGIN============================")
-    print("Server config? %d GPU Count: %d" % (global_config.server_config, torch.cuda.device_count()))
-    print("Torch CUDA version: %s" % torch.version.cuda)
-
-    network_config = ConfigHolder.getInstance().get_network_config()
-    hyperparams_table = ConfigHolder.getInstance().get_all_hyperparams()
-    loss_config = ConfigHolder.getInstance().get_loss_weights()
-    loss_iteration = global_config.loss_iteration
-
-    loss_config_table = loss_config["loss_weights"][loss_iteration]
-    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " Learning rates: ", hyperparams_table["g_lr"], hyperparams_table["d_lr"])
+    cp = ConfigParser(opts.network_version)
+    config = cp.load_config(opts.server_config) 
+    
+    global_config.sr_network_version = f"{cp.problem}_{cp.version}"
+    global_config.hyper_iteration = cp.hyper_id
+    global_config.loss_iteration = cp.loss_id
+    
+    global_config.plot_enabled = opts.plot_enabled
+    global_config.img_to_load = opts.img_to_load
+    global_config.cuda_device = opts.cuda_device
+    global_config.save_per_iter = opts.save_per_iter
+    global_config.server_config = opts.server_config
+    global_config.test_size = 2
+    
+    old_network_config = {
+        "model_type": config.get('model_type'),
+        "input_nc": config.get('input_nc'),
+        "patch_size": config.get('patch_size', 512),
+        "num_blocks": config.get('num_blocks'),
+        "max_epochs": config.get('max_epochs', 200),
+        "min_epochs": config.get('min_epochs', 10),
+        "dataset_version": config.get('dataset_version', "CityScapes"),
+        "img_path_test": config.get('img_path_test'),
+        "mask_path_test": config.get('mask_path_test'),
+        "batch_size": config.get('batch_size', [256]*4),
+        "load_size": config.get('load_size', [128]*4)
+    }
+    old_hyperparam_data = {"hyperparams": {cp.hyper_id: config.get('hyperparams', {})}}
+    old_weight_data = {"loss_weights": {cp.loss_id: config.get('losses', {})}}
+    
+    ConfigHolder.initialize(old_network_config, old_hyperparam_data, old_weight_data)
+    
+    global_config.seg_path_rgb_path_test = old_network_config["img_path_test"]
+    global_config.seg_path_mask_path_test = old_network_config["mask_path_test"]
+    global_config.batch_size = old_network_config["batch_size"][0]
+    global_config.load_size = old_network_config["load_size"][0]
+    global_config.num_workers = 8
 
     plot_utils.VisdomReporter.initialize()
-
-    print(global_config.seg_path_rgb_path_test)
-    print(global_config.seg_path_mask_path_test)
 
     test_loader_a, test_count = dataset_loader.load_cityscapes_gan_dataset_test(global_config.seg_path_rgb_path_test, global_config.seg_path_mask_path_test)
     img2img_t = paired_tester.PairedTester(device)
 
-    iteration = 0
-    start_epoch = global_config.last_epoch_st
-    print("---------------------------------------------------------------------------")
-    print("Started test loop for mode: synthseg", " Set start epoch: ", start_epoch)
-    print("---------------------------------------------------------------------------")
-
-    # compute total progress
-    load_size = global_config.load_size
-    needed_progress = int((network_config["max_epochs"]) * (test_count / load_size))
-    current_progress = int(start_epoch * (test_count / load_size))
-    pbar = tqdm(total=needed_progress, disable=global_config.disable_progress_bar)
-    pbar.update(current_progress)
+    pbar = tqdm(total=test_count, disable=global_config.disable_progress_bar)
 
     for i, (file_name, img_batch, target_batch) in enumerate(test_loader_a, 0):
         img_batch = img_batch.to(device)

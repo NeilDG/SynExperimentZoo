@@ -17,11 +17,8 @@ class ConfigParser:
         self.config = {}
 
     def _parse_vcc(self, vcc_string):
-        # Handle optional V. prefix
-        clean_string = vcc_string[2:] if vcc_string.startswith("V.") else vcc_string
-        
         # Split by last two dots for hyper and loss
-        parts = clean_string.rsplit('.', 2)
+        parts = vcc_string.rsplit('.', 2)
         if len(parts) != 3:
              raise ValueError(f"Invalid VCC format: {vcc_string}. Expected problem_version.hyper.loss")
         
