@@ -45,7 +45,7 @@ def is_training_complete(version_str, server_config):
 
 def train_sr_main():
     server_config = 5
-    model_ids = range(2, 15)
+    model_ids = range(3, 15)
     hyper_ids = range(1, 13)
     loss_ids = range(1, 6)
 
