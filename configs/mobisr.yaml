@@ -18,10 +18,11 @@ server_paths:
 # 8: DenseNet, 9: NAFSSR, 10: RestormerUNet, 11: PSPNet, 12: TranslatorGAN, 
 # 13: StyleTransferGAN, 14: EmbeddingNetwork, Default: SRMD
 
-# VRAM Tier Guide for batch/load size arrays: [Tier A (>24GB), Tier B (16-24GB), Tier C (11-12GB), Tier D (8GB)]
+# VRAM Tier Mapping (batch_size/load_size arrays):
+# [Index 0: High (>24GB), Index 1: Mid (16GB), Index 2: Low (11-12GB), Index 3: Safety (8GB)]
 
 versions:
-  # --- v02.01: CycleGAN ---
+  # --- v02.01: CycleGAN (Memory Efficient) ---
   v02.01_div2k:
     model_type: 1
     num_blocks: 6
@@ -45,7 +46,7 @@ versions:
     low_path_test: "{server_path}sr-hypersim/classic_x4/*.png"
     high_path_test: "{server_path}sr-hypersim/high/*.png"
 
-  # --- v02.02: UNet ---
+  # --- v02.02: UNet (Standard) ---
   v02.02_div2k:
     model_type: 2
     num_blocks: 6
@@ -97,8 +98,8 @@ versions:
   v02.04_div2k:
     model_type: 4
     num_blocks: 3
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [256, 256, 128, 64]
+    load_size: [128, 128, 64, 32]
     min_epochs: 400
     max_epochs: 400
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -141,12 +142,12 @@ versions:
     low_path_test: "{server_path}sr-hypersim/classic_x4/*.png"
     high_path_test: "{server_path}sr-hypersim/high/*.png"
 
-  # --- v02.06: SwinIR ---
+  # --- v02.06: SwinIR (High Capacity) ---
   v02.06_div2k:
     model_type: 6
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 400
     max_epochs: 400
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -156,8 +157,8 @@ versions:
   v02.06_hypersim:
     model_type: 6
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 400
     max_epochs: 400
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -170,7 +171,7 @@ versions:
     model_type: 7
     num_blocks: 6
     batch_size: [256, 128, 64, 32]
-    load_size: [64, 32, 16, 8]
+    load_size: [128, 64, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -181,7 +182,7 @@ versions:
     model_type: 7
     num_blocks: 6
     batch_size: [256, 128, 64, 32]
-    load_size: [64, 32, 16, 8]
+    load_size: [128, 64, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -217,8 +218,8 @@ versions:
   v02.09_div2k:
     model_type: 9
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -228,8 +229,8 @@ versions:
   v02.09_hypersim:
     model_type: 9
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -241,8 +242,8 @@ versions:
   v02.10_div2k:
     model_type: 10
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -252,8 +253,8 @@ versions:
   v02.10_hypersim:
     model_type: 10
     num_blocks: 6
-    batch_size: [128, 64, 32, 16]
-    load_size: [32, 16, 8, 4]
+    batch_size: [128, 96, 64, 32]
+    load_size: [64, 48, 32, 16]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -265,8 +266,8 @@ versions:
   v02.11_div2k:
     model_type: 11
     num_blocks: 6
-    batch_size: [256, 128, 64, 32]
-    load_size: [128, 64, 32, 16]
+    batch_size: [512, 256, 128, 64]
+    load_size: [256, 128, 64, 32]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -276,8 +277,8 @@ versions:
   v02.11_hypersim:
     model_type: 11
     num_blocks: 6
-    batch_size: [256, 128, 64, 32]
-    load_size: [128, 64, 32, 16]
+    batch_size: [512, 256, 128, 64]
+    load_size: [256, 128, 64, 32]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -289,8 +290,8 @@ versions:
   v02.12_div2k:
     model_type: 12
     num_blocks: 6
-    batch_size: [256, 128, 64, 32]
-    load_size: [128, 64, 32, 16]
+    batch_size: [512, 256, 128, 64]
+    load_size: [256, 128, 64, 32]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -300,8 +301,8 @@ versions:
   v02.12_hypersim:
     model_type: 12
     num_blocks: 6
-    batch_size: [256, 128, 64, 32]
-    load_size: [128, 64, 32, 16]
+    batch_size: [512, 256, 128, 64]
+    load_size: [256, 128, 64, 32]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -313,8 +314,8 @@ versions:
   v02.13_div2k:
     model_type: 13
     num_blocks: 6
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [1024, 512, 256, 128]
+    load_size: [512, 256, 128, 64]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -324,8 +325,8 @@ versions:
   v02.13_hypersim:
     model_type: 13
     num_blocks: 6
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [1024, 512, 256, 128]
+    load_size: [512, 256, 128, 64]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"
@@ -337,8 +338,8 @@ versions:
   v02.14_div2k:
     model_type: 14
     num_blocks: 6
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [1024, 512, 256, 128]
+    load_size: [512, 256, 128, 64]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}div2k_patched/lr/*.png"
@@ -348,8 +349,8 @@ versions:
   v02.14_hypersim:
     model_type: 14
     num_blocks: 6
-    batch_size: [512, 256, 128, 64]
-    load_size: [256, 128, 64, 32]
+    batch_size: [1024, 512, 256, 128]
+    load_size: [512, 256, 128, 64]
     min_epochs: 200
     max_epochs: 200
     low_path_train: "{server_path}sr-hypersim_patched/classic_x4/*.png"

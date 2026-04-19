@@ -61,6 +61,12 @@ def main(argv):
     
     ConfigHolder.initialize(old_network_config, old_hyperparam_data, old_weight_data)
     
+    network_config = ConfigHolder.getInstance().get_network_config()
+    hyperparams_table = ConfigHolder.getInstance().get_all_hyperparams()
+    loss_config_table = ConfigHolder.getInstance().get_loss_weights()["loss_weights"][cp.loss_id]
+    
+    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " model_type:", network_config["model_type"], " num_blocks:", network_config["num_blocks"], " batch_size:", global_config.batch_size, " load_size:", global_config.load_size, " min_epochs:", network_config["min_epochs"], " max_epochs:", network_config["max_epochs"])
+    
     global_config.seg_path_rgb_path_test = old_network_config["img_path_test"]
     global_config.seg_path_mask_path_test = old_network_config["mask_path_test"]
     global_config.batch_size = old_network_config["batch_size"][0]

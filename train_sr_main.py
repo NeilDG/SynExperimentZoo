@@ -79,7 +79,7 @@ def main(argv):
     hyperparams_table = ConfigHolder.getInstance().get_all_hyperparams()
     loss_config_table = ConfigHolder.getInstance().get_loss_weights()["loss_weights"][cp.loss_id]
     
-    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table)
+    print("Network version:", opts.network_version, ". Hyper parameters: ", hyperparams_table, " Loss weights: ", loss_config_table, " model_type:", network_config["model_type"], " num_blocks:", network_config["num_blocks"], " batch_size:", global_config.batch_size, " load_size:", global_config.load_size, " min_epochs:", network_config["min_epochs"], " max_epochs:", network_config["max_epochs"])
 
     plot_utils.VisdomReporter.initialize()
 
