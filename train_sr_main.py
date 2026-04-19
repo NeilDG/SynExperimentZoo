@@ -71,7 +71,7 @@ def main(argv):
     vram_index = global_config.get_vram_index(opts.server_config)
     global_config.batch_size = old_network_config["batch_size"][vram_index]
     global_config.load_size = old_network_config["load_size"][vram_index]
-    global_config.num_workers = 8 # Default
+    global_config.num_workers = 16 # Default
 
     print(opts)
     print("=====================BEGIN============================")
