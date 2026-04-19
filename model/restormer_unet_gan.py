@@ -100,9 +100,9 @@ class RestormerBlock(nn.Module):
 
 
 class Down(nn.Module):
-    def __init__(self, dim_in, dim_out, depth=1, heads=4, drop=0.0):
+    def __init__(self, dim_in, dim_out, depth=1, num_heads=4, drop=0.0):
         super().__init__()
-        self.blocks = nn.Sequential(*[RestormerBlock(dim_in, heads, drop=drop) for _ in range(depth)])
+        self.blocks = nn.Sequential(*[RestormerBlock(dim_in, num_heads, drop=drop) for _ in range(depth)])
         self.down = nn.Conv2d(dim_in, dim_out, 4, stride=2, padding=1)
 
     def forward(self, x):
@@ -111,11 +111,11 @@ class Down(nn.Module):
 
 
 class Up(nn.Module):
-    def __init__(self, dim_in, dim_out, depth=1, heads=4, drop=0.0):
+    def __init__(self, dim_in, dim_out, depth=1, num_heads=4, drop=0.0):
         super().__init__()
         self.up = nn.ConvTranspose2d(dim_in, dim_out, 4, stride=2, padding=1)
         self.fuse = nn.Conv2d(dim_out * 2, dim_out, 1)
-        self.blocks = nn.Sequential(*[RestormerBlock(dim_out, heads, drop=drop) for _ in range(depth)])
+        self.blocks = nn.Sequential(*[RestormerBlock(dim_out, num_heads, drop=drop) for _ in range(depth)])
 
     def forward(self, x, skip):
         x = self.up(x)
@@ -142,15 +142,15 @@ class Generator(nn.Module):
             nn.Conv2d(input_nc, base, 3),
         )
 
-        self.down1 = Down(base, base * 2, depth=depth_each, heads=heads, drop=dropout_rate)
-        self.down2 = Down(base * 2, base * 4, depth=depth_each, heads=heads, drop=dropout_rate)
-        self.down3 = Down(base * 4, base * 8, depth=depth_each, heads=heads, drop=dropout_rate)
+        self.down1 = Down(base, base * 2, depth=depth_each, num_heads=heads, drop=dropout_rate)
+        self.down2 = Down(base * 2, base * 4, depth=depth_each, num_heads=heads, drop=dropout_rate)
+        self.down3 = Down(base * 4, base * 8, depth=depth_each, num_heads=heads, drop=dropout_rate)
 
-        self.bottleneck = nn.Sequential(*[RestormerBlock(base * 8, heads=heads, drop=dropout_rate) for _ in range(depth_each)])
+        self.bottleneck = nn.Sequential(*[RestormerBlock(base * 8, num_heads=heads, drop=dropout_rate) for _ in range(depth_each)])
 
-        self.up3 = Up(base * 8, base * 4, depth=depth_each, heads=heads, drop=dropout_rate)
-        self.up2 = Up(base * 4, base * 2, depth=depth_each, heads=heads, drop=dropout_rate)
-        self.up1 = Up(base * 2, base, depth=depth_each, heads=heads, drop=dropout_rate)
+        self.up3 = Up(base * 8, base * 4, depth=depth_each, num_heads=heads, drop=dropout_rate)
+        self.up2 = Up(base * 4, base * 2, depth=depth_each, num_heads=heads, drop=dropout_rate)
+        self.up1 = Up(base * 2, base, depth=depth_each, num_heads=heads, drop=dropout_rate)
 
         self.head = nn.Sequential(
             nn.ReflectionPad2d(1),

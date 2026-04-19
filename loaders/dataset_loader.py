@@ -37,7 +37,7 @@ def load_train_img2img_dataset(a_path, b_path):
     data_loader = torch.utils.data.DataLoader(
         superres_datasets.PairedImageDataset(a_list, b_list, 1),
         batch_size=global_config.load_size,
-        num_workers=num_workers, pin_memory=True, prefetch_factor=2
+        num_workers=num_workers, pin_memory=True, prefetch_factor=2 if num_workers > 0 else None
     )
 
     return data_loader, len(a_list)

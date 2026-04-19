@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from modules import extractors
+from .modules import extractors
 
 
 class PSPModule(nn.Module):

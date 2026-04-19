@@ -8,6 +8,7 @@ from model import embedding_network, densenet_gan, ffa_gan, rrdbnet, network_swi
 from model import vanilla_cycle_gan as cycle_gan
 from model import unet_gan
 from model import usi3d_gan
+from model import attention_resunet_gan, nafssr_gan, restormer_unet_gan, psp_net, translator_gan, new_style_transfer_gan
 
 class NetworkCreator():
     def __init__(self, gpu_device):
@@ -52,6 +53,30 @@ class NetworkCreator():
             G_A = network_swinir.SwinIR(upscale=1,
                    window_size=8, img_range=1., depths=[6, 6, 6, 6],
                    embed_dim=60, num_heads=[6, 6, 6, 6], mlp_ratio=2, upsampler='pixelshuffledirect').to(self.gpu_device)
+        elif (model_type == 7):
+            print("Using Attention ResUNet")
+            G_A = attention_resunet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, norm=norm_mode).to(self.gpu_device)
+        elif (model_type == 8):
+            print("Using DenseNet")
+            G_A = densenet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(self.gpu_device)
+        elif (model_type == 9):
+            print("Using NAFSSR")
+            G_A = nafssr_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks, norm=norm_mode).to(self.gpu_device)
+        elif (model_type == 10):
+            print("Using Restormer UNet")
+            G_A = restormer_unet_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(self.gpu_device)
+        elif (model_type == 11):
+            print("Using PSPNet")
+            G_A = psp_net.PSPNet(n_classes=3).to(self.gpu_device)
+        elif (model_type == 12):
+            print("Using Translator GAN")
+            G_A = translator_gan.Generator(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(self.gpu_device)
+        elif (model_type == 13):
+            print("Using Style Transfer GAN")
+            G_A = new_style_transfer_gan.Generator(nblocks=num_blocks).to(self.gpu_device)
+        elif (model_type == 14):
+            print("Using Embedding Network")
+            G_A = embedding_network.EmbeddingNetwork(input_nc=input_nc, output_nc=3, n_residual_blocks=num_blocks).to(self.gpu_device)
         else:
             print("Using SRMD")
             G_A = network_srmd.SRMD(in_nc=input_nc, out_nc=3, nc=64, nb=num_blocks, upscale=1, act_mode='R', upsample_mode='pixelshuffle').to(self.gpu_device)
