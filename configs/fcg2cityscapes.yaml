@@ -1,4 +1,4 @@
-# img2img.yaml
+# fcg2cityscapes.yaml
 common:
   input_nc: 3
   patch_size: 64
@@ -14,8 +14,13 @@ server_paths:
   7: "D:/Datasets/"
   8: "/scratch3/neil.delgallego/"
 
+# Available Model IDs:
+# 1: CycleGAN Generator, 2: UNet Generator, 3: AdaIN Generator, 4: FFANet, 5: RRDBNet, 6: SwinIR
+# 7: AttentionResUNet, 8: DenseNet Generator, 9: NAFSSR, 10: RestormerUNet, 11: PSPNet
+# 12: TranslatorGAN, 13: StyleTransferGAN, 14: EmbeddingNetwork, Default: SRMD
+
 versions:
-  v00.00_fcg2cityscapes:
+  v00.01: # Model ID 1 (CycleGAN)
     model_type: 1
     num_blocks: 6
     batch_size: [384, 256, 192, 128]

@@ -12,8 +12,13 @@ server_paths:
   5: "C:/Datasets/ShadowMatte Dataset/"
   8: "/scratch3/neil.delgallego/ShadowMatte Dataset/"
 
+# Available Model IDs:
+# 1: CycleGAN Generator, 2: UNet Generator, 3: AdaIN Generator, 4: FFANet, 5: RRDBNet, 6: SwinIR
+# 7: AttentionResUNet, 8: DenseNet Generator, 9: NAFSSR, 10: RestormerUNet, 11: PSPNet
+# 12: TranslatorGAN, 13: StyleTransferGAN, 14: EmbeddingNetwork, Default: SRMD
+
 versions:
-  v62.00_istd:
+  v62.01_istd: # Model ID 1
     model_type: 1
     num_blocks: 6
     batch_size: [128, 128, 128, 128]

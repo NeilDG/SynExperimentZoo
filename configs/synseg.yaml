@@ -14,8 +14,13 @@ server_paths:
   7: "D:/Datasets/Segmentation Dataset/"
   8: "/scratch3/neil.delgallego/Segmentation Dataset/"
 
+# Available Model IDs:
+# 1: CycleGAN Generator, 2: UNet Generator, 3: AdaIN Generator, 4: FFANet, 5: RRDBNet, 6: SwinIR
+# 7: AttentionResUNet, 8: DenseNet Generator, 9: NAFSSR, 10: RestormerUNet, 11: PSPNet
+# 12: TranslatorGAN, 13: StyleTransferGAN, 14: EmbeddingNetwork, Default: SRMD
+
 versions:
-  v00.00_cityscapes:
+  v00.01_cityscapes: # Model ID 1
     model_type: 1
     num_blocks: 6
     batch_size: [48, 2048, 2048, 256]
@@ -30,7 +35,7 @@ versions:
     mask_path_test: "{server_path}CityScapes/gtFine/val/*/*_color.png"
     label_path_test: "{server_path}CityScapes/gtFine/val/*/*_label_*.txt"
 
-  v00.00_fcg:
+  v00.01_fcg: # Model ID 1
     model_type: 1
     num_blocks: 6
     batch_size: [256, 256, 256, 256]

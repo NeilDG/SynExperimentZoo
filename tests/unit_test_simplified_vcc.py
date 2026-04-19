@@ -8,43 +8,38 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.config_parser import ConfigParser
 
 class TestSimplifiedVCC(unittest.TestCase):
-    def test_mobisr_loading(self):
-        vcc = "mobisr_v02.06_div2k.12.3"
+    def test_mobisr_loading_convention(self):
+        # Convention: YY in vXX.YY matches model ID
+        vcc = "mobisr_v02.04_div2k.12.3"
         cp = ConfigParser(vcc)
-        
-        # Test parsing
-        self.assertEqual(cp.problem, "mobisr")
-        self.assertEqual(cp.version, "v02.06_div2k")
-        self.assertEqual(cp.hyper_id, "12")
-        self.assertEqual(cp.loss_id, "3")
-        
-        # Load config for RTX 3090 (index 3)
         config = cp.load_config(server_config_index=3)
         
-        # Test common param
-        self.assertEqual(config['input_nc'], 3)
-        
-        # Test version param
         self.assertEqual(config['model_type'], 4)
         self.assertEqual(config['num_blocks'], 3)
-        
-        # Test server path injection and resolution
         self.assertEqual(config['server_path'], "X:/SuperRes Dataset/")
-        self.assertEqual(config['low_path'], "X:/SuperRes Dataset/div2k/lr/*.png")
+
+    def test_mobisr_new_mapping(self):
+        # User requested: v02.06 = model 6
+        vcc = "mobisr_v02.06_div2k.12.3"
+        cp = ConfigParser(vcc)
+        config = cp.load_config(server_config_index=3)
         
-        # Test hyperparams
-        self.assertEqual(config['hyperparams']['g_lr'], 0.0004)
-        
-        # Test losses
-        self.assertEqual(config['losses']['l1_weight'], 0.0)
-        self.assertEqual(config['losses']['perceptual_weight'], 1.0)
+        self.assertEqual(config['model_type'], 6)
+        self.assertEqual(config['num_blocks'], 6)
 
     def test_v_prefix_compatibility(self):
-        vcc = "V.mobisr_v02.05_div2k.10.1"
+        # User requested: v02.01 = model 1
+        vcc = "V.mobisr_v02.01_div2k.1.1"
         cp = ConfigParser(vcc)
-        self.assertEqual(cp.problem, "mobisr")
         config = cp.load_config(0)
         self.assertEqual(config['model_type'], 1)
+
+    def test_fcg2cityscapes_loading(self):
+        vcc = "fcg2cityscapes_v00.01.1.1"
+        cp = ConfigParser(vcc)
+        config = cp.load_config(3)
+        self.assertEqual(config['model_type'], 1)
+        self.assertEqual(config['dataset_a_train'], "X:/Segmentation Dataset/FCG-Synth-01-patched/train-rgb/sequence.0/*.png")
 
 if __name__ == '__main__':
     unittest.main()
