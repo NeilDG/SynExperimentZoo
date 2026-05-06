@@ -31,7 +31,7 @@ def is_training_complete(version_str, server_config):
             checkpoint = torch.load(found_path, map_location='cpu', weights_only=True)
             current_epoch = checkpoint.get('epoch', 0)
             
-            if current_epoch >= max_epochs:
+            if current_epoch >= max_epochs - 1:
                 print(f"Skipping {version_str}: Already reached {current_epoch}/{max_epochs} epochs.")
                 return True
             else:
@@ -45,7 +45,7 @@ def is_training_complete(version_str, server_config):
 
 def train_sr_main():
     server_config = 5
-    model_ids = range(3, 15)
+    model_ids = range(4, 15)
     hyper_ids = range(1, 13)
     loss_ids = range(1, 6)
 

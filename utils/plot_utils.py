@@ -6,6 +6,8 @@ Created on Thu Jun 25 17:02:01 2020
 """
 import torch
 from matplotlib.lines import Line2D
+import time
+import functools
 
 import global_config
 import numpy as np
@@ -44,7 +46,20 @@ class VisdomReporter:
         self.image_windows = {}
         self.loss_windows = {}
         self.text_windows = {}
+
+    def log_profile(func):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            start_time = time.time()
+            result = func(self, *args, **kwargs)
+            duration = time.time() - start_time
+            # Only print if duration is significant (> 0.1s)
+            if duration > 0.1:
+                print(f"[Profiler] {func.__name__} took {duration:.4f}s")
+            return result
+        return wrapper
     
+    @log_profile
     def plot_image(self, img_tensor, caption, normalize = True):
         if(global_config.plot_enabled == 0):
             return
@@ -109,51 +124,54 @@ class VisdomReporter:
         else:
             self.vis.matplot(plt, win = self.loss_windows[hash(caption)], opts = dict(caption = caption))
 
+    @log_profile
     def plot_finegrain_loss(self, loss_key, iteration, losses_dict, caption_dict, label):
-        if(global_config.plot_enabled == 0):
+        if(global_config.plot_enabled == 0 or self.vis is None):
             return
         
-        loss_keys = list(losses_dict.keys())
-        caption_keys = list(caption_dict.keys())
-        colors = ['r', 'g', 'black', 'darkorange', 'olive', 'palevioletred', 'rosybrown', 'cyan', 'slategray', 'darkmagenta', 'linen', 'chocolate']
-        index = 0
-        
-        x = [i for i in range(iteration, iteration + len(losses_dict["g_loss"]))]
-        COLS = 3; ROWS = 4
-        fig, ax = plt.subplots(ROWS, COLS, sharex=True)
-        fig.set_size_inches(9, 9)
-        fig.tight_layout()
+        for key in losses_dict.keys():
+            data = np.array(losses_dict[key])
+            if len(data) == 0: continue
+            
+            # Calculate correct X-axis range for the circular buffer
+            x = np.arange(iteration - len(data), iteration)
+            
+            opts = dict(
+                caption=caption_dict.get(key, key),
+                title=f"{label} - {caption_dict.get(key, key)}",
+                ylabel='Loss',
+                xlabel='Iteration'
+            )
+            
+            # Use vis.line for native, high-performance plotting
+            win_name = f"{label}_{key}"
+            if win_name not in self.loss_windows:
+                self.loss_windows[win_name] = self.vis.line(X=x, Y=data, opts=opts)
+            else:
+                self.vis.line(X=x, Y=data, win=self.loss_windows[win_name], opts=opts, update='replace')
 
-        row = 0
-        col = 0
-        for i in range(0, len(loss_keys)):
-            if(i == 1):
-                ax[row, col].plot(x, losses_dict[loss_keys[i]], color=colors[i], label=loss_key + " " + str(caption_dict[caption_keys[i]]))
-                col = col + 1
-            elif(np.mean(losses_dict[loss_keys[i]]) > 0.0): #only display those > 0.0
-                ax[row, col].plot(x, losses_dict[loss_keys[i]], color=colors[i], label=str(caption_dict[caption_keys[i]]))
-                col = col + 1
+    def plot_train_test_loss(self, loss_key, iteration, losses_dict, caption_dict, label):
+        if (global_config.plot_enabled == 0 or self.vis is None):
+            return
 
-            if(col == COLS):
-                row = row + 1
-                col = 0
+        for key in losses_dict.keys():
+            data = np.array(losses_dict[key])
+            if len(data) == 0: continue
 
-        # for i in range(ROWS):
-        #     for j in range(COLS):
-        #         if(index < len(loss_keys)):
-        #             if(index == 1):
-        #                 ax[i, j].plot(x, losses_dict[loss_keys[index]], color=colors[index], label= loss_key + " " +str(caption_dict[caption_keys[index]]))
-        #             elif (np.mean(losses_dict[loss_keys[index]]) > 0.0): #only display those > 0.0
-        #                 ax[i, j].plot(x, losses_dict[loss_keys[index]], color = colors[index], label = str(caption_dict[caption_keys[index]]))
-        #             index = index + 1
-        #         else:
-        #             break
-    
-        fig.legend(loc = 'lower right')
-        if loss_key not in self.loss_windows:
-            self.loss_windows[loss_key] = self.vis.matplot(plt, opts = dict(caption = "Losses" + " " + str(label)))
-        else:
-            self.vis.matplot(plt, win = self.loss_windows[loss_key], opts = dict(caption = "Losses" + " " + str(label)))
+            x = np.arange(iteration - len(data), iteration)
+            opts = dict(
+                caption=caption_dict.get(key, key),
+                title=f"{label} - {caption_dict.get(key, key)}",
+                ylabel='Loss',
+                xlabel='Iteration'
+            )
+
+            win_name = f"{label}_{key}"
+            if win_name not in self.loss_windows:
+                self.loss_windows[win_name] = self.vis.line(X=x, Y=data, opts=opts)
+            else:
+                self.vis.line(X=x, Y=data, win=self.loss_windows[win_name], opts=opts, update='replace')
+
           
         plt.show()
 

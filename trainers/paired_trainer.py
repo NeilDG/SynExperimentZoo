@@ -11,7 +11,7 @@ import itertools
 
 from model.modules import image_pool
 from trainers import early_stopper, abstract_iid_trainer
-from utils import plot_utils, tensor_utils
+from utils import plot_utils, tensor_utils, metric_tracker
 
 
 class PairedTrainer:
@@ -64,18 +64,8 @@ class PairedTrainer:
         self.D_OVERALL_LOSS_KEY = "d_loss"
         self.D_B_LOSS_KEY = "d_b"
 
-        # what to store in visdom?
-        self.losses_dict = {}
-        self.losses_dict[self.G_LOSS_KEY] = []
-        self.losses_dict[self.D_OVERALL_LOSS_KEY] = []
-        self.losses_dict[self.L1_LOSS_KEY] = []
-        self.losses_dict[self.G_ADV_LOSS_KEY] = []
-        self.losses_dict[self.COLOR_LOSS_KEY] = []
-        self.losses_dict[self.TV_LOSS_KEY] = []
-        self.losses_dict[self.SSIM_LOSS_KEY] = []
-        self.losses_dict[self.PERCEPTUAL_LOSS_KEY] = []
-        self.losses_dict[self.BICUBIC_LOSS_KEY] = []
-        self.losses_dict[self.D_B_LOSS_KEY] = []
+        # what to store in visdom? (Using MetricTracker with CircularBuffer to prevent memory leaks)
+        self.losses_dict = metric_tracker.MetricTracker(max_size=2000)
 
         self.caption_dict = {}
         self.caption_dict[self.G_LOSS_KEY] = "Shadow G loss per iteration"
@@ -90,12 +80,10 @@ class PairedTrainer:
         self.caption_dict[self.D_B_LOSS_KEY] = "D(B) real loss per iteration"
 
         # what to store in visdom?
-        self.losses_dict_t = {}
+        self.losses_dict_t = metric_tracker.MetricTracker(max_size=2000)
 
         self.TRAIN_LOSS_KEY = "TRAIN_LOSS_KEY"
-        self.losses_dict_t[self.TRAIN_LOSS_KEY] = []
         self.TEST_LOSS_KEY = "TEST_LOSS_KEY"
-        self.losses_dict_t[self.TEST_LOSS_KEY] = []
 
         self.caption_dict_t = {}
         self.caption_dict_t[self.TRAIN_LOSS_KEY] = "Train L1 loss per iteration"
@@ -149,15 +137,15 @@ class PairedTrainer:
 
                 # what to put to losses dict for visdom reporting? Only start writing data after at least 1 save
                 if (iteration > global_config.save_per_iter):
-                    self.losses_dict[self.G_LOSS_KEY].append(errG.item())
-                    self.losses_dict[self.D_OVERALL_LOSS_KEY].append(errD.item())
-                    self.losses_dict[self.L1_LOSS_KEY].append(B_likeness_loss.item())
-                    self.losses_dict[self.G_ADV_LOSS_KEY].append(B_adv_loss.item())
-                    self.losses_dict[self.PERCEPTUAL_LOSS_KEY].append(B_perceptual_loss.item())
-                    self.losses_dict[self.COLOR_LOSS_KEY].append(B_color_loss.item())
-                    self.losses_dict[self.TV_LOSS_KEY].append(B_tv_loss.item())
-                    self.losses_dict[self.BICUBIC_LOSS_KEY].append(B_bicubic_loss.item())
-                    self.losses_dict[self.D_B_LOSS_KEY].append(D_B_fake_loss.item() + D_B_real_loss.item())
+                    self.losses_dict.add_metric(self.G_LOSS_KEY, errG)
+                    self.losses_dict.add_metric(self.D_OVERALL_LOSS_KEY, errD)
+                    self.losses_dict.add_metric(self.L1_LOSS_KEY, B_likeness_loss)
+                    self.losses_dict.add_metric(self.G_ADV_LOSS_KEY, B_adv_loss)
+                    self.losses_dict.add_metric(self.PERCEPTUAL_LOSS_KEY, B_perceptual_loss)
+                    self.losses_dict.add_metric(self.COLOR_LOSS_KEY, B_color_loss)
+                    self.losses_dict.add_metric(self.TV_LOSS_KEY, B_tv_loss)
+                    self.losses_dict.add_metric(self.BICUBIC_LOSS_KEY, B_bicubic_loss)
+                    self.losses_dict.add_metric(self.D_B_LOSS_KEY, D_B_fake_loss.item() + D_B_real_loss.item())
 
         a2b = self.test(input_map, "Train")
         self.stopper_method.register_metric(a2b, img_b, epoch)
@@ -180,7 +168,7 @@ class PairedTrainer:
                 return img_a2b
 
     def visdom_plot(self, iteration):
-        self.visdom_reporter.plot_finegrain_loss("a2b_loss", iteration, self.losses_dict, self.caption_dict, global_config.sr_network_version)
+        self.visdom_reporter.plot_finegrain_loss("a2b_loss", iteration, self.losses_dict.get_all_metrics(), self.caption_dict, global_config.sr_network_version)
 
     def visdom_visualize(self, input_map, label = "Train"):
         with torch.no_grad():
